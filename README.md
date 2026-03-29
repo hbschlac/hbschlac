@@ -1,8 +1,8 @@
-## Hannah Schlacter — PM who ships
+## Hannah Schlacter — PM who builds
 
-Senior PM at Walmart. I own the BuyBox — the ML ranking system behind ~400M daily product page views. I design experiments, ship features, and build internal AI tools outside my formal scope.
+I spec it, design it, and ship it. No CS degree.
 
-I also build and deploy live products as a non-engineer. No CS degree. Started not knowing what "deploy" meant.
+Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M daily product page views. I run experiments, ship features, and build internal AI tools outside my formal scope.
 
 ---
 
