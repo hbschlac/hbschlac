@@ -1,0 +1,47 @@
+# ~/.claude/.gitignore
+# Allowlist approach per plan §10a: deny everything, then re-allow
+# canonical config + skills + memory + plans.
+#
+# Rationale: blocklist is fragile — a future Claude release could drop new
+# files in here that contain secrets or transcripts. Default-deny means new
+# stuff stays out until explicitly allowed.
+
+# 1. Deny everything by default
+*
+
+# 2. Re-allow tracked top-level files
+!.gitignore
+!README.md
+!CLAUDE.md
+!settings.json
+!stop-hook-git-check.sh
+
+# 3. Re-allow canonical directories (and their contents)
+!skills/
+!skills/**
+!plans/
+!plans/**
+!memory/
+!memory/**
+
+# 4. Belt-and-suspenders: hard-deny common secret patterns even inside
+#    allowed paths. If a skill or plan accidentally holds a credential, this
+#    catches it before it ships.
+**/.env
+**/.env.*
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*.token
+**/credentials*
+**/secrets*
+**/*.secret
+**/*_secret
+**/*_token
+**/*_key
+
+# 5. Hard-deny things we never want in here
+**/settings.local.json
+**/.credentials.json
+**/.anthropic*
