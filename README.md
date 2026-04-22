@@ -10,8 +10,10 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 
 | Project | What it does | Stack |
 |---------|-------------|-------|
-| **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
-| **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
+| **[Muse](https://www.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
+| **[Interior Design Tool](https://schlacter.me/projects/home-design)** | Image gallery + journal + crop tool + vendor management for an interior designer · magic-link demo sharing · bug tracker built-in | Next.js · Vercel KV |
+| **[Vantara Agent Studio](https://vantara-agent-studio.vercel.app)** | Enterprise agent-builder with 4-step wizard · Claude-powered clarifying questions · demo mode requires no API setup · built in a day | Next.js · Vercel AI SDK · Upstash Redis |
+| **[Claude Skills](https://schlacter.me/projects/claude-skills)** | Concept product for persistent AI instruction sets · proved the naming/framing hypothesis before Anthropic shipped the feature natively | Next.js · Vercel |
 | **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
 
 ---
