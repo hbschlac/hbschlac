@@ -11,7 +11,7 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 | Project | What it does | Stack |
 |---------|-------------|-------|
 | **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
-| **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
+| **[Claude Skills](https://schlacter.me/projects)** | Authoring and shipping open-source Claude Code skills · [`mcp-contributor`](https://github.com/hbschlac/mcp-contributor) (upstream MCP governance, drift detection, 12K-word playbook) · [`code-builder`](https://github.com/hbschlac/code-builder) (5 parallel drafts, self-scored rubric, winner merged) · plus a non-engineer explainer site | Shell · Next.js · Vercel |
 | **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
 
 ---
@@ -25,6 +25,16 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 📊 &nbsp;**Accenture** (2017–2019) · Senior Consulting Analyst · strategy consulting for Silicon Valley tech clients
 
 🎓 &nbsp;**UC Berkeley Haas MBA** · UIUC BS Entrepreneurship & Marketing · Graduated High Honors
+
+---
+
+### Claude Code skills I maintain
+
+| Skill | What it does | Status |
+|-------|-------------|--------|
+| [`mcp-contributor`](https://github.com/hbschlac/mcp-contributor) | Upstream contribution playbook for the MCP spec, 10 SDKs, and governance org · automated drift detection via `refresh.sh` · 89-URL source map | v0.2.3 · Apache 2.0 |
+| [`code-builder`](https://github.com/hbschlac/code-builder) | Generates 5 parallel implementations in isolated worktrees, self-scores against a 100-point rubric, merges the winner | v0.1 |
+| [`claude-code-insights-dashboard`](https://github.com/hbschlac/claude-code-insights-dashboard) | Parses local session transcripts into a public stats dashboard with social cards | MIT |
 
 ---
 
