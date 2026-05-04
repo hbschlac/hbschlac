@@ -11,8 +11,17 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 | Project | What it does | Stack |
 |---------|-------------|-------|
 | **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
-| **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
+| **[Claude Skills](https://schlacter.me/projects/claude-skills)** | Concept product for persistent AI instruction sets — framed "system prompts" as "skills" for non-engineers · Anthropic later shipped Projects and CLAUDE.md validating the core thesis | Next.js · Vercel |
+| **[Interior Design Tool](https://schlacter.me/projects/home-design)** | Private design tool — gallery, floor plan, AI advisor, designer brief, and project roadmap · shipped demo link to Houzz CEO | Next.js · Vercel KV |
 | **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
+
+**Also:** [Claude Wishlist](https://schlacter.me/projects/claude-wishlist) · [Vantara Agent Studio](https://schlacter.me/projects/vantara-agent-studio) · [LinkedIn Newsfeed Agent](https://schlacter.me/projects/linkedin-newsfeed-agent) · [14 more →](https://schlacter.me/projects)
+
+---
+
+### How I build
+
+I ship with Claude Code as my primary development environment. Across my projects: 50+ production deployments, 9 Vercel apps, all built with AI-assisted development. The things I've learned doing this — where AI development actually breaks — are in the case studies on my portfolio.
 
 ---
 
