@@ -1,0 +1,42 @@
+# New pages detected by weekly refresh that need to be triaged into sources.yml
+#
+# Detected in issues #5 (Apr 26), #6 (May 3), #7 (May 10)
+# These pages appeared in MCP's llms.txt but are not yet tracked in sources.yml.
+#
+# Add these entries to sources.yml in the appropriate sections:
+
+# --- Working Group Charters (3 pages, first detected Apr 26) ---
+
+- url: https://modelcontextprotocol.io/development/working-groups/file-uploads/charter
+  status: gap-low  # WG charter — reference-only unless contributing to this WG
+  note: "File Uploads WG charter. Promote to gap-med if planning to contribute."
+  fetched: null
+
+- url: https://modelcontextprotocol.io/development/working-groups/interceptors/charter
+  status: gap-low
+  note: "Interceptors WG charter. Promote to gap-med if planning to contribute."
+  fetched: null
+
+- url: https://modelcontextprotocol.io/development/working-groups/sdk/charter
+  status: gap-low  # First detected May 10
+  note: "SDK WG charter. Promote to gap-med if contributing to SDK standardization."
+  fetched: null
+
+# --- Best Practices (1 page, first detected Apr 26) ---
+
+- url: https://modelcontextprotocol.io/development/client-best-practices
+  status: gap-med  # Contributor-relevant — may affect PR review criteria
+  note: "Client best practices. Should inform Step 10 (Good PR checklist) and Step 4 (non-spec repo workflow)."
+  fetched: null
+
+# --- New SEPs (2 pages, first detected May 10) ---
+
+- url: https://modelcontextprotocol.io/development/seps/SEP-2322-MRTR
+  status: sep-ref  # Individual SEP — link-only
+  note: "SEP-2322 MRTR. Link-only unless central to a contribution workflow."
+  fetched: null
+
+- url: https://modelcontextprotocol.io/development/seps/SEP-2567-sessionless-mcp
+  status: sep-ref
+  note: "SEP-2567 Sessionless MCP. Link-only unless central to a contribution workflow."
+  fetched: null

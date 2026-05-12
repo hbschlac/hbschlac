@@ -1,0 +1,105 @@
+# GitHub Actions workflow for code-builder weekly learning sync
+# Drop this file into .github/workflows/weekly-sync.yml in the code-builder repo
+#
+# Mirrors the working pattern from mcp-contributor's weekly-refresh.yml
+# Triggers the learning sync that mines run logs + post-merge diffs
+# to update SKILL.md's "Current learnings" section
+
+name: Weekly learning sync
+
+on:
+  schedule:
+    - cron: '0 1 * * 0'  # Sunday 1:00 AM UTC (replaces the manual "Sunday 6pm" instruction)
+  workflow_dispatch: {}   # Manual trigger
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for stale learnings
+        id: staleness
+        run: |
+          # Extract "Last synced:" date from SKILL.md
+          last_synced=$(grep -oP 'Last synced: \K[\d-]+' SKILL.md || echo "never")
+          if [ "$last_synced" = "never" ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "days_stale=unknown" >> "$GITHUB_OUTPUT"
+          else
+            days_since=$(( ($(date +%s) - $(date -d "$last_synced" +%s)) / 86400 ))
+            echo "days_stale=$days_since" >> "$GITHUB_OUTPUT"
+            if [ "$days_since" -gt 14 ]; then
+              echo "stale=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "stale=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Check for unprocessed run logs
+        id: runs
+        run: |
+          # Count run logs newer than last sync date
+          last_synced=$(grep -oP 'Last synced: \K[\d-]+' SKILL.md || echo "2020-01-01")
+          if [ -d "runs" ]; then
+            new_runs=$(find runs/ -name "*.md" -newer <(date -d "$last_synced" +%Y%m%d) 2>/dev/null | wc -l)
+          else
+            new_runs=0
+          fi
+          echo "new_runs=$new_runs" >> "$GITHUB_OUTPUT"
+
+      - name: Generate sync report
+        if: steps.staleness.outputs.stale == 'true' || steps.runs.outputs.new_runs > 0
+        run: |
+          cat > sync-report.md << 'EOF'
+          ## code-builder learning sync needed
+
+          - **Last synced:** $(grep -oP 'Last synced: \K[\d-]+' SKILL.md || echo "never")
+          - **Days since sync:** ${{ steps.staleness.outputs.days_stale }}
+          - **Unprocessed run logs:** ${{ steps.runs.outputs.new_runs }}
+
+          ### Action needed
+          Run `code-builder sync` or `/code-builder sync` in a Claude Code session
+          to process new run logs and update the learnings section.
+
+          The sync cannot run in CI because it requires Claude Code to analyze
+          run logs and post-merge diffs. This issue is a reminder to run it manually.
+          EOF
+
+      - name: Open reminder issue
+        if: steps.staleness.outputs.stale == 'true' || steps.runs.outputs.new_runs > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `[sync] Learnings stale — ${context.payload.repository.name}`;
+            const body = require('fs').readFileSync('sync-report.md', 'utf8');
+            // Check for existing open issue to avoid duplicates
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'sync',
+              per_page: 1
+            });
+            if (existing.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['sync']
+              });
+            }
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-report
+          path: sync-report.md
+          retention-days: 30
+          if-no-files-found: ignore
