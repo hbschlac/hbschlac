@@ -11,8 +11,18 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 | Project | What it does | Stack |
 |---------|-------------|-------|
 | **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
-| **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
+| **[Portfolio & Case Studies](https://schlacter.me/projects)** | 18 live case studies spanning product research, AI tools, and full-stack builds | Next.js · Vercel · KV |
 | **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
+| **[Claude Code Skills](https://github.com/hbschlac/code-builder)** | Custom skills for Claude Code — parallel-draft coding, MCP contribution workflows, portfolio automation | Markdown · Shell |
+
+### Recent research & data projects
+
+| Project | What it does |
+|---------|-------------|
+| **[Tinker Flywheel](https://schlacter.me/tinker-flywheel)** | 2,000+ signals on fine-tuning pain — "Train is solved. Evaluate is where developers get stuck" |
+| **[Managed Agents Pulse](https://schlacter.me/managed-agents-pulse)** | Launch-week developer feedback intelligence for Anthropic's Managed Agents API |
+| **[Workspace AI Gaps](https://schlacter.me/workspace-ai-gaps)** | Gemini for Workspace opportunity map from Reddit, HN, App Store, YouTube |
+| **[Claude Wishlist](https://schlacter.me/claude-ideas)** | Automated Mon/Wed/Fri/Sun scrape of r/ClaudeAI — what users actually want |
 
 ---
 
