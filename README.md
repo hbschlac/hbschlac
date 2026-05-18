@@ -11,8 +11,16 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 | Project | What it does | Stack |
 |---------|-------------|-------|
 | **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
-| **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
+| **[Claude Skills](https://schlacter.me/projects/claude-skills)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
 | **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
+
+### Claude Code skills I use
+
+| Skill | What it does | Status |
+|-------|-------------|--------|
+| **[code-builder](https://github.com/hbschlac/code-builder)** | Auto-spawns 5 parallel drafts in isolated worktrees, self-scores against a 100-point rubric, merges the winner, cherry-picks gaps from rejected drafts · self-improving via weekly learning sync | Active |
+| **[mcp-contributor](https://github.com/hbschlac/mcp-contributor)** | LLM-ingestible synthesis of MCP governance docs · automated weekly drift detection via GitHub Actions · triage logic, SEP lifecycle, contributor ladder | Active · [v0.2.3](https://github.com/hbschlac/mcp-contributor/releases/tag/v0.2.3) |
+| **[insights-dashboard](https://github.com/hbschlac/claude-code-insights-dashboard)** | Turns local Claude Code session transcripts into a stats page · 400+ hours tracked | Public |
 
 ---
 
