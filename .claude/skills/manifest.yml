@@ -1,0 +1,111 @@
+# Claude Code Skills Manifest
+# Central registry of all skills — version, health, environment compatibility,
+# activation triggers, and cross-skill conflict declarations.
+#
+# Check this file to understand what's installed, what's healthy, and what
+# conflicts with what.
+
+skills:
+
+  code-builder:
+    version: "0.2.0"  # bumped from implicit 0.1.0 — adds env detection, single-pass gate, self-test
+    repo: hbschlac/code-builder
+    path: ~/.claude/skills/code-builder/SKILL.md
+    status: active
+    last_audit: "2026-05-20"
+    environment:
+      full:     # local git repo with persistent ~/.claude/skills/
+        parallel: true
+        logging: local-runs-dir
+        learning_sync: weekly
+      ephemeral:  # Claude Code on web, CI containers
+        parallel: false
+        logging: commit-message-metadata
+        learning_sync: disabled
+      no-git:
+        parallel: false
+        logging: none
+        learning_sync: disabled
+    triggers:
+      explicit:
+        - "/code-builder"
+        - "build/code/implement/create X"
+        - "fix/debug/something broke"
+        - "5x this"
+        - "parallel this"
+      implicit:
+        - "working in git repo + coding task described"
+        - "error/stack trace/failing log shared"
+        - "code pasted with change request"
+    conflicts:
+      - skill: mcp-contributor
+        condition: "both triggered on MCP codebase work"
+        resolution: "mcp-contributor handles workflow/governance; code-builder handles implementation quality. If both activate, mcp-contributor sets the process, code-builder executes the code."
+    health_checks:
+      - "git rev-parse --git-dir"
+      - "test -w ~/.claude/skills/code-builder/runs/"
+      - "git worktree list"
+
+  mcp-contributor:
+    version: "0.2.3"
+    repo: hbschlac/mcp-contributor
+    path: ~/.claude/skills/mcp-contributor/SKILL.md
+    status: active-with-issues
+    last_audit: "2026-05-20"
+    open_issues: 8  # 3 manual + 5 automated drift alerts
+    drift_status: stale  # 11 broken anchors, 11 untriaged new pages
+    environment:
+      full:
+        all_features: true
+      ephemeral:
+        all_features: true  # read-only skill, no persistent state needed
+      no-git:
+        all_features: true  # guidance skill, doesn't need git
+    triggers:
+      explicit:
+        - "/mcp-contributor"
+        - "contribute to MCP"
+        - "write an SEP"
+        - "MCP spec PR"
+        - "MCP good first issue"
+        - "find an MCP maintainer"
+      implicit:
+        - "discussing MCP contribution workflow"
+        - "asking about MCP governance"
+    conflicts:
+      - skill: code-builder
+        condition: "MCP codebase implementation work"
+        resolution: "see code-builder conflict declaration"
+    content_tiers:
+      quick: "typo/docs fix — loads §0, §1, §3, §8 only"
+      standard: "SDK or non-spec repo PR — loads §0-§4, §6, §8"
+      full: "SEP, governance, or first-time contributor — loads all"
+
+  # Inactive / showcase-only skills (no SKILL.md to load)
+
+  skills-gallery:
+    version: "1.0.0"
+    repo: hbschlac/skills-gallery
+    status: showcase-only
+    description: "Web page teaching non-engineers what Claude Code skills are and how to create them"
+    note: "Not a Claude Code skill itself — a static HTML site"
+
+  claude-code-insights-dashboard:
+    version: "1.0.0"
+    repo: hbschlac/claude-code-insights-dashboard
+    status: utility
+    description: "Parses session transcripts into monthly analytics"
+    note: "Does not track skill activations — only sessions, hours, commits. Enhancement proposed in SKILLS-AUDIT.md."
+
+# Cross-cutting concerns
+meta:
+  audit_cadence: monthly
+  next_audit_due: "2026-06-20"
+  token_budget_notes: >
+    code-builder SKILL.md: ~200 lines (down from ~300 after trim).
+    mcp-contributor SKILL.md: ~400+ lines — tiered loading proposed to reduce
+    per-activation cost by 40-70% for simple tasks.
+  ephemeral_strategy: >
+    Skills that need persistent state (code-builder learning loop) degrade
+    gracefully in ephemeral environments. Skills that are read-only guidance
+    (mcp-contributor) work everywhere.
