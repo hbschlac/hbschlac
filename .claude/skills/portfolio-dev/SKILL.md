@@ -123,6 +123,22 @@ Invoke the content-quality skill for any user-facing text.
 Subdomain routing is handled via Next.js middleware rewrite. See vercel-ship
 skill for the pattern. Key files: `middleware.ts` + `app/jamie-bach-2026/`.
 
+### SEO and metadata
+
+1. Every page needs `metadata` export (App Router) with `title`, `description`, `openGraph`
+2. Project pages should use dynamic metadata from `projects.ts` data
+3. Include `og:image` — use the OG image API route pattern from vercel-ship
+4. Verify metadata with: open the page, View Source, search for `og:` tags
+5. For case studies: `title` should be the project name, not "Case Study: [name]"
+
+### Multi-project sites (kindle-schlacter-me, etc.)
+
+Not all Next.js projects are the portfolio. For standalone project sites (kindle-schlacter-me):
+- They deploy to their own Vercel project, not schlacter-me
+- They may have their own domain/subdomain
+- Use vercel-ship for deployment, NOT portfolio-dev conventions
+- Reference portfolio-dev only if the site links back to schlacter.me
+
 ---
 
 ## Deployment
@@ -158,6 +174,9 @@ skill for the pattern. Key files: `middleware.ts` + `app/jamie-bach-2026/`.
 
 ## Changelog
 
+- **2026-06-05 — v3: SEO/metadata patterns, multi-project site guidance**
+  - ADDED: SEO and metadata section (og:image, dynamic metadata, verification)
+  - ADDED: Multi-project site guidance (kindle-schlacter-me etc. are NOT portfolio-dev)
 - **2026-05-29 — v2: Added vercel-ship cross-references, subdomain docs, tsc check**
   - Added: relationship to vercel-ship skill
   - Added: subdomain content section (jamie's bach pattern)

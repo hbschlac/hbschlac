@@ -86,6 +86,17 @@ git log --oneline -10 -- $(dirname {file})
 git diff HEAD~10..HEAD -- $(dirname {file})
 ```
 
+### Environment-specific investigation
+
+| Environment | What to check first |
+|---|---|
+| **Vercel serverless** | Missing env vars, trust proxy, middleware order, `fs` usage, body parser conflict |
+| **GitHub Actions** | Secrets not passed to reusable workflows, `working-directory` wrong, Ubuntu version changed, network timeouts |
+| **Docker/containers** | Port mapping, volume mounts, env var injection, DNS resolution inside container |
+| **Python venv** | Wrong Python version, venv not activated in CI, `pip install -e` vs `pip install` |
+| **Cron/scheduled** | UTC vs local timezone, job overlap (previous run still going), empty-input path |
+| **Web session (Claude Code)** | Missing deps (hook didn't run), no network access, ephemeral filesystem, sandbox scope |
+
 ---
 
 ## Step 5: Write the root-cause report
@@ -133,8 +144,26 @@ This is a valid outcome. Not every bug is solvable in one session.
 
 ---
 
+## When to Abandon vs. Keep Debugging
+
+**Abandon the current approach when:**
+- 3+ fundamentally different hypotheses have been tested and disproven
+- The fix requires access/permissions you don't have (production DB, third-party dashboard)
+- The bug is in a dependency and you can't patch it locally
+- The cost of the workaround is lower than the cost of the fix
+
+**Keep debugging when:**
+- You have untested hypotheses that are fundamentally different from prior attempts
+- The bug is a regression (it worked before, something specific changed)
+- You haven't yet read the callers/configuration/adjacent files (Step 4 incomplete)
+
+---
+
 ## Changelog
 
+- **2026-06-05 — v4: Environment-specific debugging, abandon vs. continue framework**
+  - ADDED: Environment-specific investigation table (Vercel, GHA, Docker, Python, cron, web session)
+  - ADDED: "When to Abandon vs. Keep Debugging" decision framework
 - **2026-05-29 — v3: Integrated with code-builder debug loop, added shared assumption patterns**
   - Added: explicit relationship to code-builder's debug loop
   - Added: "shared assumption" patterns table

@@ -132,8 +132,38 @@ If you skip this step, your work will be orphaned and the next session will redo
 
 ---
 
+## Concurrent Session Safety
+
+When multiple web sessions may be active on the same repo:
+
+1. **Use unique branch names.** The auto-generated `claude/*` names handle this.
+2. **Check for branches updated in the last hour before starting work on shared files.**
+   ```bash
+   git branch -r --sort=-committerdate | head -10
+   git log --all --oneline --since="1 hour ago"
+   ```
+3. **Don't edit CLAUDE.md or shared config files unless that's the primary task.** These are high-contention files.
+4. **If you see a recent branch touching the same files, ask before proceeding.** Two sessions editing the same component will create a merge conflict neither can resolve.
+
+---
+
+## Branch Naming and Hygiene
+
+- **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
+- **Feature work**: `feature/{short-description}` for human-initiated branches.
+- **After merge**: Delete the remote branch. Orphaned branches are noise.
+  ```bash
+  git push origin --delete {branch-name}
+  ```
+- **Stale branch threshold**: Any branch not updated in 14 days with no PR is likely orphaned. Flag it.
+
+---
+
 ## Changelog
 
+- **2026-06-05 — v6: Concurrent session safety, branch naming/hygiene**
+  - ADDED: Concurrent session guidance (check for recent branches, avoid shared file contention)
+  - ADDED: Branch naming conventions and stale branch detection threshold
 - **2026-06-04 — v5: Add PR-merge workflow to break Groundhog Day cycle**
   - Added: "Land Your Work" section with explicit PR creation + merge via MCP tools
   - Fixed: Groundhog Day scan now fetches remote branches first (web sessions start with no local branches)

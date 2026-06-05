@@ -68,6 +68,10 @@ Check for:
 
 The hook must install deps for ALL entry points, not just root.
 
+- **Monorepo workspaces:** Check for `pnpm-workspace.yaml`, `package.json` workspaces field, `turbo.json`, `nx.json`. Install at root level — workspace-aware package managers handle sub-packages.
+- **Database migrations:** If `prisma/`, `drizzle.config.*`, or `migrations/` exist, add `npx prisma generate` or equivalent to the hook. Don't run `migrate deploy` in hooks — that's destructive.
+- **Python projects with system deps:** Some Python packages need system-level libraries. Check for `apt-get` instructions in README. Add to hook: `sudo apt-get update && sudo apt-get install -y {deps}` before pip install.
+
 ### 3. Design Hook
 
 Key principles:
@@ -189,6 +193,10 @@ Provide summary with:
 
 ## Changelog
 
+- **2026-06-05 — v5: Monorepo workspaces, database migrations, Python system deps**
+  - ADDED: Monorepo workspace detection and handling guidance
+  - ADDED: Database migration handling in hooks (prisma generate, not migrate deploy)
+  - ADDED: Python system dependency installation pattern
 - **2026-05-29 — v4: carried forward, no substantive changes needed**
   - This skill is stable and well-structured. No changes from v3.
 - **2026-05-27 — v3: carried forward from v2 with minor cleanup**
