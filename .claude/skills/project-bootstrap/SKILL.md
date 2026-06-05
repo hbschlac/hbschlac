@@ -97,6 +97,32 @@ grep -l "pg\|postgres\|prisma\|drizzle\|mongoose\|sqlite\|mysql" package.json 2>
 [ -d "migrations" ] && echo "MIGRATIONS: $(ls migrations/ | wc -l) files"
 ```
 
+### 1H. Containerization
+```bash
+[ -f "Dockerfile" ] && echo "DOCKER: yes" && head -5 Dockerfile
+[ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ] && echo "COMPOSE: yes"
+[ -f ".dockerignore" ] && echo "DOCKERIGNORE: yes"
+```
+
+### 1I. Linter / Formatter config
+```bash
+for f in .eslintrc .eslintrc.js .eslintrc.json eslint.config.js eslint.config.mjs \
+         .prettierrc .prettierrc.json prettier.config.js \
+         ruff.toml .ruff.toml pyproject.toml \
+         .rubocop.yml rustfmt.toml .golangci.yml biome.json; do
+  [ -f "$f" ] && echo "LINT_CONFIG: $f"
+done
+```
+
+### 1J. Monorepo / Workspaces
+```bash
+[ -f "pnpm-workspace.yaml" ] && echo "WORKSPACE: pnpm" && cat pnpm-workspace.yaml
+node -e "const p=JSON.parse(require('fs').readFileSync('package.json'));if(p.workspaces)console.log('WORKSPACE: npm',JSON.stringify(p.workspaces))" 2>/dev/null
+[ -f "lerna.json" ] && echo "WORKSPACE: lerna"
+[ -f "turbo.json" ] && echo "WORKSPACE: turborepo"
+[ -f "nx.json" ] && echo "WORKSPACE: nx"
+```
+
 ---
 
 ## Step 2: Generate CLAUDE.md
@@ -185,11 +211,18 @@ Only add commands that were actually detected.
 - **Don't assume framework conventions.** Read the actual code.
 - **Don't include secrets or env values.**
 - **Don't bloat with every file path.** 5-10 key directories, not a full tree.
+- **Don't ignore existing linter configs.** Detect .eslintrc, ruff.toml, etc. and reference them.
+- **Don't miss monorepo structure.** If workspaces exist, document each workspace's role.
 
 ---
 
 ## Changelog
 
+- **2026-06-05 — v1.1: Docker, linter config, monorepo/workspace detection**
+  - ADDED: Container detection (Dockerfile, docker-compose)
+  - ADDED: Linter/formatter config detection (eslint, prettier, ruff, rubocop, biome, etc.)
+  - ADDED: Monorepo/workspace detection (pnpm, npm, lerna, turborepo, nx)
+  - ADDED: Anti-patterns for linter configs and monorepo structure
 - **2026-05-29 — v1: Initial skill based on config debt analysis**
   - Covers: language detection, command detection, structure analysis, deployment target
   - Motivated by: muse-shopping (65K LOC, 0 config), interior-designer-portfolio (active, 0 config)

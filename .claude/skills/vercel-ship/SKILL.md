@@ -96,6 +96,19 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 - [ ] **No `import` of server-only code from client components.** Check for `fs`, `path`, `crypto` imports in `"use client"` files.
 - [ ] **`output: 'standalone'` is set if using custom server.**
 
+### 2I. Preview deployments
+
+- [ ] **Test the preview URL, not just localhost.** Preview URLs use different domains — CORS, cookies, OAuth redirects may break.
+- [ ] **Check the Vercel deployment log, not just the build log.** Runtime errors don't appear in build output.
+- [ ] **For subdomain routing: preview URLs don't have subdomains.** Test the rewrite path directly (e.g., `/jamie-bach-2026/`) on preview.
+
+### 2J. Edge vs. Serverless
+
+- [ ] **Edge Runtime cannot use Node.js APIs.** No `fs`, `path`, `child_process`, `crypto` (use `Web Crypto` instead). No native Node modules.
+- [ ] **Edge has 128KB code size limit.** Large dependencies (ORMs, sharp, puppeteer) cannot run at the edge.
+- [ ] **Middleware always runs at the edge.** Keep middleware lightweight — no DB calls, no heavy computation.
+- [ ] **Cron jobs (`vercel.json` cron) use Serverless Functions, not Edge.** Set appropriate `maxDuration`.
+
 ---
 
 ## Step 3: Debug common failures
@@ -134,6 +147,19 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 2. Move initialization out of request handler
 3. Consider edge runtime: `export const runtime = 'edge'`
 4. For Playwright/puppeteer: offload to GitHub Actions (learned from libby-hold-monitor: 30s→4min timeout before pivoting to GHA)
+
+### "Runtime Error" (build succeeds, page crashes)
+
+1. Check Vercel Function Logs (not build logs) for the actual stack trace
+2. Common causes: missing env var at runtime (set in Vercel dashboard, not `.env`), database connection string uses localhost, `fetch()` to relative URL in server component (needs absolute URL on Vercel)
+3. For ISR/SSG pages: check `revalidate` timing — stale data looks like a bug but is caching
+
+### "Cron job not running"
+
+1. Cron requires `vercel.json` `crons` field AND a matching API route
+2. Free tier: 1 cron job per day max. Pro: every minute
+3. Cron invocations are `GET` requests — your handler must handle `GET`
+4. Check Vercel dashboard → Crons tab for execution history
 
 ### OAuth flow failures
 
@@ -235,6 +261,11 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-05 — v1.1: Preview URLs, Edge vs Serverless, runtime errors, cron jobs**
+  - ADDED: Preview deployment testing checklist (2I) — CORS, cookies, subdomain routing on previews
+  - ADDED: Edge vs Serverless checklist (2J) — code size limits, API restrictions, middleware constraints
+  - ADDED: "Runtime Error" debugging section (build succeeds but page crashes)
+  - ADDED: "Cron job not running" debugging section
 - **2026-05-29 — v1: Initial skill based on 100+ deployments, 13 failures, 10 projects**
   - TypeScript type propagation as #1 pre-deploy check (data-driven from 100% failure rate)
   - Deployment failure database with real examples

@@ -15,7 +15,9 @@ End-to-end guide for contributing to the **Model Context Protocol** governance o
 
 **Conflict:** When active, code-builder defers to this skill's workflow for code changes.
 
-**Usage note:** As of May 2026, this skill has had zero real-world contributions beyond dry runs. The drift detection automation is active but the anchor bug (see Known Issues) generates false positives weekly. Fix the anchor bug before investing in new features.
+**Usage note:** As of June 2026, this skill has had zero real-world contributions beyond dry runs. The drift detection automation is active but the anchor bug (see Known Issues) generates false positives weekly. Fix the anchor bug before investing in new features.
+
+**Investment status: OVER-INVESTED.** This is the most maintained skill relative to its actual usage (zero). 10 open issues in the mcp-contributor repo, none resolved. Before doing ANY work on this skill: (1) fix the anchor bug, (2) close the stale issues, (3) make one real contribution to the MCP org. Until then, no further skill iteration.
 
 ---
 
@@ -191,10 +193,15 @@ MCP auth is actively evolving. Key specs and SEPs:
 
 5. **Discord invite link may rotate.** Reference the community page URL instead of a direct invite link.
 
+6. **Over-maintenance without usage.** This skill has been iterated 4 times across 30+ sessions without a single real MCP contribution. Future sessions should NOT audit/improve this skill — instead, use it to make an actual contribution.
+
 ---
 
 ## Changelog
 
+- **2026-06-05 — v4.1: Added over-investment warning, frozen for maintenance**
+  - ADDED: "OVER-INVESTED" warning — no further iteration until anchor bug fixed and one real contribution made
+  - ADDED: Known issue #6 — over-maintenance without usage
 - **2026-05-29 — v4: Applied staleness patches, expanded coverage**
   - FIXED: Replaced hardcoded protocol version with "check the spec repo" instruction
   - FIXED: Replaced hardcoded SEP counts with "check the current index" instruction

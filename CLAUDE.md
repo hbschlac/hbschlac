@@ -16,15 +16,16 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v7 | Parallel drafts, self-scoring, debug loop, visual mode |
-| vercel-ship | v1 | Pre-deploy validation for Next.js + Vercel |
-| mcp-contributor | v4 | MCP governance contribution workflow |
-| content-quality | v4 | Anti-AI-slop, voice matching, hallucination prevention |
-| session-safety | v5 | Groundhog Day prevention, cross-session conflict detection |
-| portfolio-dev | v2 | schlacter.me / Next.js portfolio patterns |
-| session-start-hook | v4 | SessionStart hook creation for Claude Code on the web |
-| project-bootstrap | v1 | Auto-generate CLAUDE.md for repos |
-| debug-escalation | v3 | Fix-churn cycle breaker |
+| code-builder | v7.2 | Parallel drafts, self-scoring, debug loop, visual mode |
+| vercel-ship | v1.1 | Pre-deploy validation for Next.js + Vercel |
+| mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
+| content-quality | v5 | Anti-AI-slop, voice matching, hallucination prevention |
+| session-safety | v6 | Groundhog Day prevention, cross-session conflict detection |
+| portfolio-dev | v3 | schlacter.me / Next.js portfolio patterns |
+| session-start-hook | v5 | SessionStart hook creation for Claude Code on the web |
+| project-bootstrap | v1.1 | Auto-generate CLAUDE.md for repos |
+| debug-escalation | v4 | Fix-churn cycle breaker |
+| research-pipeline | v1 | Scrape, classify, analyze, present research data |
 
 ## Sandbox constraint
 
@@ -56,7 +57,8 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 2. **mcp-contributor refresh.sh anchor bug.** Grep expects `## Step 11.1:` but SKILL.md uses `### 11.1`. Creates false-positive issues weekly.
 3. **mcp-contributor has zero real-world usage** despite extensive maintenance.
 4. **No skill for PM workflows** (specs, experiment design, data analysis).
-5. **No skill for the research pipeline** (scrape, classify, dashboard — used in 4 projects).
+5. ~~**No skill for the research pipeline**~~ **RESOLVED**: research-pipeline v1 created 2026-06-05.
+6. **mcp-contributor is FROZEN** — over-invested (v4.1 across 30+ sessions, zero real contributions). No further iteration until: anchor bug fixed, stale issues closed, one real MCP contribution made.
 
 ## README editing rules
 

@@ -15,6 +15,9 @@ landing page copy, any text making claims about what a product does.
 
 Does NOT activate for: code-only changes, config files, internal comments.
 
+Also activates for: GitHub repo descriptions, PR titles/descriptions, commit messages in
+public repos, project taglines.
+
 Also invoked by code-builder Step 6 when a code diff includes user-facing text.
 
 ---
@@ -45,6 +48,12 @@ Never write these or close variants:
 - "Passionate problem-solver" / "detail-oriented" → remove, show don't tell
 - "World-class" / "enterprise-grade" → remove unless literally describing enterprise software
 - "Democratize" / "democratizing" → say who gets access to what
+- "It's important to note" / "It's worth mentioning" → just say it
+- "Let me [verb]" / "I'd be happy to" → just do it (Claude-voice tell)
+- "Great question" / "That's a great point" → remove (flattery filler)
+- "In order to" → "to"
+- "A wide range of" / "a variety of" → be specific or use a number
+- "Solution" (as a product descriptor) → say what it actually does
 
 ---
 
@@ -110,10 +119,19 @@ Before finalizing content:
 
 6. **The "Claude voice" trap.** If the output reads like a ChatGPT/Claude response rather than something Hannah would write, rewrite it. Test: would Hannah post this on her LinkedIn? If it sounds like an AI wrote it, it's wrong.
 
+7. **The "repo description" trap.** GitHub repo descriptions are the first thing anyone reads. Rules: under 120 chars, lead with what it does (not what it is), include a concrete differentiator. Bad: "A comprehensive personalized shopping platform." Good: "Personalized shopping · 264 brands · 10 retailers · one checkout · built solo."
+
+8. **The "research summary" trap.** Research content (case studies, data analyses, community research) should lead with the finding, not the methodology. Bad: "We conducted an analysis of 1,183 data points." Good: "1,183 Twitch users say discovery is broken. Here's what they want instead."
+
 ---
 
 ## Changelog
 
+- **2026-06-05 — v5: GitHub repo descriptions, research content, expanded Claude-voice bans**
+  - ADDED: 7 more banned phrases targeting Claude-specific output patterns
+  - ADDED: Activation for GitHub repo descriptions, PR titles, commit messages
+  - ADDED: "repo description" failure mode (#7) with length/structure rules
+  - ADDED: "research summary" failure mode (#8) — lead with finding, not methodology
 - **2026-05-29 — v4: Added "Claude voice" failure mode, expanded banned phrases**
   - Added: "passionate problem-solver", "world-class", "enterprise-grade", "democratize"
   - Added: "numbers before adjectives" voice rule

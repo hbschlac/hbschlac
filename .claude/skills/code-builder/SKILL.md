@@ -70,6 +70,7 @@ Detect the project's stack before assuming commands. Check in order:
 | `pyproject.toml` / `requirements.txt` | Python | `pytest` | `ruff check .` or `flake8` | `mypy .` if configured |
 | `Gemfile` | Ruby | `bundle exec rspec` | `rubocop` | — |
 | `pom.xml` / `build.gradle` | Java/Kotlin | `mvn test` / `gradle test` | — | — |
+| `.github/workflows/*.yml` | GH Actions | per workflow | per workflow | — |
 
 Read from `package.json` scripts when available — don't assume `npm test` exists.
 
@@ -373,7 +374,35 @@ Log entry (append to `{LOG_DIR}/{date}.jsonl`):
 
 Last synced: 2026-05-29 (manual consolidation from 28 session branches — automated sync has NEVER executed)
 
-**WARNING:** The weekly sync (Sunday 6pm) is this skill's core differentiator but no cron/GH Action has ever been set up. These learnings are static since the initial backfill. Set up the sync runner before trusting these as current.
+**WARNING:** The weekly sync (Sunday 6pm) is this skill's core differentiator but no cron/GH Action has ever been set up. These learnings are static since the initial backfill.
+
+**To unblock:** Create `.github/workflows/code-builder-sync.yml` in this repo:
+```yaml
+name: code-builder learning sync
+on:
+  schedule:
+    - cron: '0 1 * * 0'  # Sunday 1am UTC (6pm PT)
+  workflow_dispatch:
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect run logs
+        run: |
+          mkdir -p .claude/skills/code-builder/runs
+          # Aggregate .claude/runs/*.jsonl from recent sessions
+          find .claude/runs -name '*.jsonl' -newer .claude/skills/code-builder/SKILL.md 2>/dev/null | while read f; do
+            cat "$f" >> .claude/skills/code-builder/runs/aggregated.jsonl
+          done
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .claude/skills/code-builder/runs/
+          git diff --cached --quiet || git commit -m "chore: code-builder learning sync $(date +%Y-%m-%d)" && git push
+```
+This is a starting point — the real sync should analyze run logs and update the learnings section.
 
 ### Process
 
@@ -384,11 +413,27 @@ Last synced: 2026-05-29 (manual consolidation from 28 session branches — autom
 - **Guard nullable API responses before destructuring.** KV/API calls return null on miss. (2 citations)
 - **Check for existing utilities before writing new ones.** Duplicated helpers across 3 repos. (3 citations)
 
+### Python
+
+- **Always create and activate a venv before installing.** `python3 -m venv .venv && source .venv/bin/activate`. Never install globally. (Pattern: keep-sync, kindle-connector, libby-hold-monitor all use venvs)
+- **Use `if __name__ == "__main__":` in every entry point.** Prevents double-execution when imported by tests. (Pattern: every Python CLI/automation project)
+- **Pin deps with `pip freeze > requirements.txt` after install.** Unpinned deps break on next session/deploy. (Pattern: 3 repos had version drift)
+- **Use `pathlib.Path` over `os.path`.** Consistent cross-platform, fewer string manipulation bugs.
+- **For scheduled automation, validate the happy path AND the "nothing to do" path.** Cron jobs that crash on empty input generate noise. (Pattern: libby-hold-monitor, keep-sync)
+- **Check `sys.exit()` codes in GH Actions.** Non-zero exits fail the workflow. Intentional "nothing to do" should exit 0.
+
 ### Integration
 
 - **Offload Playwright/puppeteer to GHA instead of serverless.** Cold starts on Vercel/Render exceed 30s. (1 citation: libby-hold-monitor architecture pivot)
 - **Register both www and non-www OAuth redirect URIs.** Google treats them as different. (1 citation: muse `68d29d4`)
 - **Handle OAuth-only accounts in password login flow.** `bcrypt.compare(input, null)` crashes. (1 citation: muse `3a83f67`)
+
+### Automation / Scheduling
+
+- **GitHub Actions cron syntax uses UTC.** `schedule: cron: '0 6 * * *'` is 6am UTC, not local.
+- **Always add `workflow_dispatch` alongside `schedule`.** Enables manual re-runs during debugging without waiting for the next cron tick.
+- **For long-running automations, add a timeout.** `timeout-minutes: 10` prevents hung jobs from consuming quota.
+- **Log the "last successful run" timestamp.** Without this, debugging "it stopped working" means reading days of GH Actions logs.
 
 ### Merge Safety
 
@@ -399,6 +444,11 @@ Last synced: 2026-05-29 (manual consolidation from 28 session branches — autom
 
 ## Changelog
 
+- **2026-06-05 — v7.2: Python patterns, automation/scheduling learnings, GH Action template for sync**
+  - ADDED: Python-specific learnings section (venv, pathlib, entry points, dep pinning)
+  - ADDED: Automation/scheduling learnings (cron UTC, workflow_dispatch, timeouts)
+  - ADDED: Concrete GH Action YAML template to unblock the learning sync (known issue #1)
+  - ADDED: GH Actions to language/framework detection table
 - **2026-06-04 — v7.1: Web-session run logging, sync staleness warning, dual-entry-point check**
   - FIXED: Run log path adapts to web (ephemeral) vs laptop (persistent) environments
   - FIXED: Sync staleness warning now explicitly states the automated sync has never run
