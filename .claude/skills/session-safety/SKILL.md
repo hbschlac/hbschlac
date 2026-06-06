@@ -147,6 +147,18 @@ When multiple web sessions may be active on the same repo:
 
 ---
 
+## Multi-Developer Coordination
+
+When multiple humans (or their Claudes) work on the same repo:
+
+1. **Maintain COORDINATION.md.** Track: who's working on what, review queue, blocked items. Update it at session start and end.
+2. **Stack PRs with explicit dependencies.** Use `base` branches: PR #2 targets PR #1's branch, not main. State "Depends on #N" in the PR body.
+3. **Don't review-bomb.** If there are 6 stacked PRs, review in order. Don't leave comments on PR #6 about issues that should be caught in PR #2.
+4. **Separate CI from content PRs.** CI setup (workflows, hooks) should be its own PR so it doesn't block feature review.
+5. **Self-onboarding documentation.** When onboarding another developer's Claude, create a PR with CLAUDE.md, review checklist, and coordination doc. The other Claude should be able to `git clone` and start working without a handoff message.
+
+---
+
 ## Branch Naming and Hygiene
 
 - **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
@@ -161,6 +173,9 @@ When multiple web sessions may be active on the same repo:
 
 ## Changelog
 
+- **2026-06-06 — v7: Multi-developer coordination**
+  - ADDED: Multi-developer coordination section (COORDINATION.md, PR stacking, self-onboarding)
+  - Evidence: recs.community multi-Claude workflow (PRs #1-7)
 - **2026-06-05 — v6: Concurrent session safety, branch naming/hygiene**
   - ADDED: Concurrent session guidance (check for recent branches, avoid shared file contention)
   - ADDED: Branch naming conventions and stale branch detection threshold

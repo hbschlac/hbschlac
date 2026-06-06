@@ -172,8 +172,26 @@ Not all Next.js projects are the portfolio. For standalone project sites (kindle
 
 ---
 
+## Related Projects (NOT portfolio-dev)
+
+These are Hannah's other projects. They deploy independently and use different patterns:
+
+| Project | Repo | Stack | Deploy | Skill |
+|---------|------|-------|--------|-------|
+| kindle.schlacter.me | kindle-schlacter-me | Next.js + Vercel KV | Vercel | vercel-ship |
+| Kindle bridge | kindle-connector | Python + Flask | k8s (self-hosted) | code-builder |
+| recs.community | recs.community | Next.js + Supabase | Vercel | vercel-ship |
+| Muse | muse-shopping | Node.js + PostgreSQL + Stripe | Vercel | vercel-ship |
+
+**Do NOT apply portfolio-dev conventions to these projects.** They have their own CLAUDE.md files and conventions. Use code-builder for execution and vercel-ship (or project-specific docs) for deployment.
+
+---
+
 ## Changelog
 
+- **2026-06-06 — v3.1: Related projects table**
+  - ADDED: Related projects table clarifying which projects are NOT portfolio-dev
+  - Evidence: kindle-schlacter-me, kindle-connector, recs.community, muse-shopping are all independent
 - **2026-06-05 — v3: SEO/metadata patterns, multi-project site guidance**
   - ADDED: SEO and metadata section (og:image, dynamic metadata, verification)
   - ADDED: Multi-project site guidance (kindle-schlacter-me etc. are NOT portfolio-dev)

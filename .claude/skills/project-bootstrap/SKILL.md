@@ -123,6 +123,22 @@ node -e "const p=JSON.parse(require('fs').readFileSync('package.json'));if(p.wor
 [ -f "nx.json" ] && echo "WORKSPACE: nx"
 ```
 
+### 1K. Supabase
+```bash
+[ -d "supabase" ] && echo "BACKEND: Supabase"
+[ -d "supabase/migrations" ] && echo "MIGRATIONS: $(ls supabase/migrations/ | wc -l) files"
+[ -f "supabase/config.toml" ] && echo "SUPABASE_CONFIG: yes"
+grep -q "@supabase/ssr\|@supabase/supabase-js" package.json 2>/dev/null && echo "SUPABASE_CLIENT: yes"
+```
+
+### 1L. Deploy scripts
+```bash
+[ -f "deploy.sh" ] && echo "DEPLOY_SCRIPT: deploy.sh"
+ls k8s/*.yml k8s/*.yaml kubernetes/*.yml kubernetes/*.yaml 2>/dev/null && echo "DEPLOY: Kubernetes"
+[ -f "render.yaml" ] && echo "DEPLOY: Render"
+[ -f "railway.json" ] || [ -f "railway.toml" ] && echo "DEPLOY: Railway"
+```
+
 ---
 
 ## Step 2: Generate CLAUDE.md
@@ -213,11 +229,17 @@ Only add commands that were actually detected.
 - **Don't bloat with every file path.** 5-10 key directories, not a full tree.
 - **Don't ignore existing linter configs.** Detect .eslintrc, ruff.toml, etc. and reference them.
 - **Don't miss monorepo structure.** If workspaces exist, document each workspace's role.
+- **Don't ignore Supabase migrations.** If `supabase/migrations/` exists, document it and add `npx supabase db push` or migration commands.
+- **Don't miss deploy scripts.** If `deploy.sh` exists, include it in the Commands section.
 
 ---
 
 ## Changelog
 
+- **2026-06-06 — v1.2: Supabase detection, deploy script detection**
+  - ADDED: Supabase detection (migrations, config, client packages)
+  - ADDED: Deploy script detection (deploy.sh, k8s manifests, Railway)
+  - ADDED: Anti-patterns for Supabase migrations and deploy scripts
 - **2026-06-05 — v1.1: Docker, linter config, monorepo/workspace detection**
   - ADDED: Container detection (Dockerfile, docker-compose)
   - ADDED: Linter/formatter config detection (eslint, prettier, ruff, rubocop, biome, etc.)

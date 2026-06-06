@@ -71,6 +71,7 @@ Detect the project's stack before assuming commands. Check in order:
 | `Gemfile` | Ruby | `bundle exec rspec` | `rubocop` | — |
 | `pom.xml` / `build.gradle` | Java/Kotlin | `mvn test` / `gradle test` | — | — |
 | `.github/workflows/*.yml` | GH Actions | per workflow | per workflow | — |
+| `supabase/` dir + `package.json` | Next.js + Supabase | from scripts | from scripts | `tsc --noEmit` |
 
 Read from `package.json` scripts when available — don't assume `npm test` exists.
 
@@ -440,10 +441,48 @@ This is a starting point — the real sync should analyze run logs and update th
 - **Never force-push without checking other sessions' branches.** 3 incidents of code loss from merge conflicts in calmar. (3 citations)
 - **Check `git branch -a --sort=-committerdate` before starting.** Build on existing branch work, don't start over. (28 orphaned branches as evidence)
 
+### Supabase
+
+- **Enable RLS on every table, then write policies.** Default-deny means forgetting a policy locks out the app. But forgetting RLS exposes the table to any authenticated user. (Pattern: recs.community initial schema)
+- **Security-definer functions need `SET search_path = public`.** Without it, a malicious user can shadow `public` tables with their own schema. (Pattern: recs.community `is_active_member`, `is_admin`)
+- **Use triggers for cross-table consistency, not application code.** Profile creation on signup, admin membership on community creation — these must succeed atomically. Application-level inserts can fail between steps. (Pattern: recs.community `on_auth_user_created`, `on_community_created`)
+- **Nullable FK on user delete preserves data.** `contributor_id UUID REFERENCES auth.users ON DELETE SET NULL` keeps the rec but shows "Former member." Don't CASCADE delete user-generated content. (Pattern: recs.community `recs` table)
+- **Test RLS policies with positive AND negative cases.** "Can a member see their community's recs?" AND "Can a non-member see them?" Both must be verified. (Pattern: recs.community review checklist)
+- **Supabase auth middleware must refresh the session on every request.** Use `@supabase/ssr` with the three-file pattern (server, client, middleware). The middleware calls `getUser()` which refreshes the cookie. (Pattern: recs.community auth PR)
+- **Migration files are append-only.** Never edit a deployed migration. Create a new one to fix mistakes. Name format: `YYYYMMDDNNNNNN_description.sql`.
+
+### API Resilience
+
+- **Cross-source fallback with deadline budgets.** When downloading from multiple sources (archive.org, Gutenberg, Standard Ebooks), try the primary source first with a per-attempt timeout, then fall back through alternatives in priority order. Hard outer deadline prevents total timeout. (Pattern: kindle-schlacter-me `resilientDownload.ts`)
+- **Dead-resource fast-fail.** If an external resource shows zero progress + zero speed + zero connectivity for ~90s, abort instead of polling for the full timeout. Reset the counter if any progress is detected. (Pattern: kindle-connector dead-torrent detection)
+- **Charge quota only after success.** Failed attempts at an external service shouldn't consume the user's rate limit or quota. Move the quota increment after the success confirmation. (Pattern: kindle-schlacter-me send quota)
+- **Parallel fan-out with per-target timeout.** When querying multiple external sources, query in parallel with individual timeouts. One slow source returns partial results instead of blocking everything. (Pattern: kindle-connector parallel indexer fan-out, 30s→3s latency improvement)
+- **Negative caching for metadata.** Cache "not found" results with a TTL (e.g., 7 days) to avoid re-querying APIs for data that doesn't exist. (Pattern: kindle-schlacter-me book metadata cache)
+
+### KV / Caching
+
+- **Key design: `namespace:entity:identifier:qualifier`.** Example: `kindle:devicestate:{email}`, `kindle:bookmeta:{bookKey}`, `kindle:quota:send:{email}:{date}`. Consistent key structure prevents collisions and enables pattern-based cleanup. (Pattern: kindle-schlacter-me KV usage)
+- **Event-time monotonic guards for state updates.** When multiple events (delivered, bounced) can arrive out of order, store the event timestamp and only update if the new event is newer. Prevents a late-arriving "delivered" from overwriting a more recent "bounced." (Pattern: kindle-schlacter-me per-address delivery banners)
+- **Shared cache across features.** Book metadata fetched for the modal should be the same cache used for ratings display. Use a single cache key, not feature-specific duplicates. (Pattern: kindle-schlacter-me `kindle:bookmeta:{bookKey}`)
+
+### Multi-Developer
+
+- **PR stacking for greenfield projects.** When building a new project with dependencies between features (scaffold → schema → auth → features), use stacked PRs with explicit `base` branches. Each PR body should state its dependency. (Pattern: recs.community PRs #1-6)
+- **COORDINATION.md for multi-agent repos.** When multiple Claude instances work on the same repo, maintain a coordination doc listing: active work, review queue, blocked items, and parking lot. (Pattern: recs.community COORDINATION.md)
+- **Review checklists are persistent, not per-PR.** A `docs/review-checklist.md` lets any reviewer (human or Claude) apply consistent standards without re-deriving them each time. (Pattern: recs.community review checklist)
+- **Self-onboarding PRs.** When another developer's Claude will work on the repo, create a PR that makes the repo self-orienting: CLAUDE.md with session-start checklist, review checklist, coordination doc. (Pattern: recs.community PR #4)
+
 ---
 
 ## Changelog
 
+- **2026-06-06 — v7.3: Supabase, API resilience, KV/caching, multi-developer learnings**
+  - ADDED: Supabase to framework detection table
+  - ADDED: Supabase learnings section (RLS, migrations, security-definer, auth middleware, triggers)
+  - ADDED: API resilience learnings (cross-source fallback, dead-resource fast-fail, parallel fan-out, quota-after-success)
+  - ADDED: KV/caching learnings (key design, event-time monotonic guards, shared cache)
+  - ADDED: Multi-developer learnings (PR stacking, COORDINATION.md, review checklists, self-onboarding)
+  - Evidence: 14 PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping (May-Jun 2026)
 - **2026-06-05 — v7.2: Python patterns, automation/scheduling learnings, GH Action template for sync**
   - ADDED: Python-specific learnings section (venv, pathlib, entry points, dep pinning)
   - ADDED: Automation/scheduling learnings (cron UTC, workflow_dispatch, timeouts)
