@@ -109,6 +109,19 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 - [ ] **Middleware always runs at the edge.** Keep middleware lightweight — no DB calls, no heavy computation.
 - [ ] **Cron jobs (`vercel.json` cron) use Serverless Functions, not Edge.** Set appropriate `maxDuration`.
 
+### 2K. Supabase integration
+
+- [ ] **Supabase env vars are set in Vercel.** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public), plus `SUPABASE_SERVICE_ROLE_KEY` (server-only, NOT `NEXT_PUBLIC_`).
+- [ ] **Auth middleware refreshes the session.** `middleware.ts` must call Supabase `getUser()` on every request to refresh the cookie. Missing this causes silent auth failures after token expiry.
+- [ ] **Middleware matcher excludes Supabase callback.** If using OAuth with Supabase, the `/auth/callback` route must not be caught by auth-redirect middleware.
+- [ ] **RLS policies are tested on the preview deployment.** Preview uses a different Supabase project (or the same one with preview env vars). Verify that RLS behaves correctly with the preview's JWT issuer.
+
+### 2L. Vercel KV / Redis
+
+- [ ] **KV env vars are set.** `KV_REST_API_URL` and `KV_REST_API_TOKEN` in Vercel project settings.
+- [ ] **KV operations have timeouts.** Vercel KV uses HTTP under the hood. Set reasonable timeouts to prevent hanging serverless functions.
+- [ ] **KV keys include environment prefix in dev.** Prevent local development from polluting production KV data. Pattern: `${process.env.NODE_ENV === 'production' ? '' : 'dev:'}kindle:...`
+
 ---
 
 ## Step 3: Debug common failures
@@ -170,6 +183,16 @@ Diagnosis order:
 4. Check the OAuth provider's error response
 5. Check if OAuth-only account trying password login
 6. For Google: `www.domain.com` and `domain.com` are different URIs
+
+### Webhook failures (events not arriving)
+
+1. Verify the webhook endpoint URL matches the production domain exactly
+2. Check that the webhook secret env var is set and trimmed in Vercel
+3. Verify the endpoint handles the correct HTTP method (usually POST)
+4. Check Vercel Function Logs — webhook requests may be hitting the function but failing silently
+5. For Resend webhooks: verify the exact event types are enabled (e.g., `email.delivered`, `email.bounced`)
+6. Return 200 quickly — webhook providers retry on timeout. Do heavy processing async.
+7. Implement idempotency — webhooks can be delivered more than once
 
 ---
 
@@ -261,6 +284,11 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-06 — v1.2: Supabase integration, Vercel KV, webhook debugging**
+  - ADDED: Supabase integration checklist (2K) — env vars, auth middleware, RLS on preview
+  - ADDED: Vercel KV / Redis checklist (2L) — env vars, timeouts, environment prefixing
+  - ADDED: Webhook debugging section — endpoint verification, idempotency, quick 200 returns
+  - Evidence: kindle-schlacter-me Resend webhooks, recs.community Supabase auth
 - **2026-06-05 — v1.1: Preview URLs, Edge vs Serverless, runtime errors, cron jobs**
   - ADDED: Preview deployment testing checklist (2I) — CORS, cookies, subdomain routing on previews
   - ADDED: Edge vs Serverless checklist (2J) — code size limits, API restrictions, middleware constraints
