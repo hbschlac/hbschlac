@@ -159,6 +159,84 @@ When multiple humans (or their Claudes) work on the same repo:
 
 ---
 
+## Stacked PR Workflow (Detailed)
+
+When building a feature that decomposes into 3+ sequential PRs (common for greenfield projects):
+
+### Creating the stack
+
+```bash
+# PR #1: scaffold (targets main)
+git checkout -b hannah/scaffold-nextjs main
+# ... work, commit, push ...
+# Create PR #1 targeting main
+
+# PR #2: schema (targets PR #1's branch)
+git checkout -b hannah/schema-and-routes hannah/scaffold-nextjs
+# ... work, commit, push ...
+# Create PR #2 with base=hannah/scaffold-nextjs
+# PR body: "Depends on #1 (scaffold)"
+
+# PR #3: auth (targets PR #2's branch)
+git checkout -b hannah/supabase-auth hannah/schema-and-routes
+# ... work, commit, push ...
+# Create PR #3 with base=hannah/schema-and-routes
+# PR body: "Depends on #2 (schema + routes)"
+```
+
+### When a base PR merges
+
+After PR #1 merges to main:
+1. GitHub offers to retarget PR #2 to main — accept it
+2. If there are conflicts, rebase: `git rebase main` on PR #2's branch
+3. Push the rebased branch: `git push --force-with-lease`
+4. Repeat down the stack
+
+### Review order
+
+- Review PRs in dependency order (#1 before #2 before #3)
+- Don't block a later PR on comments in an earlier one — fix the earlier PR first
+- CI may only run on the latest PR in the stack — verify each PR builds independently
+
+### When NOT to stack
+
+- 2 independent features → parallel branches, not a stack
+- Feature + unrelated bug fix → separate branches
+- Stack depth > 5 → consider combining some PRs (the rebase cascade becomes painful)
+
+---
+
+## Handoff Documentation
+
+When a PR or session requires human action (dashboard config, deploys, external service setup):
+
+### Pattern: end every PR that needs human action with a numbered list
+
+```markdown
+## What you need to do (N quick things)
+
+1. **Activate the Resend webhook:**
+   - Resend -> Webhooks -> endpoint `https://kindle.schlacter.me/api/webhooks/resend`
+   - Enable `email.delivered` + `email.bounced`
+   - Copy the `whsec_...` secret
+   - Vercel -> Settings -> Env Vars -> add `RESEND_WEBHOOK_SECRET=<whsec_...>` -> redeploy
+   - Verify: unsigned POST to endpoint returns 401 (was 503)
+
+2. **Set Google Books API key (recommended):**
+   - Set `GOOGLE_BOOKS_API_KEY` in Vercel env vars
+   - Works without it for light use, but prod is more reliable with a key
+```
+
+### Rules
+
+- **Be specific.** "Set the env var" is not enough. Say which dashboard, which field name, which value format.
+- **Include verification steps.** "After setting X, do Y and expect Z." The human needs to know it worked.
+- **Separate required from recommended.** "(required)" vs "(recommended)" in the heading.
+- **Don't mix human actions with completed work.** The handoff section is ONLY for things Claude couldn't do.
+- **For k8s/non-Vercel deploys:** state the exact command. `git pull && ./deploy.sh` or "Needs a rebuild + redeploy of the k8s image (cc @sam)."
+
+---
+
 ## Branch Naming and Hygiene
 
 - **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
@@ -173,6 +251,10 @@ When multiple humans (or their Claudes) work on the same repo:
 
 ## Changelog
 
+- **2026-06-07 — v8: Stacked PR workflow detail, handoff documentation patterns**
+  - ADDED: Detailed stacked PR workflow (create, rebase when base merges, review order, when not to stack)
+  - ADDED: Handoff documentation pattern (numbered human-action lists, verification steps, required vs recommended)
+  - Evidence: recs.community stacked PRs #1-7, kindle-schlacter-me handoff sections, kindle-connector deploy instructions
 - **2026-06-06 — v7: Multi-developer coordination**
   - ADDED: Multi-developer coordination section (COORDINATION.md, PR stacking, self-onboarding)
   - Evidence: recs.community multi-Claude workflow (PRs #1-7)

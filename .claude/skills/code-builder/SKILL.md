@@ -441,6 +441,31 @@ This is a starting point — the real sync should analyze run logs and update th
 - **Never force-push without checking other sessions' branches.** 3 incidents of code loss from merge conflicts in calmar. (3 citations)
 - **Check `git branch -a --sort=-committerdate` before starting.** Build on existing branch work, don't start over. (28 orphaned branches as evidence)
 
+### External Data Trust
+
+- **Validate external metadata before displaying to users.** Google Books returns study guides, SparkNotes, and wrong editions for common titles. Apply strict match validation: main-title exact match OR bidirectional title overlap. Reject study guides, summaries, and companion books by pattern. Show "No description available" + a manual search link rather than wrong data. (Pattern: kindle-schlacter-me book modal)
+- **Negative-cache "no match" results with a TTL.** When an external API has no result for a query, cache that fact (e.g., 7 days) so you don't re-query every page load. (Pattern: kindle-schlacter-me `kindle:bookmeta:{bookKey}`)
+- **Label the data source when displaying third-party data.** "via Google Books" not "Rating: 4.2" — users need to know where data came from and that it may not be authoritative. (Pattern: kindle-schlacter-me star ratings)
+- **Never auto-display unvalidated API content in user-facing UI.** An LLM-generated blurb, an unverified API response, or an unmatched title can show wrong content to users. Always validate or show a fallback.
+
+### SQL Migration Authoring
+
+- **Migration files are append-only and sequentially named.** `YYYYMMDDNNNNNN_description.sql`. Never edit a deployed migration — create a new one to fix mistakes. (Pattern: recs.community migrations)
+- **Write RLS policies in the same migration as the table.** Don't create a table in one migration and add RLS in another — the gap leaves the table exposed. (Pattern: recs.community initial schema)
+- **Security-definer functions need explicit `search_path`.** Without `SET search_path = public`, a malicious user can shadow tables. Also: mark them `SECURITY DEFINER` and keep them minimal. (Pattern: recs.community `is_active_member`, `is_admin`)
+- **Use triggers for cross-table consistency, not application code.** Profile creation on signup, admin membership on community creation — these must succeed atomically. (Pattern: recs.community `on_auth_user_created`, `on_community_created`)
+
+### Large Feature Rounds
+
+- **Number features within a round (R0, R1, ...).** Creates a natural review order and makes PR descriptions scannable. Group by theme, not by priority. (Pattern: kindle-schlacter-me Round 2, R0-R10)
+- **Ship interdependent features in one PR, independent ones separately.** If search ranking (R2) affects the library page (R7), they belong together. Resilience fixes are a separate PR. (Pattern: kindle-schlacter-me Round 2 vs. resilient download)
+- **End multi-feature PRs with "what you need to do" handoffs.** External actions (webhook activation, env vars, deploys) that Claude can't do. Be specific: which dashboard, which value, which endpoint to verify. (Pattern: kindle-schlacter-me PR #1)
+
+### Non-Vercel Deployment
+
+- **For k8s/Docker projects, verify deploy.sh exists and the Dockerfile builds.** Not every project deploys to Vercel. Check for `Dockerfile`, `deploy.sh`, `k8s/` manifests. (Pattern: kindle-connector)
+- **Python k8s projects: verify the image rebuilds cleanly.** After changes, `python -m py_compile` the entry point. The deploy step is a human handoff: "Needs a rebuild + redeploy of the k8s image." (Pattern: kindle-connector PRs #1, #2)
+
 ### Supabase
 
 - **Enable RLS on every table, then write policies.** Default-deny means forgetting a policy locks out the app. But forgetting RLS exposes the table to any authenticated user. (Pattern: recs.community initial schema)
@@ -476,6 +501,12 @@ This is a starting point — the real sync should analyze run logs and update th
 
 ## Changelog
 
+- **2026-06-07 — v7.4: External data trust, SQL migration, feature rounds, non-Vercel deployment**
+  - ADDED: External data trust learnings (validate before display, negative caching, source labeling)
+  - ADDED: SQL migration authoring learnings (append-only, RLS in same migration, security-definer search_path)
+  - ADDED: Large feature rounds learnings (R-numbering, ship interdependent together, handoff docs)
+  - ADDED: Non-Vercel deployment learnings (k8s/Docker, deploy.sh, py_compile verification)
+  - Evidence: kindle-schlacter-me PR #1 (Round 2), kindle-connector PRs #1-2 (k8s), recs.community schema
 - **2026-06-06 — v7.3: Supabase, API resilience, KV/caching, multi-developer learnings**
   - ADDED: Supabase to framework detection table
   - ADDED: Supabase learnings section (RLS, migrations, security-definer, auth middleware, triggers)
