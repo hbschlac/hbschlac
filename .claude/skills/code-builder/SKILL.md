@@ -465,6 +465,39 @@ This is a starting point — the real sync should analyze run logs and update th
 - **Event-time monotonic guards for state updates.** When multiple events (delivered, bounced) can arrive out of order, store the event timestamp and only update if the new event is newer. Prevents a late-arriving "delivered" from overwriting a more recent "bounced." (Pattern: kindle-schlacter-me per-address delivery banners)
 - **Shared cache across features.** Book metadata fetched for the modal should be the same cache used for ratings display. Use a single cache key, not feature-specific duplicates. (Pattern: kindle-schlacter-me `kindle:bookmeta:{bookKey}`)
 
+### Testing Strategy
+
+- **Test resilience logic, not happy paths only.** For features with fallback/retry behavior, test: happy path, each fallback trigger, exclusion rules, timeout/deadline cutoff, and the "nothing works" path. (Pattern: kindle-schlacter-me `resilientDownload.test.ts` — 7 test cases covering cross-source fallback, archive.org single-attempt cap, libgen exclusion, deadline cutoff, empty-URL guard)
+- **Gate PRs on tests + lint + typecheck.** Add `.github/workflows/pr-tests.yml` that runs `jest` (or detected test cmd), lint, and `tsc --noEmit` on every PR. Use `paths:` filter to skip unrelated changes. (Pattern: muse-shopping PR#1 — 63 existing tests, zero CI gate until automated)
+- **Use `continue-on-error: true` for gradual adoption.** When adding CI to a project with pre-existing issues (TS errors, lint warnings), gate what you can enforce today and mark the rest `continue-on-error`. Flip to required after cleanup. (Pattern: muse-shopping typecheck gate)
+- **Test at the boundary, not the implementation.** For API resilience, test the public function (`resolveAndDownload`) not internal helpers. For RLS, test "can member X see community Y's data?" and "can non-member Z see it?" — both positive and negative. (Pattern: recs.community review checklist, kindle-schlacter-me test structure)
+- **Add a test with the bug fix.** When fixing a production incident, write the test that reproduces the bug BEFORE writing the fix. The test should fail first. (Pattern: debug-escalation Step 6 requirement)
+- **No tests for glue code.** Don't test: simple pass-through components, config files, one-line utilities, framework boilerplate. Test: business logic, data transformations, resilience/fallback behavior, security boundaries (RLS, auth gates).
+
+### CI / GitHub Actions
+
+- **Minimal PR gate workflow template:**
+  ```yaml
+  name: PR Tests
+  on:
+    pull_request:
+      branches: [main]
+      paths: ['{src,lib,app}/**']
+  jobs:
+    check:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-node@v4
+          with: { node-version-file: '.nvmrc' }
+        - run: npm install
+        - run: npm test
+        - run: npx tsc --noEmit
+        - run: npm run lint
+  ```
+- **Separate CI setup from feature PRs.** CI changes should be their own PR so they don't block feature review and can be tested independently. (Pattern: recs.community PR#5 — standalone CI PR)
+- **For Python projects, use a matrix for version testing** if the project supports multiple Python versions. Otherwise, pin to the version in `.python-version`.
+
 ### Multi-Developer
 
 - **PR stacking for greenfield projects.** When building a new project with dependencies between features (scaffold → schema → auth → features), use stacked PRs with explicit `base` branches. Each PR body should state its dependency. (Pattern: recs.community PRs #1-6)
@@ -474,8 +507,23 @@ This is a starting point — the real sync should analyze run logs and update th
 
 ---
 
+### PRD-to-Code
+
+- **Decompose the PRD into stacked PRs before writing code.** For greenfield projects built from a PRD, plan the PR sequence first: scaffold → data model/schema → auth → core feature loop → CI → coordination docs. Each PR should be independently deployable (or at least buildable). (Pattern: recs.community 7 PRs from PRD)
+- **Implement the first product loop first.** Don't build horizontally (all pages, then all APIs). Build vertically: the first user journey that exercises signup → core action → result. For recs.community: signup → create community → land on admin page. Everything else comes after.
+- **Schema migrations before application code.** Get the data model right (with RLS, triggers, FK rules) before writing UI. Schema mistakes are expensive to fix after data exists. (Pattern: recs.community PR#2 schema, PR#3 auth, PR#6 features)
+- **Out-of-scope lists prevent scope creep.** Every PR body should list what's intentionally NOT included. "No invite-link generator yet" is a decision, not a gap. (Pattern: every recs.community PR body has an "Out of scope" section)
+
+---
+
 ## Changelog
 
+- **2026-06-08 — v7.4: Testing strategy, CI/GH Actions, PRD-to-code learnings**
+  - ADDED: Testing strategy section (what to test, test-with-bugfix, no-test-for-glue, gradual CI adoption)
+  - ADDED: CI / GitHub Actions section (PR gate template, separate CI from features)
+  - ADDED: PRD-to-code section (stacked PRs from PRD, vertical slicing, schema-first, out-of-scope lists)
+  - Evidence: kindle-schlacter-me 71 tests + resilientDownload.test.ts, muse-shopping PR#1 CI gate, recs.community 7 PRs from PRD
+  - Resolves CLAUDE.md known issues #4 (PM/PRD workflow) and #8 (testing strategy)
 - **2026-06-06 — v7.3: Supabase, API resilience, KV/caching, multi-developer learnings**
   - ADDED: Supabase to framework detection table
   - ADDED: Supabase learnings section (RLS, migrations, security-definer, auth middleware, triggers)

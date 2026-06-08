@@ -159,6 +159,20 @@ When multiple humans (or their Claudes) work on the same repo:
 
 ---
 
+## Cross-Repo Coordination
+
+When a product spans multiple repos (e.g., a frontend + backend bridge, or a web app + Python service):
+
+1. **Identify coupled repos early.** If your change touches an API contract, deployment sequence, or shared data format, the other repo needs a coordinated change.
+2. **Reference the other repo's PR in your PR body.** "Requires kindle-connector PR#2 to be deployed first" prevents half-deployed states.
+3. **Deploy order matters.** Backend/API changes usually deploy before frontend changes that depend on them. Document the deploy sequence in the PR body.
+4. **Sandbox limitation:** Web sessions can only push to one repo. For cross-repo changes, complete one repo's work and note the other repo's changes in CLAUDE.md under "Laptop instructions."
+5. **Shared env vars.** When two repos share an API endpoint or secret, changes to the value must be coordinated. List affected repos in the PR body.
+
+Evidence: kindle-schlacter-me (Vercel frontend) + kindle-connector (k8s Python bridge) are a coupled system. kindle-connector PR#2 (infohash lookup) was paired with kindle-schlacter-me PR#2 (resilient download). Both PRs reference each other.
+
+---
+
 ## Branch Naming and Hygiene
 
 - **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
@@ -173,6 +187,9 @@ When multiple humans (or their Claudes) work on the same repo:
 
 ## Changelog
 
+- **2026-06-08 — v8: Cross-repo coordination**
+  - ADDED: Cross-repo coordination section (coupled repos, deploy order, sandbox limitation)
+  - Evidence: kindle-schlacter-me + kindle-connector coupled PRs (PR#2 in both repos)
 - **2026-06-06 — v7: Multi-developer coordination**
   - ADDED: Multi-developer coordination section (COORDINATION.md, PR stacking, self-onboarding)
   - Evidence: recs.community multi-Claude workflow (PRs #1-7)
