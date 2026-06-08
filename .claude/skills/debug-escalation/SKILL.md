@@ -23,13 +23,61 @@ you've hit the 5-hypothesis limit, or when the same area has been fixed and brok
 ## Activation
 
 Triggers when ANY of these are true:
+
+**Fix-churn triggers:**
 - 3+ fix commits in the same file area within a session
 - A fix was reverted or overwritten within 30 minutes
 - code-builder's debug loop hit its 5-hypothesis limit
 - User says "this keeps breaking" / "we've been going in circles" / "nothing works"
 - Git log shows 3+ consecutive "fix:" commits to the same file
 
-> **debug-escalation activated** — fix-churn detected in {area}. Switching from symptom-chasing to root-cause analysis.
+**Production incident triggers:**
+- "It's broken in prod" / "users are reporting X" / "this was working yesterday"
+- External dependency returning errors (503, 403, timeouts) that the app doesn't handle
+- Monitoring shows failures / quota burn / cascading errors
+- Feature works locally but fails in production (or vice versa)
+
+> **debug-escalation activated** — [fix-churn detected in {area} | production incident: {symptom}]. Switching to root-cause analysis.
+
+---
+
+## Step 0: Production Incident Response (skip if fix-churn)
+
+When the trigger is a production incident (not fix-churn), follow this before Step 1.
+
+### 0A. Triage
+
+1. **Blast radius:** How many users/features are affected? Is this total outage or degraded?
+2. **Recency:** When did this start? Check deploy history — was anything shipped recently?
+3. **Dependency check:** Probe external services directly before assuming your code is broken.
+
+```bash
+# Check recent deploys
+git log --oneline -10 --since="24 hours ago"
+# Probe external dependency (example)
+curl -sI https://external-api.example.com | head -5
+```
+
+### 0B. Incident investigation order
+
+1. **External dependencies first.** Most "sudden" production failures are upstream outages, not code bugs. Probe every external service the failing feature touches.
+2. **Deployment state.** Is the running code the same as what's on main? Check deploy logs, not just git.
+3. **Data/state corruption.** Check KV, database, cache for stale or invalid state. Real example: kindle-schlacter-me traced a download failure to archive.org returning 503/403 by probing the URL directly and checking KV delivery history.
+4. **Recent changes.** `git log --oneline -10 -- {affected-files}` — did a recent change introduce a fragile assumption?
+
+### 0C. Build the resilient fix
+
+Production incidents expose fragile assumptions. The fix should not just restore service — it should prevent recurrence:
+
+| Pattern | When to use |
+|---|---|
+| **Cross-source fallback** | Primary data source can go down. Try primary with timeout, fall back through alternatives in priority order. |
+| **Dead-resource fast-fail** | External resource hangs indefinitely. Detect zero-progress + zero-speed for N seconds → abort early. |
+| **Quota-after-success** | Rate-limited operation. Don't charge quota until the operation actually succeeds. |
+| **Parallel fan-out** | Multiple sources queried sequentially. Query all in parallel with per-source timeout. |
+| **Negative caching** | API returns "not found" repeatedly. Cache the miss with TTL to avoid hammering. |
+
+After the fix, proceed to Step 5 to write the root-cause report.
 
 ---
 
@@ -161,6 +209,11 @@ This is a valid outcome. Not every bug is solvable in one session.
 
 ## Changelog
 
+- **2026-06-08 — v5: Production incident response protocol**
+  - ADDED: Production incident triggers (external dep failures, "broken in prod", cascading errors)
+  - ADDED: Step 0 — Production incident response (triage, external dep probing, data/state check)
+  - ADDED: Resilient fix patterns table (cross-source fallback, dead-resource fast-fail, quota-after-success, parallel fan-out, negative caching)
+  - Evidence: kindle-schlacter-me PR#2 (archive.org outage → cascading download failures → quota burn), kindle-connector PR#2 (dead-torrent fast-fail)
 - **2026-06-05 — v4: Environment-specific debugging, abandon vs. continue framework**
   - ADDED: Environment-specific investigation table (Vercel, GHA, Docker, Python, cron, web session)
   - ADDED: "When to Abandon vs. Keep Debugging" decision framework

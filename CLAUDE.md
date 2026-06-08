@@ -16,15 +16,15 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v7.3 | Parallel drafts, self-scoring, debug loop, visual mode |
+| code-builder | v7.4 | Parallel drafts, self-scoring, debug loop, visual mode, testing strategy, CI setup, PRD-to-code |
 | vercel-ship | v1.2 | Pre-deploy validation for Next.js + Vercel |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
 | content-quality | v5 | Anti-AI-slop, voice matching, hallucination prevention |
-| session-safety | v7 | Groundhog Day prevention, cross-session conflict detection |
+| session-safety | v8 | Groundhog Day prevention, cross-session/cross-repo conflict detection |
 | portfolio-dev | v3.1 | schlacter.me / Next.js portfolio patterns |
 | session-start-hook | v5 | SessionStart hook creation for Claude Code on the web |
 | project-bootstrap | v1.2 | Auto-generate CLAUDE.md for repos |
-| debug-escalation | v4 | Fix-churn cycle breaker |
+| debug-escalation | v5 | Fix-churn cycle breaker + production incident response |
 | research-pipeline | v1 | Scrape, classify, analyze, present research data |
 
 ## Sandbox constraint
@@ -56,12 +56,14 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 1. **code-builder learning sync has never run.** 52+ days since initial backfill. No GH Action exists.
 2. **mcp-contributor refresh.sh anchor bug.** Grep expects `## Step 11.1:` but SKILL.md uses `### 11.1`. Creates false-positive issues weekly.
 3. **mcp-contributor has zero real-world usage** despite extensive maintenance.
-4. **No skill for PM workflows** (specs, experiment design, data analysis). recs.community was built from a PRD but no skill codifies PRD-to-code translation patterns.
+4. ~~**No skill for PM workflows**~~ **RESOLVED**: code-builder v7.4 adds PRD-to-code section (stacked PR decomposition, vertical slicing, schema-first, out-of-scope patterns). Evidence: recs.community 7 PRs from PRD.
 5. ~~**No skill for the research pipeline**~~ **RESOLVED**: research-pipeline v1 created 2026-06-05.
 6. **mcp-contributor is FROZEN** — over-invested (v4.1 across 30+ sessions, zero real contributions). No further iteration until: anchor bug fixed, stale issues closed, one real MCP contribution made.
-7. **Supabase patterns are uncovered.** recs.community uses Supabase heavily (RLS, migrations, auth triggers, security-definer functions). code-builder and vercel-ship now include Supabase learnings (v7.3 and v1.2 respectively).
-8. **No testing strategy skill.** kindle-schlacter-me has 71 tests, recs.community has CI but no tests yet. No guidance on what to test, test patterns, or when to add tests.
+7. ~~**Supabase patterns are uncovered.**~~ **RESOLVED**: code-builder v7.3 and vercel-ship v1.2 include Supabase learnings.
+8. ~~**No testing strategy skill.**~~ **RESOLVED**: code-builder v7.4 adds testing strategy section (what to test, test-with-bugfix, gradual CI adoption, CI workflow template). Evidence: kindle-schlacter-me 71 tests, muse-shopping CI gate.
 9. **Non-Vercel deployment is barely covered.** kindle-connector deploys to k8s. Only vercel-ship exists for deployment patterns.
+10. **No production incident response pattern existed.** debug-escalation v5 now covers production incident triage and resilient fix patterns. Evidence: kindle-schlacter-me PR#2 archive.org outage.
+11. **Cross-repo coordination was missing.** session-safety v8 now covers coupled repos (deploy order, shared env vars, sandbox limitations). Evidence: kindle-schlacter-me + kindle-connector coupled PRs.
 
 ## README editing rules
 
