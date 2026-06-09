@@ -507,17 +507,44 @@ This is a starting point — the real sync should analyze run logs and update th
 
 ---
 
+### Performance Optimization
+
+- **Profile before parallelizing.** Identify whether the bottleneck is sequential I/O, CPU, or a single slow dependency. `console.time()`/`timeEnd()` around each section. For API fan-out: log per-source latency, not just total. (Pattern: kindle-connector went from 30s→3s by identifying that sequential indexer queries were the bottleneck, not any single slow indexer)
+- **Per-source timeout budgets within an overall deadline.** When querying N sources in parallel, give each source its own timeout (e.g., 5s) plus a hard overall deadline (e.g., 15s). One hung source returns partial results instead of blocking everything. Don't set per-source timeout = overall timeout. (Pattern: kindle-connector parallel fan-out)
+- **Benchmark before AND after, with the same dataset.** "It feels faster" is not evidence. Log wall-clock time for the same operation before the change and after. Include the numbers in the PR body. (Pattern: kindle-connector PR#1 reported 30s→3s)
+- **Sequential → parallel is the highest-leverage refactor for I/O-bound code.** If you see `for (const x of items) { await fetch(x) }`, that's sequential I/O. Convert to `await Promise.allSettled(items.map(x => fetch(x)))`. Guard with per-item timeouts.
+
+### Async Multi-Step Workflows
+
+- **Model state transitions explicitly.** For workflows like send→email→delivered→bounced, define the states as a union type and the valid transitions. Store the current state and the timestamp of the last transition. (Pattern: kindle-schlacter-me send stages and Resend webhook delivery tracking)
+- **Event-time ordering, not arrival-time ordering.** Webhooks arrive out of order. A "delivered" event may arrive after a "bounced" event. Store the event timestamp and only update state if the new event is chronologically newer. (Pattern: kindle-schlacter-me per-address delivery banners — already in KV/Caching section, but this is the workflow design principle)
+- **Idempotent event handlers.** Webhooks can be delivered more than once. Process each event idempotently: check if the state transition already happened before applying it. Return 200 regardless. (Pattern: kindle-schlacter-me Resend webhook handler)
+- **Separate the trigger from the work.** Webhook handlers should acknowledge quickly (return 200) and queue the actual work. Don't do heavy processing in the webhook handler — providers retry on timeout.
+
+### Feature Batching
+
+- **Group features into deployable rounds.** When shipping multiple features, group them by dependency (not by type). Round 1: foundational changes (data model, auth). Round 2: features that depend on Round 1. Each round should be deployable independently. (Pattern: kindle-schlacter-me R0-R10 shipped banners, book modal, library page, search, export, and send stages as one cohesive round because they all depended on the same data model changes)
+- **Preview-first for multi-feature PRs.** Deploy to preview and test the golden path through all features before merging to main. Multi-feature PRs have more interaction bugs than single-feature PRs. (Pattern: kindle-schlacter-me "review on the Vercel preview, then merge to main")
+- **List what's in each round in the PR body.** Each feature gets a one-line summary with its identifier (R0, R1, etc.). This makes review tractable for large PRs and lets the reviewer skip to what they care about.
+
 ### PRD-to-Code
 
 - **Decompose the PRD into stacked PRs before writing code.** For greenfield projects built from a PRD, plan the PR sequence first: scaffold → data model/schema → auth → core feature loop → CI → coordination docs. Each PR should be independently deployable (or at least buildable). (Pattern: recs.community 7 PRs from PRD)
 - **Implement the first product loop first.** Don't build horizontally (all pages, then all APIs). Build vertically: the first user journey that exercises signup → core action → result. For recs.community: signup → create community → land on admin page. Everything else comes after.
 - **Schema migrations before application code.** Get the data model right (with RLS, triggers, FK rules) before writing UI. Schema mistakes are expensive to fix after data exists. (Pattern: recs.community PR#2 schema, PR#3 auth, PR#6 features)
 - **Out-of-scope lists prevent scope creep.** Every PR body should list what's intentionally NOT included. "No invite-link generator yet" is a decision, not a gap. (Pattern: every recs.community PR body has an "Out of scope" section)
+- **Unblock stacked PRs proactively.** Stacked PRs are only useful if they actually merge. After creating the stack: merge #1 immediately if CI passes, retarget #2 to main, repeat. If a PR is blocked on review, ping the reviewer. If blocked on CI, fix CI first — a stack of 7 open PRs is worse than no stack at all. (Evidence: recs.community PRs #1-7 all open for 13+ days with no merges)
 
 ---
 
 ## Changelog
 
+- **2026-06-09 — v7.5: Performance optimization, async workflows, feature batching, stacked PR unblocking**
+  - ADDED: Performance optimization learnings (profile before parallelize, per-source timeout budgets, benchmark before/after, sequential→parallel)
+  - ADDED: Async multi-step workflow learnings (explicit state machines, event-time ordering, idempotent handlers, separate trigger from work)
+  - ADDED: Feature batching learnings (deployable rounds, preview-first, list features in PR body)
+  - ADDED: Stacked PR unblocking guidance (merge #1 immediately, retarget, don't let stacks rot)
+  - Evidence: kindle-connector PR#1 (30s→3s parallel fan-out), kindle-schlacter-me PR#1 (R0-R10 feature rounds, send stage state machine, Resend webhooks), recs.community PRs #1-7 (stacked but unmerged for 13+ days)
 - **2026-06-08 — v7.4: Testing strategy, CI/GH Actions, PRD-to-code learnings**
   - ADDED: Testing strategy section (what to test, test-with-bugfix, no-test-for-glue, gradual CI adoption)
   - ADDED: CI / GitHub Actions section (PR gate template, separate CI from features)
