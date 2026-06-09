@@ -266,6 +266,42 @@ Gotchas:
 
 ---
 
+## Step 7: Domain migration checklist
+
+When renaming a domain, subdomain, or repo (e.g., community.recs → recs.community):
+
+1. **Rename the GitHub repo first.** Old URL auto-redirects. Update `git remote set-url origin` locally.
+2. **Update Vercel project settings.** Change the domain in Vercel Dashboard → Project → Domains. Add the new domain, verify DNS, then remove the old one.
+3. **DNS propagation.** After changing DNS records, allow up to 48h. Verify with `dig +short {domain}` or `nslookup {domain}`. During propagation, keep both old and new domains active.
+4. **Update all hardcoded URLs.** Search the codebase: `grep -rn 'old-domain' --include='*.ts' --include='*.tsx' --include='*.json' --include='*.md'`. Common locations: `package.json` name, `next.config.*` domains, `middleware.ts` host checks, OAuth redirect URIs, README links, CLAUDE.md references.
+5. **Update OAuth providers.** Add the new domain's redirect URIs BEFORE removing the old ones. Test login on the new domain.
+6. **Update webhook endpoints.** Any external service (Resend, Stripe, etc.) sending webhooks to the old domain needs the URL updated.
+7. **SEO: canonical URLs and redirects.** Add redirects from old domain → new domain in `vercel.json` or middleware. Update `<link rel="canonical">` and `og:url` in metadata.
+8. **Update external references.** GitHub repo description, linked sites, portfolio references, README badges.
+
+---
+
+## Step 8: MCP tools for deployment verification
+
+When running in a Claude Code web session with Vercel MCP tools available, use them for deployment verification instead of (or in addition to) manual checks:
+
+```
+mcp__Vercel__list_deployments — Check recent deploy status
+mcp__Vercel__get_deployment — Get specific deployment details  
+mcp__Vercel__get_deployment_build_logs — Read build logs for failures
+mcp__Vercel__get_runtime_logs — Debug runtime errors
+mcp__Vercel__get_project — Verify project config (env vars, domains)
+mcp__Vercel__list_toolbar_threads — Check for user-reported issues via Vercel toolbar
+```
+
+**When to use MCP tools vs. manual checks:**
+- **Pre-deploy (Step 2):** Still run `tsc --noEmit` locally. MCP tools don't replace local validation.
+- **Post-deploy debugging:** Use `get_deployment_build_logs` first — faster than scrolling the Vercel dashboard.
+- **Runtime errors:** Use `get_runtime_logs` to see server-side errors that don't appear in build logs.
+- **Verifying config:** Use `get_project` to confirm env vars are set without needing dashboard access.
+
+---
+
 ## Deployment Failure Database
 
 Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript type errors.
@@ -284,6 +320,10 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-09 — v1.3: Domain migration, MCP deployment tools**
+  - ADDED: Domain migration checklist (Step 7) — repo rename, DNS, OAuth, webhooks, SEO
+  - ADDED: MCP tools for deployment verification (Step 8) — build logs, runtime logs, project config
+  - Evidence: recs.community PR#7 (domain rename), every web session has Vercel MCP tools but no skill mentioned them
 - **2026-06-06 — v1.2: Supabase integration, Vercel KV, webhook debugging**
   - ADDED: Supabase integration checklist (2K) — env vars, auth middleware, RLS on preview
   - ADDED: Vercel KV / Redis checklist (2L) — env vars, timeouts, environment prefixing

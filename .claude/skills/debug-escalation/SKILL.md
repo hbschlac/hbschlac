@@ -192,6 +192,43 @@ This is a valid outcome. Not every bug is solvable in one session.
 
 ---
 
+## Performance Escalation (not a bug — it's slow)
+
+When the problem isn't "broken" but "too slow," the fix-churn cycle still applies — sessions often iterate on micro-optimizations without profiling first.
+
+### Step P1: Measure before optimizing
+
+```bash
+# For API endpoints: measure wall-clock time
+time curl -s https://your-api/endpoint > /dev/null
+
+# For Node.js: add timing around suspects
+console.time('section-name');
+// ... code ...
+console.timeEnd('section-name');
+```
+
+### Step P2: Identify the bottleneck category
+
+| Category | Symptom | Fix direction |
+|---|---|---|
+| **Sequential I/O** | N serial `await fetch()` calls, each taking 1-5s | Parallelize with `Promise.allSettled()` |
+| **Single slow dependency** | One external call takes 10s+ | Add timeout + fallback, or cache |
+| **Cold start** | First request slow, subsequent fast | Move initialization out of handler, reduce bundle |
+| **Unnecessary work** | Processing data that's already cached or unchanged | Add caching layer, skip no-op |
+| **N+1 queries** | One DB query per item in a list | Batch or join |
+
+### Step P3: Fix the bottleneck, benchmark the fix
+
+1. Fix the #1 bottleneck only. Don't optimize multiple things at once.
+2. Re-measure with the same method as Step P1.
+3. Report before/after numbers in the commit message or PR body.
+4. If improvement is <2x, the bottleneck may be elsewhere — go back to P1.
+
+Evidence: kindle-connector PR#1 — profiling revealed sequential indexer queries (not slow indexers), parallelization gave 10x improvement (30s→3s).
+
+---
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -209,6 +246,10 @@ This is a valid outcome. Not every bug is solvable in one session.
 
 ## Changelog
 
+- **2026-06-09 — v6: Performance escalation**
+  - ADDED: Performance escalation section (measure→categorize→fix→benchmark cycle)
+  - ADDED: Bottleneck category table (sequential I/O, single slow dep, cold start, N+1)
+  - Evidence: kindle-connector PR#1 (30s→3s from profiling + parallelization, not micro-optimization)
 - **2026-06-08 — v5: Production incident response protocol**
   - ADDED: Production incident triggers (external dep failures, "broken in prod", cascading errors)
   - ADDED: Step 0 — Production incident response (triage, external dep probing, data/state check)

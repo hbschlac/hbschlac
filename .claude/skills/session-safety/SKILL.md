@@ -173,6 +173,50 @@ Evidence: kindle-schlacter-me (Vercel frontend) + kindle-connector (k8s Python b
 
 ---
 
+## Stacked PR Management
+
+Creating stacked PRs is not enough — they must actually merge. A stack of 7 open PRs is worse than no stack.
+
+### Merge stacked PRs immediately
+
+1. **Merge PR #1 as soon as CI passes.** Don't wait for the whole stack to be reviewed.
+2. **After #1 merges, retarget #2 to main.** GitHub offers the button, or: `gh pr edit 2 --base main`.
+3. **Repeat for each PR in the stack.** The goal is to land work incrementally, not batch-review everything.
+4. **If a PR is blocked on review:** ping the reviewer. If no response in 24h, merge if CI is green and the change is low-risk.
+5. **If a PR is blocked on CI:** fix CI first. CI failures block the entire downstream stack.
+
+### Rebasing stacked PRs
+
+When a base PR merges and the next PR has conflicts:
+```bash
+git checkout feature-branch-2
+git rebase main
+git push --force-with-lease
+```
+
+Use `--force-with-lease` (not `--force`) to avoid overwriting concurrent changes.
+
+### Stuck stack detection
+
+At session start, check for stale open PRs:
+```bash
+# PRs open for more than 7 days with no activity
+gh pr list --state open --json number,title,createdAt,updatedAt
+```
+
+If a PR stack has been open for >7 days with no merges, flag it:
+```
+STUCK STACK DETECTED: {repo} has {N} open PRs from {date}.
+None have merged. Options:
+1. Merge #1 now if CI is green
+2. Close the stack and create a single combined PR
+3. Ask the owner what's blocking
+```
+
+Evidence: recs.community PRs #1-7 opened May 27, zero merged by June 9. 13 days of stale stacked PRs.
+
+---
+
 ## Branch Naming and Hygiene
 
 - **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
@@ -187,6 +231,9 @@ Evidence: kindle-schlacter-me (Vercel frontend) + kindle-connector (k8s Python b
 
 ## Changelog
 
+- **2026-06-09 — v9: Stacked PR management and stuck stack detection**
+  - ADDED: Stacked PR management section (merge immediately, retarget, rebase, stuck detection)
+  - Evidence: recs.community PRs #1-7 open for 13+ days with zero merges despite correct stacking
 - **2026-06-08 — v8: Cross-repo coordination**
   - ADDED: Cross-repo coordination section (coupled repos, deploy order, sandbox limitation)
   - Evidence: kindle-schlacter-me + kindle-connector coupled PRs (PR#2 in both repos)
