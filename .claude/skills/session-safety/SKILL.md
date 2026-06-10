@@ -65,6 +65,30 @@ unless explicitly confirmed "yes, start fresh."
 
 ---
 
+## Meta-Review Circuit Breaker
+
+If the task is "review skills," "audit skills," "improve skills," or "consolidate sessions":
+
+```bash
+git log --oneline --since="7 days ago" origin/main | grep -i "improve.*skill\|skill.*review\|gap analysis"
+```
+
+If a skill-review PR was merged in the last 7 days:
+
+```
+REVIEW THROTTLED: A skill improvement PR was merged {N} days ago ({commit}).
+
+The skills have been reviewed {count} times in the last 30 days.
+Instead of another review pass, consider:
+1. Do actual productive work (build a feature, fix a bug, ship something)
+2. If you found a SPECIFIC gap, state it — don't do a full audit
+3. If the user insists, make targeted edits only — no full-file rewrites
+```
+
+This prevents the pattern where consecutive sessions keep doing the same "analyze all PRs, find gaps, add learnings" work instead of building things.
+
+---
+
 ## Before Modifying Files
 
 1. Check if the file has uncommitted changes. Warn before overwriting.
@@ -231,6 +255,9 @@ Evidence: recs.community PRs #1-7 opened May 27, zero merged by June 9. 13 days 
 
 ## Changelog
 
+- **2026-06-10 — v10: Meta-review circuit breaker**
+  - ADDED: Meta-review circuit breaker — throttles "review all skills" sessions if a review was merged in the last 7 days
+  - Evidence: 4 consecutive review sessions (Jun 5-9) all doing "analyze PRs, find gaps, add learnings" instead of building things
 - **2026-06-09 — v9: Stacked PR management and stuck stack detection**
   - ADDED: Stacked PR management section (merge immediately, retarget, rebase, stuck detection)
   - Evidence: recs.community PRs #1-7 open for 13+ days with zero merges despite correct stacking

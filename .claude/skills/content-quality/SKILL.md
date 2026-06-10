@@ -89,6 +89,27 @@ Never write these or close variants:
 
 ---
 
+## Commit and PR Content
+
+Commits and PRs are the most frequent content every session produces. Apply voice rules here too.
+
+### Commit messages
+
+- **Lead with what changed, not what you did.** "Add retry logic for webhook delivery" not "Updated the webhook handler to include retry logic."
+- **No AI filler.** "This commit updates..." / "The following changes..." — just state the change.
+- **Be specific.** "Fix TypeScript error in NavBar props" not "Fix build error."
+- **Keep the first line under 72 chars.** Details go in the body.
+
+### PR titles and descriptions
+
+- **Title: imperative mood, under 70 chars.** "Add cross-source download fallback" not "Added comprehensive fallback system for downloads."
+- **Body: what and why, not how.** The diff shows how. The body explains what problem this solves and why this approach.
+- **No banned phrases in PR descriptions.** "Robust error handling" → "Retry with 3 fallback sources." Same rules as portfolio copy.
+- **Include numbers.** "30s→3s search latency" is more useful than "improved performance."
+- **Out-of-scope list.** State what's intentionally NOT included. Prevents reviewers from asking about missing features.
+
+---
+
 ## Review Checklist
 
 Before finalizing content:
@@ -127,6 +148,10 @@ Before finalizing content:
 
 ## Changelog
 
+- **2026-06-10 — v6: Commit and PR content quality**
+  - ADDED: Commit message quality rules (lead with change, no AI filler, be specific, 72-char limit)
+  - ADDED: PR title/description rules (imperative mood, what not how, include numbers, out-of-scope lists)
+  - Evidence: every session produces commits/PRs but had no quality guidance for this content type
 - **2026-06-05 — v5: GitHub repo descriptions, research content, expanded Claude-voice bans**
   - ADDED: 7 more banned phrases targeting Claude-specific output patterns
   - ADDED: Activation for GitHub repo descriptions, PR titles, commit messages
