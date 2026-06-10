@@ -1,0 +1,33 @@
+name: code-builder learning sync
+on:
+  schedule:
+    - cron: '0 1 * * 0'  # Sunday 1am UTC (6pm PT)
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect run logs
+        run: |
+          mkdir -p .claude/skills/code-builder/runs
+          if [ -d ".claude/runs" ]; then
+            find .claude/runs -name '*.jsonl' -newer .claude/skills/code-builder/SKILL.md 2>/dev/null | while read f; do
+              cat "$f" >> .claude/skills/code-builder/runs/aggregated.jsonl
+            done
+          fi
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .claude/skills/code-builder/runs/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: code-builder learning sync $(date +%Y-%m-%d)"
+            git push
+          else
+            echo "No new run logs to sync"
+          fi

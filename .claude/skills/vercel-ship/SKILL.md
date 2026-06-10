@@ -302,6 +302,43 @@ mcp__Vercel__list_toolbar_threads — Check for user-reported issues via Vercel 
 
 ---
 
+## Step 9: Non-Vercel Deployment Patterns (Docker / k8s)
+
+Not all projects deploy to Vercel. For projects using Docker and/or Kubernetes (e.g., kindle-connector):
+
+### Docker pre-deploy checklist
+
+- [ ] **Dockerfile builds locally.** `docker build -t {name} .` must succeed before pushing.
+- [ ] **Multi-stage builds reduce image size.** Build stage (with dev deps) → production stage (runtime only).
+- [ ] **`.dockerignore` excludes node_modules, .git, .env, tests.** Large contexts slow builds.
+- [ ] **No hardcoded localhost in app code.** Use env vars for service URLs: `process.env.API_URL || 'http://localhost:3000'`.
+- [ ] **Health check endpoint exists.** k8s liveness/readiness probes need a `/health` or `/healthz` route.
+- [ ] **Graceful shutdown.** Handle `SIGTERM` — finish in-flight requests, close DB connections, then exit 0.
+- [ ] **Env vars injected at runtime, not baked into image.** Secrets must come from k8s Secrets or ConfigMaps, not Dockerfile `ENV`.
+
+### k8s deployment checklist
+
+- [ ] **Resource limits are set.** CPU and memory limits prevent one pod from starving the node.
+- [ ] **Replicas > 1 for production.** Single-replica deployments have downtime during updates.
+- [ ] **Rolling update strategy.** `maxUnavailable: 0, maxSurge: 1` ensures zero-downtime deploys.
+- [ ] **Secrets are k8s Secrets, not env vars in the manifest.** `kubectl create secret` or sealed-secrets.
+- [ ] **Service ports match container ports.** Mismatch = silent connection refused.
+- [ ] **Ingress/DNS is configured for the production domain.** Verify with `curl -sI https://{domain}`.
+
+### Docker/k8s debugging
+
+| Symptom | Check first |
+|---|---|
+| Container starts then exits | `docker logs {container}` — usually missing env var or crash on import |
+| Pod in CrashLoopBackOff | `kubectl logs {pod}` + `kubectl describe pod {pod}` — check readiness probe, resource limits |
+| Service unreachable | `kubectl get svc` — verify port mapping, then `kubectl port-forward` to test directly |
+| Image not found | Verify image tag, registry auth, pull policy (`Always` vs `IfNotPresent`) |
+| "Connection refused" to another service | DNS: use `{service-name}.{namespace}.svc.cluster.local`, not localhost |
+
+Evidence: kindle-connector deploys Python + Flask to k8s. Known issue #9 in CLAUDE.md (non-Vercel deployment barely covered) is now addressed.
+
+---
+
 ## Deployment Failure Database
 
 Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript type errors.
@@ -320,6 +357,12 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-10 — v1.4: Non-Vercel deployment (Docker/k8s)**
+  - ADDED: Docker pre-deploy checklist (build, multi-stage, .dockerignore, health checks, graceful shutdown)
+  - ADDED: k8s deployment checklist (resource limits, replicas, rolling updates, secrets, ingress)
+  - ADDED: Docker/k8s debugging table (CrashLoopBackOff, service unreachable, image not found)
+  - Resolves CLAUDE.md known issue #9 (non-Vercel deployment barely covered)
+  - Evidence: kindle-connector deploys Python + Flask to k8s
 - **2026-06-09 — v1.3: Domain migration, MCP deployment tools**
   - ADDED: Domain migration checklist (Step 7) — repo rename, DNS, OAuth, webhooks, SEO
   - ADDED: MCP tools for deployment verification (Step 8) — build logs, runtime logs, project config

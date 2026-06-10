@@ -16,11 +16,11 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v7.5 | Parallel drafts, self-scoring, debug loop, visual mode, testing strategy, CI setup, PRD-to-code, perf optimization, async workflows |
-| vercel-ship | v1.3 | Pre-deploy validation for Next.js + Vercel, domain migration, MCP deployment tools |
+| code-builder | v8 | Parallel drafts, self-scoring, debug loop, visual mode. Learnings extracted to LEARNINGS.md |
+| vercel-ship | v1.4 | Pre-deploy validation for Next.js + Vercel + Docker/k8s |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
-| content-quality | v5 | Anti-AI-slop, voice matching, hallucination prevention |
-| session-safety | v9 | Groundhog Day prevention, cross-session/cross-repo conflict detection, stacked PR management |
+| content-quality | v6 | Anti-AI-slop, voice matching, hallucination prevention, commit/PR quality |
+| session-safety | v10 | Groundhog Day + meta-review circuit breaker + stacked PR management |
 | portfolio-dev | v3.1 | schlacter.me / Next.js portfolio patterns |
 | session-start-hook | v5 | SessionStart hook creation for Claude Code on the web |
 | project-bootstrap | v1.2 | Auto-generate CLAUDE.md for repos |
@@ -62,7 +62,7 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 
 ## Known issues
 
-1. **code-builder learning sync has never run.** 52+ days since initial backfill. No GH Action exists.
+1. ~~**code-builder learning sync has never run.**~~ **RESOLVED**: GH Action deployed at `.github/workflows/code-builder-sync.yml` (2026-06-10). Learnings extracted to `LEARNINGS.md`.
 2. **mcp-contributor refresh.sh anchor bug.** Grep expects `## Step 11.1:` but SKILL.md uses `### 11.1`. Creates false-positive issues weekly.
 3. **mcp-contributor has zero real-world usage** despite extensive maintenance.
 4. ~~**No skill for PM workflows**~~ **RESOLVED**: code-builder v7.4 adds PRD-to-code section (stacked PR decomposition, vertical slicing, schema-first, out-of-scope patterns). Evidence: recs.community 7 PRs from PRD.
@@ -70,7 +70,7 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 6. **mcp-contributor is FROZEN** — over-invested (v4.1 across 30+ sessions, zero real contributions). No further iteration until: anchor bug fixed, stale issues closed, one real MCP contribution made.
 7. ~~**Supabase patterns are uncovered.**~~ **RESOLVED**: code-builder v7.3 and vercel-ship v1.2 include Supabase learnings.
 8. ~~**No testing strategy skill.**~~ **RESOLVED**: code-builder v7.4 adds testing strategy section (what to test, test-with-bugfix, gradual CI adoption, CI workflow template). Evidence: kindle-schlacter-me 71 tests, muse-shopping CI gate.
-9. **Non-Vercel deployment is barely covered.** kindle-connector deploys to k8s. Only vercel-ship exists for deployment patterns.
+9. ~~**Non-Vercel deployment is barely covered.**~~ **RESOLVED**: vercel-ship v1.4 adds Docker/k8s deployment checklists and debugging patterns. Evidence: kindle-connector deploys Python + Flask to k8s.
 10. **No production incident response pattern existed.** debug-escalation v5 now covers production incident triage and resilient fix patterns. Evidence: kindle-schlacter-me PR#2 archive.org outage.
 11. ~~**Cross-repo coordination was missing.**~~ **RESOLVED**: session-safety v8 now covers coupled repos (deploy order, shared env vars, sandbox limitations). Evidence: kindle-schlacter-me + kindle-connector coupled PRs.
 12. ~~**No performance optimization patterns.**~~ **RESOLVED**: code-builder v7.5 adds performance optimization section (profile→parallelize→benchmark). debug-escalation v6 adds performance escalation. Evidence: kindle-connector PR#1 30s→3s.
@@ -79,6 +79,23 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 15. ~~**MCP deployment tools were a blindspot.**~~ **RESOLVED**: vercel-ship v1.3 adds MCP tools section for deployment verification. Evidence: every web session has Vercel MCP tools but no skill mentioned them.
 16. **recs.community has 7 stacked PRs open for 13+ days with zero merges.** session-safety v9 adds stuck stack detection, but the PRs themselves still need to be merged.
 17. **mcp-contributor cron creates false-positive issues weekly.** 6 identical issues May-Jun 2026 (all reporting 11 anchor misses). The cron should be disabled or the anchor bug fixed — "FROZEN" doesn't stop the automation.
+
+## What to work on next (not another skill review)
+
+The skills have been reviewed and improved 5 times in 6 days (Jun 4-10). They are comprehensive. Before doing another review, consider:
+
+**Productive work that moves projects forward:**
+- Merge the recs.community PR stack (#1-7, open 14+ days) — requires laptop
+- Build features on kindle-schlacter-me, kindle-connector, or recs.community
+- Update the portfolio site (schlacter.me) with new projects
+- Set up CI for repos that don't have it yet
+
+**Remaining structural issues (only if specifically asked):**
+- mcp-contributor: fix anchor bug or disable the cron (requires laptop, 5 min)
+- mcp-contributor: make one real contribution to the MCP org to validate the skill
+- Clean up orphaned branches (35+ across hbschlac/hbschlac)
+
+**Do NOT do:** another full skill review. If you found a specific gap, make a targeted edit.
 
 ## README editing rules
 
