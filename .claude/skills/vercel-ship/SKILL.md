@@ -339,6 +339,28 @@ Evidence: kindle-connector deploys Python + Flask to k8s. Known issue #9 in CLAU
 
 ---
 
+## Step 10: Post-Deploy Observability
+
+Deploying successfully is not the end. These checks prevent "it's been broken for 3 days and nobody noticed."
+
+### 2M. Post-deploy verification (add to Step 2 checklist)
+
+- [ ] **Hit the production URL after deploy.** Not just the build log — load the actual page. Check for runtime errors in browser console.
+- [ ] **Verify API endpoints return expected data.** `curl -s https://your-app.vercel.app/api/health | jq .` — should return 200 with valid JSON.
+- [ ] **Check Vercel Function Logs for the first 5 minutes.** Runtime errors often appear only on first real traffic.
+- [ ] **For webhook-dependent features:** trigger a test event and verify it arrives. Webhook endpoints can pass build but fail at runtime.
+
+### Monitoring setup for Vercel projects
+
+| What | How | Why |
+|---|---|---|
+| **Deploy failure alerts** | Vercel dashboard → Settings → Notifications | Know immediately when a push breaks the build |
+| **Runtime error monitoring** | `mcp__Vercel__get_runtime_logs` in web sessions, or integrate Sentry/LogRocket | Build success ≠ runtime success |
+| **External dependency health** | GHA cron that pings external APIs every 6h (see debug-escalation) | Catch upstream outages before users report them |
+| **Uptime monitoring** | Free tier: UptimeRobot or similar. Ping production URL every 5min | Know when the site is down, not when someone tweets about it |
+
+---
+
 ## Deployment Failure Database
 
 Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript type errors.
@@ -357,6 +379,10 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-11 — v1.5: Post-deploy observability**
+  - ADDED: Post-deploy verification checklist (2M) — hit prod URL, verify APIs, check function logs, test webhooks
+  - ADDED: Monitoring setup table for Vercel projects (deploy alerts, runtime monitoring, uptime)
+  - Evidence: incidents discovered reactively across kindle-schlacter-me, muse-shopping; no project had monitoring configured
 - **2026-06-10 — v1.4: Non-Vercel deployment (Docker/k8s)**
   - ADDED: Docker pre-deploy checklist (build, multi-stage, .dockerignore, health checks, graceful shutdown)
   - ADDED: k8s deployment checklist (resource limits, replicas, rolling updates, secrets, ingress)

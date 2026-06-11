@@ -229,6 +229,49 @@ Evidence: kindle-connector PR#1 — profiling revealed sequential indexer querie
 
 ---
 
+## Proactive Monitoring Setup (prevent incidents before they happen)
+
+debug-escalation is reactive by default. This section covers what to configure BEFORE incidents so you catch them early instead of discovering them when users report "it's broken."
+
+### What to monitor per deployment type
+
+| Deploy target | Monitoring | Setup |
+|---|---|---|
+| **Vercel** | Runtime logs + deploy notifications | Vercel dashboard → Notifications → deploy failures to Slack/email. Check `mcp__Vercel__get_runtime_logs` in web sessions. |
+| **k8s** | Pod health + resource usage | `kubectl top pods`, liveness/readiness probes, alerting on CrashLoopBackOff |
+| **GitHub Actions** | Workflow failure notifications | Repository → Settings → Notifications → workflow runs. Or: `mcp__github__actions_list` in web sessions. |
+| **External APIs** | Uptime + response time | Periodic health check (cron job or GHA scheduled workflow) that probes each external dependency and alerts on failure |
+
+### Minimum viable monitoring for any project
+
+1. **Deploy failure alerts.** Vercel/GHA send emails by default — make sure they're going to an inbox you check.
+2. **External dependency health check.** A scheduled job (GHA cron or Vercel cron) that pings external APIs and records status. This is how you catch "archive.org is down" BEFORE users report download failures.
+3. **Error budget tracking.** After a production incident, add a regression check: a test or health probe that would have caught the specific failure mode.
+
+### Health check pattern (GHA cron)
+
+```yaml
+name: Health Check
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for url in "https://your-app.vercel.app/api/health" "https://external-api.example.com"; do
+            status=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+            if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+              echo "ALERT: $url returned $status"
+              exit 1
+            fi
+          done
+```
+
+Evidence: kindle-schlacter-me PR#2 was triggered by an archive.org outage discovered reactively. A 6-hour health check on archive.org endpoints would have caught it hours earlier.
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -246,6 +289,11 @@ Evidence: kindle-connector PR#1 — profiling revealed sequential indexer querie
 
 ## Changelog
 
+- **2026-06-11 — v7: Proactive monitoring setup**
+  - ADDED: Proactive monitoring section (deploy alerts, external dep health checks, error budgets)
+  - ADDED: Health check GHA cron pattern for external dependency monitoring
+  - ADDED: Per-deployment monitoring table (Vercel, k8s, GHA, external APIs)
+  - Evidence: kindle-schlacter-me archive.org outage was discovered reactively; health check would have caught it hours earlier
 - **2026-06-09 — v6: Performance escalation**
   - ADDED: Performance escalation section (measure→categorize→fix→benchmark cycle)
   - ADDED: Bottleneck category table (sequential I/O, single slow dep, cold start, N+1)

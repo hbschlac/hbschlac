@@ -16,9 +16,18 @@ landing page copy, any text making claims about what a product does.
 Does NOT activate for: code-only changes, config files, internal comments.
 
 Also activates for: GitHub repo descriptions, PR titles/descriptions, commit messages in
-public repos, project taglines.
+public repos, project taglines, **GitHub profile README** (`hbschlac/hbschlac/README.md`).
 
 Also invoked by code-builder Step 6 when a code diff includes user-facing text.
+
+### Profile README rules
+
+The profile README is the highest-traffic content piece. Extra rules:
+- **Keep it current.** Every shipped project should be represented. Check: does the projects table match what's actually deployed?
+- **Projects table is the portfolio's front door.** Each row: name (linked), one-line description, stack. No filler. No unshipped projects.
+- **Tone: builder, not marketer.** "No CS degree." is the voice. "Passionate about leveraging technology" is not.
+- **Work section: numbers over narrative.** "7% CVR improvement" beats "drove significant improvements."
+- **Update triggers:** new project shipped, role change, significant feature launch. Not every commit.
 
 ---
 
@@ -148,6 +157,10 @@ Before finalizing content:
 
 ## Changelog
 
+- **2026-06-11 — v7: Profile README rules**
+  - ADDED: GitHub profile README to explicit activation scope
+  - ADDED: Profile README rules (keep current, projects table, builder tone, update triggers)
+  - Evidence: profile README hasn't been updated to reflect kindle-schlacter-me or recs.community; 2 shipped projects missing from the projects table
 - **2026-06-10 — v6: Commit and PR content quality**
   - ADDED: Commit message quality rules (lead with change, no AI filler, be specific, 72-char limit)
   - ADDED: PR title/description rules (imperative mood, what not how, include numbers, out-of-scope lists)

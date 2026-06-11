@@ -241,6 +241,68 @@ Evidence: recs.community PRs #1-7 opened May 27, zero merged by June 9. 13 days 
 
 ---
 
+## Cross-Repo Management from Web Sessions
+
+Web sessions are scope-locked to one repo's MCP tools. This is the #1 cause of stuck PRs — work gets created in other repos but can never be merged from subsequent web sessions.
+
+### Check what repos are accessible
+
+Before assuming you can't reach a repo:
+```
+mcp__claude-code-remote__list_repos → shows all repos available to add
+```
+
+If the target repo appears, add it to the session:
+```
+mcp__claude-code-remote__add_repo → adds repo to current session's MCP scope
+```
+
+After adding, you can use `mcp__github__merge_pull_request`, `mcp__github__list_pull_requests`, etc. on that repo.
+
+### When a repo can't be added
+
+If the repo isn't in `list_repos` or `add_repo` fails:
+
+1. **Write a self-contained merge script** in CLAUDE.md under "Laptop instructions." Not "merge the PRs" — the exact commands:
+   ```bash
+   cd ~/recs.community
+   gh pr merge 1 --squash
+   gh pr edit 2 --base main && gh pr merge 2 --squash
+   # Continue for each PR in the stack
+   ```
+
+2. **Track stuck PRs explicitly** in CLAUDE.md's known issues with: repo, PR numbers, days open, what's blocking.
+
+3. **Don't create more stacked PRs if existing ones haven't merged.** A stack of 7 unmerged PRs is worse than no stack. Evidence: recs.community #1-7 (15+ days, zero merges).
+
+### Stuck PR triage (extends stuck stack detection)
+
+At session start, also check for PRs in known repos that aren't the current session's scope:
+```bash
+# Check CLAUDE.md for known stuck PRs
+grep -A5 "stuck\|unmerged\|open.*days" CLAUDE.md
+```
+
+If stuck PRs exist, the FIRST action should be attempting to add that repo and merge — not building new features on top of the stuck foundation.
+
+## Rollback Patterns
+
+When a merged PR breaks production:
+
+### Vercel
+1. **Instant rollback:** Vercel dashboard → Deployments → find last working deploy → "Promote to Production." This is faster than any code revert.
+2. **Code revert:** `git revert {merge-commit-sha} && git push` creates a new commit undoing the merge.
+3. **Don't force-push main.** Revert commits preserve history.
+
+### k8s / Docker
+1. **Roll back deployment:** `kubectl rollout undo deployment/{name}` reverts to previous revision.
+2. **Pin to previous image tag:** `kubectl set image deployment/{name} {container}={image}:{previous-tag}`
+3. **Check rollout status:** `kubectl rollout status deployment/{name}`
+
+### Database
+1. **Migrations are forward-only.** Write a new migration that undoes the change, don't edit the deployed one.
+2. **For Supabase:** `supabase db reset` is destructive. Use a corrective migration instead.
+
 ## Branch Naming and Hygiene
 
 - **Web sessions**: Use the auto-assigned `claude/*` branch name. Don't rename.
@@ -255,6 +317,11 @@ Evidence: recs.community PRs #1-7 opened May 27, zero merged by June 9. 13 days 
 
 ## Changelog
 
+- **2026-06-11 — v11: Cross-repo management, rollback patterns**
+  - ADDED: Cross-repo management from web sessions (list_repos → add_repo → merge workflow)
+  - ADDED: Concrete guidance for when repos can't be added (merge scripts, stuck PR tracking)
+  - ADDED: Rollback patterns for Vercel, k8s/Docker, and databases
+  - Evidence: recs.community #1-7 stuck 15+ days, muse-shopping #1 stuck 20+ days — both because no session could reach them
 - **2026-06-10 — v10: Meta-review circuit breaker**
   - ADDED: Meta-review circuit breaker — throttles "review all skills" sessions if a review was merged in the last 7 days
   - Evidence: 4 consecutive review sessions (Jun 5-9) all doing "analyze PRs, find gaps, add learnings" instead of building things

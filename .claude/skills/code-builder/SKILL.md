@@ -20,6 +20,19 @@ Default: when uncertain, activate. Single-pass costs nothing; missing a dev task
 
 **Conflict:** If `mcp-contributor` is active (guiding a PR to the MCP org), code-builder defers. code-builder handles only code tasks mcp-contributor doesn't claim.
 
+### Skill precedence (when multiple skills trigger)
+
+code-builder is the execution engine. Domain skills provide context. They co-activate, not compete:
+
+| Task type | Active skills | Who does what |
+|---|---|---|
+| Portfolio feature | code-builder + portfolio-dev | portfolio-dev: conventions, data model. code-builder: mode selection, execution. |
+| Deploy failure | vercel-ship (primary) | vercel-ship owns debugging. code-builder activates only if the fix requires code changes. |
+| CSS/styling | code-builder (visual mode) + portfolio-dev | code-builder runs 3 visual drafts. portfolio-dev constrains the design system. |
+| User-facing text in code | code-builder + content-quality | code-builder runs Step 6 content check. content-quality validates the text. |
+| Production incident | debug-escalation (primary) | debug-escalation owns triage. code-builder's debug loop activates only for the fix itself. |
+| Cross-repo coordination | session-safety (primary) | session-safety owns the workflow. code-builder handles per-repo code changes. |
+
 ## Announcement
 
 > **code-builder activated** — [parallel, N drafts | single pass | debug loop | visual, 3 drafts]. [reason.]
@@ -181,6 +194,8 @@ Escalate when ANY fire:
 ---
 
 ## Step 4a — Parallel Path
+
+**Status: UNTESTED in production.** As of 2026-06-11, no run log exists for parallel mode. The first real parallel run should: (1) use N=3 (not N=5), (2) log the full score breakdown, (3) commit the run log, (4) note whether worktrees worked in the environment (web session vs. laptop). If worktrees fail in a web session sandbox, fall back to single-pass — don't debug the environment.
 
 1. **Git repo gate (BLOCKING):** `git rev-parse --git-dir` must succeed. If not, abort parallel — do NOT silently fall back to single.
 
@@ -381,6 +396,10 @@ Last synced: 2026-06-10. GH Action deployed at `.github/workflows/code-builder-s
 
 ## Changelog
 
+- **2026-06-11 — v8.1: Skill precedence table, parallel mode untested flag**
+  - ADDED: Skill precedence table — defines which skill leads when multiple trigger simultaneously
+  - ADDED: Parallel mode untested warning with first-run guidance (N=3, log everything, test worktrees)
+  - Evidence: 4+ skills can trigger on a single task (portfolio + vercel + visual + content-quality) with no routing; parallel mode has zero production run logs after 7 versions
 - **2026-06-10 — v8: Extract learnings, deploy GH Action, add large-codebase patterns**
   - MOVED: 15 learnings subsections (~280 lines) to `LEARNINGS.md` — keeps workflow crisp, reference accessible
   - ADDED: "Working on Large Existing Codebases" section in LEARNINGS.md (read-before-change, smallest fix, incremental CI, tech debt triage)
