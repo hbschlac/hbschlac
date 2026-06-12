@@ -272,6 +272,21 @@ jobs:
 
 Evidence: kindle-schlacter-me PR#2 was triggered by an archive.org outage discovered reactively. A 6-hour health check on archive.org endpoints would have caught it hours earlier.
 
+## Claude Code Web Session Debugging
+
+Debugging in web sessions has unique constraints. Before applying general debug patterns, account for:
+
+| Constraint | Impact | Workaround |
+|---|---|---|
+| **Ephemeral filesystem** | Can't persist debugging artifacts between sessions. Breakpoints, test fixtures, custom scripts — gone on restart. | Commit debug helpers to the repo. Write reproduction steps in CLAUDE.md, not just "it's broken." |
+| **No browser access** | Can't visually inspect UI, open devtools, or see console output in a real browser. | Use `curl` for API testing. For UI issues, describe what the user should test and ask them to report back. Use `WebFetch` for SSR-rendered pages. |
+| **MCP tool failures** | GitHub/Vercel MCP tools can timeout, return stale data, or silently fail. | Always verify MCP tool results. If `mcp__github__pull_request_read` returns an error, try `mcp__github__list_pull_requests` as a fallback. Don't build on assumed state. |
+| **No long-running processes** | Can't run a dev server and then test against it in separate steps. | Run server + test in a single command: `timeout 10 bash -c 'npm run dev & sleep 5 && curl localhost:3000/api/health'`. Or use build-time checks (`tsc --noEmit`, `next build`). |
+| **Context window limits** | Long debug sessions exhaust context. Earlier findings get compressed. | Write the root-cause report (Step 5) EARLY — don't wait until the end. Commit findings as you go. |
+| **Network policy** | Outbound requests may be blocked depending on environment config. | Check if the request works with `curl -sI` before assuming code is broken. Network errors in web sessions are often policy, not code. |
+
+---
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -289,6 +304,9 @@ Evidence: kindle-schlacter-me PR#2 was triggered by an archive.org outage discov
 
 ## Changelog
 
+- **2026-06-12 — v8: Claude Code web session debugging**
+  - ADDED: Web session debugging table — ephemeral filesystem, no browser access, MCP tool failures, no long-running processes, context limits, network policy constraints
+  - Evidence: debugging patterns assumed persistent environments and browser access; web sessions have neither
 - **2026-06-11 — v7: Proactive monitoring setup**
   - ADDED: Proactive monitoring section (deploy alerts, external dep health checks, error budgets)
   - ADDED: Health check GHA cron pattern for external dependency monitoring

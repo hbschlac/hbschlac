@@ -150,6 +150,21 @@ CLAUDE_CODE_REMOTE=true CLAUDE_ENV_FILE=/tmp/test-env-file ./.claude/hooks/sessi
 
 If `$CLAUDE_ENV_FILE` was written to: `source /tmp/test-env-file` and verify.
 
+### 6B. Debug Hook Failures
+
+When a hook fails silently or tests/linters don't work after session start:
+
+| Symptom | Check | Fix |
+|---|---|---|
+| Hook didn't run | `cat .claude/settings.json` — is `hooks.SessionStart` registered? | Add the hook registration. Use `$CLAUDE_PROJECT_DIR` prefix. |
+| Hook ran but deps missing | Run the hook script manually: `bash -x .claude/hooks/session-start.sh` | The `-x` flag shows each line as it executes. Look for silent failures. |
+| `npm install` fails in hook | Check if `package-lock.json` exists. Network issues in web sessions? | Try `npm install --prefer-offline --no-audit`. Check network policy. |
+| Python venv not activated | `$CLAUDE_ENV_FILE` must be written to — `echo 'export PATH=...' >> "$CLAUDE_ENV_FILE"` | Verify the env file path is correct and the file is sourced by the session. |
+| Hook runs on laptop (unwanted) | Missing `$CLAUDE_CODE_REMOTE` guard | Add `[ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && exit 0` as first line. |
+| Hook timeout | Hook takes >5min (default async timeout) | Set `"asyncTimeout": 300000` or optimize the install step. Use `npm ci` if lockfile exists. |
+
+**Cross-reference:** When bootstrapping a new repo, `project-bootstrap` (Step 4B) generates the hook alongside CLAUDE.md. Use that for new repos instead of creating from scratch.
+
 ### 7. Validate Linter
 
 Run the linter on a single file. Common commands:
@@ -193,6 +208,9 @@ Provide summary with:
 
 ## Changelog
 
+- **2026-06-12 — v6: Hook debugging, project-bootstrap cross-reference**
+  - ADDED: Hook debugging table (Step 6B) — silent failures, missing deps, venv issues, timeout, cross-ref to project-bootstrap
+  - Evidence: hooks fail silently in web sessions and there was no troubleshooting guide; project-bootstrap creates CLAUDE.md but not hooks
 - **2026-06-05 — v5: Monorepo workspaces, database migrations, Python system deps**
   - ADDED: Monorepo workspace detection and handling guidance
   - ADDED: Database migration handling in hooks (prisma generate, not migrate deploy)

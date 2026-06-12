@@ -134,6 +134,36 @@ Last synced: 2026-06-09 (manual, from PRs across kindle-schlacter-me, kindle-con
 - **Out-of-scope lists prevent scope creep.** Every PR lists what's intentionally NOT included.
 - **Unblock stacked PRs proactively.** Merge #1 immediately if CI passes, retarget #2 to main, repeat.
 
+## Test Framework Setup
+
+When a project has no test infrastructure, set it up before writing tests:
+
+**Jest (Next.js / Node.js):**
+```bash
+npm install -D jest @types/jest ts-jest
+# For Next.js: npm install -D @testing-library/react @testing-library/jest-dom jest-environment-jsdom
+```
+Config: `jest.config.ts` with `preset: 'ts-jest'`. For Next.js, use `nextJest()` from `next/jest`.
+
+**Vitest (Vite projects):**
+```bash
+npm install -D vitest @testing-library/react @testing-library/jest-dom
+```
+Config: `vitest.config.ts` — Vitest reads from `vite.config.ts` by default. Add `test: { environment: 'jsdom' }` for React.
+
+**pytest (Python):**
+```bash
+pip install pytest pytest-cov
+# For async: pip install pytest-asyncio
+```
+Config: `pyproject.toml` under `[tool.pytest.ini_options]`. Set `testpaths = ["tests"]`.
+
+**Common mistakes:**
+- Don't install test deps globally — always `--save-dev` or in venv
+- Don't configure both Jest and Vitest — pick one per project
+- Set up a single passing test before configuring CI — verify the runner works first
+- For Supabase: mock `@supabase/supabase-js` in tests, don't hit real DB. Use `supabase start` only for integration tests.
+
 ## Working on Large Existing Codebases
 
 - **Read before changing.** For codebases >10K LOC, spend 15-30 minutes reading architecture before writing any code. Map: entry points, data flow, config, and the specific area you'll change.

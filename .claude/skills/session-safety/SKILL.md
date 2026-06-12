@@ -87,6 +87,23 @@ Instead of another review pass, consider:
 
 This prevents the pattern where consecutive sessions keep doing the same "analyze all PRs, find gaps, add learnings" work instead of building things.
 
+### Productive Work Accelerator
+
+When the circuit breaker fires, don't just say "do productive work." Check CLAUDE.md for the "What to work on next" section and suggest the top unblocked item. If CLAUDE.md doesn't have that section, check:
+
+```bash
+# 1. Stuck PRs that could be merged right now
+grep -A3 "stuck\|unmerged\|open.*days\|stacked PR" CLAUDE.md
+
+# 2. README/profile staleness
+grep -A3 "stale\|missing.*project\|update.*README" CLAUDE.md
+
+# 3. Features that are half-built
+grep -A3 "TODO\|WIP\|in-progress\|blocked" CLAUDE.md
+```
+
+Present the top 3 actionable items with one-line descriptions. Don't list everything — pick what's unblocked and high-impact.
+
 ---
 
 ## Before Modifying Files
@@ -317,6 +334,9 @@ When a merged PR breaks production:
 
 ## Changelog
 
+- **2026-06-12 — v12: Productive work accelerator**
+  - ADDED: Productive work accelerator — when meta-review circuit breaker fires, actively suggest top unblocked items from CLAUDE.md instead of just saying "do productive work"
+  - Evidence: circuit breaker correctly prevents reviews but leaves the session directionless; 4+ sessions stopped reviewing but didn't start building
 - **2026-06-11 — v11: Cross-repo management, rollback patterns**
   - ADDED: Cross-repo management from web sessions (list_repos → add_repo → merge workflow)
   - ADDED: Concrete guidance for when repos can't be added (merge scripts, stuck PR tracking)

@@ -12,7 +12,8 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 |---------|-------------|-------|
 | **[Muse](https://app.muse.shopping)** | Personalized shopping platform · 264 brands · 10 retailers · one agentic checkout · Gmail receipt parsing · built solo | Node.js · PostgreSQL · Stripe |
 | **[Claude Skills](https://schlacter.me/projects)** | Makes Claude's persistent instruction system understandable for non-engineers · built because Anthropic's docs assumed you were a developer | Next.js · Vercel |
-| **[Kindle × Libby](https://github.com/hbschlac/libby-hold-monitor)** | Automated library-to-Kindle delivery · book just appears · zero steps · fully unattended in the cloud | Node.js · Automation |
+| **[Kindle × Schlacter](https://kindle.schlacter.me)** | Automated library-to-Kindle delivery · book just appears · zero steps · cross-source fallback across 3 download providers · fully unattended | Next.js · Vercel KV · Python · k8s |
+| **[recs.community](https://github.com/hbschlac/recs.community)** | Community-driven recommendations platform · Supabase auth · stacked PR architecture from PRD | Next.js · Supabase |
 
 ---
 

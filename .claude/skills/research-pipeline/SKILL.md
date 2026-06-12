@@ -189,6 +189,61 @@ Format: CSV for broad compatibility, JSON for structured data, both if possible.
 
 ---
 
+## Claude API for Classification
+
+When using Claude for automated classification (Step 3B), use the cheapest model that meets accuracy targets:
+
+| Model | Use when | Cost per 1K items (~200 tokens each) |
+|---|---|---|
+| Haiku | Simple categorization (3-5 categories), sentiment analysis | ~$0.05 |
+| Sonnet | Complex taxonomy (10+ categories), theme extraction, nuanced sentiment | ~$0.60 |
+| Opus | Multi-dimensional coding, disagreement resolution, taxonomy generation | ~$3.00 |
+
+**Batching pattern:**
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+def classify_batch(items, categories, batch_size=20):
+    results = []
+    for i in range(0, len(items), batch_size):
+        batch = items[i:i+batch_size]
+        # Send multiple items in one prompt to reduce API calls
+        prompt = f"Classify each item into one of: {', '.join(categories)}\n\n"
+        for j, item in enumerate(batch):
+            prompt += f"{j+1}. {item['text'][:500]}\n"
+        prompt += "\nRespond with one category per line, numbered to match."
+        
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        results.extend(parse_classifications(response.content[0].text))
+    return results
+```
+
+**Rules:**
+- Start with Haiku, upgrade only if accuracy on gold set is <85%
+- Batch 10-20 items per API call to reduce cost and latency
+- Store the model ID and prompt version alongside results — you'll re-run when you refine
+- Set `max_tokens` conservatively — classification responses are short
+- For >5K items, use the Anthropic Batch API for 50% cost reduction
+
+### Data Visualization
+
+| Library | Use when | Avoid when |
+|---|---|---|
+| **Recharts** | React dashboards, simple bar/line/pie charts, quick setup | Complex custom visualizations, non-React |
+| **Chart.js** | Lightweight, framework-agnostic, canvas-based | Need SVG output, complex interactions |
+| **D3.js** | Custom visualizations, maps, force-directed graphs | Simple charts (overkill), tight deadlines |
+| **Observable Plot** | Quick exploratory analysis, notebook-style | Production dashboards |
+
+For research dashboards (Step 5A), default to Recharts with Next.js. It handles responsive sizing and SSR without configuration.
+
+---
+
 ## Anti-patterns
 
 - **Don't collect first, ask questions later.** Define the question before scraping.
@@ -202,6 +257,10 @@ Format: CSV for broad compatibility, JSON for structured data, both if possible.
 
 ## Changelog
 
+- **2026-06-12 — v1.1: Claude API integration, data visualization**
+  - ADDED: Claude API for classification — model selection table (Haiku/Sonnet/Opus by use case), batching pattern, Batch API note
+  - ADDED: Data visualization library comparison table (Recharts, Chart.js, D3, Observable Plot)
+  - Evidence: classification step referenced LLMs but had no concrete API guidance; dashboard step recommended Recharts without comparing alternatives
 - **2026-06-05 — v1: Initial skill based on 4 research repos**
   - Covers: data collection, classification (manual + LLM), analysis, presentation
   - Sources: twitch-community-research, workspace-ai-research, claude-code-insights-dashboard, managed-agents-pulse

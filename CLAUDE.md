@@ -16,16 +16,16 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v8.1 | Parallel drafts, self-scoring, debug loop, visual mode. Skill precedence table. Learnings in LEARNINGS.md |
-| vercel-ship | v1.5 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + post-deploy observability |
+| code-builder | v8.2 | Parallel drafts, self-scoring, debug loop, visual mode. Web session patterns. Learnings in LEARNINGS.md |
+| vercel-ship | v1.6 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + migration coordination + ISR debugging |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
-| content-quality | v7 | Anti-AI-slop, voice matching, hallucination prevention, commit/PR quality, profile README |
-| session-safety | v11 | Groundhog Day + cross-repo management + rollback patterns + stacked PR management |
-| portfolio-dev | v3.1 | schlacter.me / Next.js portfolio patterns |
-| session-start-hook | v5 | SessionStart hook creation for Claude Code on the web |
-| project-bootstrap | v1.2 | Auto-generate CLAUDE.md for repos |
-| debug-escalation | v7 | Fix-churn cycle breaker + production incident response + proactive monitoring |
-| research-pipeline | v1 | Scrape, classify, analyze, present research data |
+| content-quality | v8 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality |
+| session-safety | v12 | Groundhog Day + productive work accelerator + cross-repo management + rollback patterns |
+| portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
+| session-start-hook | v6 | SessionStart hook creation + hook debugging + project-bootstrap cross-reference |
+| project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
+| debug-escalation | v8 | Fix-churn cycle breaker + production incident response + web session debugging |
+| research-pipeline | v1.1 | Scrape, classify, analyze, present research data + Claude API integration |
 
 ## Sandbox constraint
 
@@ -86,7 +86,14 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 18. **muse-shopping #1 is open 20+ days (since May 22).** PR adds test gate for broken-in-prod. Not tracked previously — same stuck-PR pattern as recs.community.
 19. **code-builder parallel mode has never been used in production.** 7 versions of the most complex execution mode with zero run logs. First real use should be N=3 with full logging.
 20. **No project has monitoring/alerting configured.** Incidents are discovered reactively. debug-escalation v7 adds proactive monitoring patterns but no project has implemented them yet.
-21. **Profile README is stale.** kindle-schlacter-me and recs.community are shipped/in-progress but not listed in README.md projects table.
+21. ~~**Profile README is stale.**~~ **RESOLVED**: README.md updated with kindle-schlacter-me and recs.community (2026-06-12).
+22. **No Claude Code web session patterns in any skill.** Sessions run in ephemeral containers with MCP tools, subagents, and network constraints — none of this was covered. code-builder v8.2, debug-escalation v8, session-start-hook v6 now address this.
+23. **No ship/launch announcement patterns.** content-quality covered portfolio copy but not "I just shipped, tell people." content-quality v8 adds ship announcement templates.
+24. **No database migration + deploy coordination.** Supabase/Prisma migrations must run before Vercel deploy. vercel-ship v1.6 adds migration coordination checklist.
+25. **No test framework setup guidance.** Projects starting tests from zero had no patterns for Jest/Vitest/pytest initial setup. code-builder LEARNINGS.md now covers this.
+26. **project-bootstrap and session-start-hook were disconnected.** Bootstrapping a repo should generate hooks too. project-bootstrap v1.3 cross-references session-start-hook.
+27. **ISR/SSG stale data debugging was missing from vercel-ship.** Added revalidation debugging patterns to vercel-ship v1.6.
+28. **research-pipeline had no Claude API integration guidance.** v1.1 adds model selection, batching patterns, and data viz library comparison.
 
 ## What to work on next (not another skill review)
 
@@ -96,9 +103,8 @@ The skills have been reviewed and improved 5 times in 6 days (Jun 4-10). They ar
 - Merge the recs.community PR stack (#1-7, open 15+ days) — try `list_repos`/`add_repo` first, laptop if needed
 - Merge muse-shopping #1 (open 20+ days) — same approach
 - Build features on kindle-schlacter-me, kindle-connector, or recs.community
-- Update the portfolio site (schlacter.me) with new projects
-- Update README.md to reflect kindle-schlacter-me and recs.community
-- Set up monitoring/health checks for any deployed project (see debug-escalation v7)
+- Update the portfolio site (schlacter.me) with new projects (see portfolio-dev end-to-end workflow)
+- Set up monitoring/health checks for any deployed project (see debug-escalation v8)
 - Set up CI for repos that don't have it yet
 
 **Remaining structural issues (only if specifically asked):**

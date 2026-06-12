@@ -135,6 +135,47 @@ Before finalizing content:
 
 ---
 
+## Ship Announcements
+
+When a project ships or hits a milestone, you need announcement content. These are not portfolio copy — they're shorter, more casual, and have a call to action.
+
+### LinkedIn/social post template
+
+```
+{What I built — one line, concrete.}
+
+{The interesting technical or product detail — what makes it not boring.}
+
+{The number or result — users, improvement, scale.}
+
+{Link or CTA.}
+```
+
+Example: "Built a system that delivers library books to your Kindle automatically. You reserve a book at the library, it just appears on your Kindle. No steps. Zero-touch cloud automation with fallback across 3 download sources. kindle.schlacter.me"
+
+**Rules:**
+- No "excited to announce" / "thrilled to share" — banned phrases apply here too
+- Lead with what it does, not that you built it
+- One technical detail that makes it interesting to builders
+- One number that proves it works
+- Under 200 words for LinkedIn, under 280 chars for Twitter/X
+- Don't self-deprecate ("just a side project") and don't oversell ("revolutionary")
+
+### Release notes / changelog
+
+For feature updates to shipped products:
+
+```
+## {Version or date}
+
+- **{Feature name}:** {What it does, in one line.} {Why it matters.}
+- **Fix:** {What was broken.} {What it does now.}
+```
+
+No "various improvements" or "bug fixes and performance improvements." If you can't name it, it's not worth announcing.
+
+---
+
 ## Common Failure Modes
 
 1. **The "impressive rewrite" trap.** Don't make copy sound more impressive — make it more specific. "ML system behind ~400M daily product page views" beats "cutting-edge ML platform powering millions of interactions."
@@ -157,6 +198,10 @@ Before finalizing content:
 
 ## Changelog
 
+- **2026-06-12 — v8: Ship announcements and launch content**
+  - ADDED: Ship announcement section — LinkedIn/social post template, release notes template
+  - ADDED: Rules for launch content (no "excited to announce," lead with what it does, include one number)
+  - Evidence: content-quality covered portfolio copy but not the "I just shipped, tell people" workflow; no template for announcing features or projects
 - **2026-06-11 — v7: Profile README rules**
   - ADDED: GitHub profile README to explicit activation scope
   - ADDED: Profile README rules (keep current, projects table, builder tone, update triggers)
