@@ -131,6 +131,21 @@ skill for the pattern. Key files: `middleware.ts` + `app/jamie-bach-2026/`.
 4. Verify metadata with: open the page, View Source, search for `og:` tags
 5. For case studies: `title` should be the project name, not "Case Study: [name]"
 
+### End-to-end: add a shipped project to the portfolio
+
+When a new project ships (kindle-schlacter-me, recs.community, etc.), the full workflow is:
+
+1. **Verify it's shipped.** Live URL works, core feature is functional, no embarrassing bugs on the landing page.
+2. **Add to `lib/projects.ts`.** All required fields. Set `featured: true` if it should appear on the landing page.
+3. **Take screenshots.** Visit the live site, capture hero image at 1200×630 (OG image dimensions). Save to `public/images/{slug}/`.
+4. **Write the case study.** Use content-quality rules. Lead with the most interesting fact. Structure: "What it does → Why it's interesting → How it works (brief) → What I learned."
+5. **Verify the project page.** `npm run dev` → visit `/projects/{slug}` → check mobile + desktop.
+6. **Update the profile README** (`hbschlac/hbschlac/README.md`). Add a row to the "What I've built" table. Same content-quality rules apply.
+7. **Update `schlacter.me` metadata.** Ensure the landing page's project count and descriptions are current.
+8. **Deploy.** Push to main → Vercel auto-deploys → verify production URL.
+
+**Don't skip step 6.** The profile README is the most-viewed artifact and it stays stale if you don't explicitly update it.
+
 ### Multi-project sites (kindle-schlacter-me, etc.)
 
 Not all Next.js projects are the portfolio. For standalone project sites (kindle-schlacter-me):
@@ -189,6 +204,9 @@ These are Hannah's other projects. They deploy independently and use different p
 
 ## Changelog
 
+- **2026-06-12 — v3.2: End-to-end new project workflow**
+  - ADDED: Complete "add a shipped project to the portfolio" workflow — verify shipped, add to projects.ts, screenshots, case study, profile README update, deploy
+  - Evidence: portfolio-dev had pieces but no complete flow; profile README stayed stale because step 6 (update README) was never explicit
 - **2026-06-06 — v3.1: Related projects table**
   - ADDED: Related projects table clarifying which projects are NOT portfolio-dev
   - Evidence: kindle-schlacter-me, kindle-connector, recs.community, muse-shopping are all independent

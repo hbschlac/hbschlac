@@ -211,6 +211,33 @@ Only add commands that were actually detected.
 
 ---
 
+## Step 4B: Generate session-start hook (for web sessions)
+
+If the repo will be used in Claude Code web sessions, generate a SessionStart hook alongside the CLAUDE.md. See `session-start-hook` skill for full patterns, but the minimum is:
+
+```bash
+mkdir -p .claude/hooks
+cat > .claude/hooks/session-start.sh << 'EOF'
+#!/bin/bash
+set -euo pipefail
+[ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && exit 0
+{detected install command}
+EOF
+chmod +x .claude/hooks/session-start.sh
+```
+
+Register in `.claude/settings.json` under `hooks.SessionStart`. This ensures tests and linters work in web sessions without manual dep installation.
+
+**When to include:**
+- Any repo that uses `npm install`, `pip install`, or equivalent before tests can run
+- Any repo where Claude Code web sessions are expected (check for existing `.claude/` dir or CLAUDE.md)
+
+**When to skip:**
+- Repos with no test/lint infrastructure
+- Repos already bootstrapped with hooks
+
+---
+
 ## Step 5: Write and report
 
 1. Write `CLAUDE.md` to project root
@@ -236,6 +263,10 @@ Only add commands that were actually detected.
 
 ## Changelog
 
+- **2026-06-12 — v1.3: Session-start hook generation**
+  - ADDED: Step 4B — generate session-start hook alongside CLAUDE.md for web session support
+  - ADDED: Cross-reference to session-start-hook skill for full hook patterns
+  - Evidence: project-bootstrap generated CLAUDE.md but not hooks; repos bootstrapped for Claude Code still needed manual hook setup
 - **2026-06-06 — v1.2: Supabase detection, deploy script detection**
   - ADDED: Supabase detection (migrations, config, client packages)
   - ADDED: Deploy script detection (deploy.sh, k8s manifests, Railway)

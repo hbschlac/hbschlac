@@ -100,6 +100,17 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Task adds conditional logic around a hook? | No conditional calls, no hooks in callbacks/effects. |
 | Task adds user-facing text? | Run content-quality checks. |
 
+### 1C-2. Claude Code Environment (web sessions)
+
+| Check | Action |
+|---|---|
+| Running in ephemeral container? | No persistent filesystem between sessions. Anything worth keeping must be committed and pushed. |
+| Need to search/fetch external info? | Use subagents (`Agent` tool with `subagent_type: "Explore"`) for broad searches. Use `WebFetch`/`WebSearch` for specific URLs. Don't shell out to `curl` for APIs when MCP tools exist. |
+| Using MCP tools (GitHub, Vercel, etc.)? | MCP tools can timeout or fail silently. Always verify the result — don't assume success. If a tool returns an error, retry once, then fall back to an alternative approach or flag the user. |
+| Need to work across repos? | Check `mcp__claude-code-remote__list_repos` first. If the repo is available, use `add_repo`. If not, write laptop instructions in CLAUDE.md. Don't silently skip cross-repo work. |
+| Spawning subagents for parallel work? | Use `Agent` tool with `run_in_background: true` for independent tasks. For research: specify "report in under 200 words" to keep context lean. For code changes: use `isolation: "worktree"`. Never spawn more than 3 subagents for one task. |
+| Session nearing context limits? | Conversation gets auto-compressed. Keep skill activations minimal after the first 3 — suppress announcements. Prefer direct tool calls over subagent delegation for simple tasks. |
+
 ### 1D. Deployment & Integration
 
 | Check | Action |
@@ -396,6 +407,10 @@ Last synced: 2026-06-10. GH Action deployed at `.github/workflows/code-builder-s
 
 ## Changelog
 
+- **2026-06-12 — v8.2: Claude Code web session patterns**
+  - ADDED: Pre-flight check 1C-2 — Claude Code environment (ephemeral containers, MCP tool failures, subagent patterns, cross-repo access, context limits)
+  - ADDED: Test framework setup section in LEARNINGS.md (Jest, Vitest, pytest initial config)
+  - Evidence: every web session faces these constraints but no skill addressed them; projects starting tests from zero had no setup guidance
 - **2026-06-11 — v8.1: Skill precedence table, parallel mode untested flag**
   - ADDED: Skill precedence table — defines which skill leads when multiple trigger simultaneously
   - ADDED: Parallel mode untested warning with first-run guidance (N=3, log everything, test worktrees)

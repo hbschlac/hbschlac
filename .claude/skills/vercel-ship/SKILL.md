@@ -116,7 +116,15 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 - [ ] **Middleware matcher excludes Supabase callback.** If using OAuth with Supabase, the `/auth/callback` route must not be caught by auth-redirect middleware.
 - [ ] **RLS policies are tested on the preview deployment.** Preview uses a different Supabase project (or the same one with preview env vars). Verify that RLS behaves correctly with the preview's JWT issuer.
 
-### 2L. Vercel KV / Redis
+### 2L. Database Migration Coordination
+
+- [ ] **Run migrations BEFORE deploying new code that depends on them.** New columns, tables, or RLS policies must exist before the app code references them. Deploy sequence: migration → code deploy.
+- [ ] **For Supabase: push migrations via CLI or dashboard before Vercel deploy.** `npx supabase db push` or apply via Supabase dashboard. Vercel build does NOT run migrations automatically.
+- [ ] **For Prisma: run `prisma migrate deploy` in a CI step before the build step.** Or use `prisma db push` for prototype phase.
+- [ ] **Test migration rollback.** Write a "down" migration or verify you can revert with a new forward migration. Never edit a deployed migration file.
+- [ ] **Preview deployments need migration access.** If preview branches use a separate database, migrations must be applied there too. Otherwise, preview deploys will crash on missing tables/columns.
+
+### 2M. Vercel KV / Redis
 
 - [ ] **KV env vars are set.** `KV_REST_API_URL` and `KV_REST_API_TOKEN` in Vercel project settings.
 - [ ] **KV operations have timeouts.** Vercel KV uses HTTP under the hood. Set reasonable timeouts to prevent hanging serverless functions.
@@ -173,6 +181,14 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 2. Free tier: 1 cron job per day max. Pro: every minute
 3. Cron invocations are `GET` requests — your handler must handle `GET`
 4. Check Vercel dashboard → Crons tab for execution history
+
+### ISR / SSG stale data ("it shows old content")
+
+1. **Check `revalidate` value.** `export const revalidate = 3600` means data can be up to 1 hour stale. During development, set to `0` or use `export const dynamic = 'force-dynamic'`.
+2. **On-demand revalidation.** Use `revalidatePath('/path')` or `revalidateTag('tag')` in API routes after data changes. Without this, ISR pages won't update until the timer expires.
+3. **Check the data source, not the page.** If the API returns stale data, the page will be stale regardless of revalidation settings.
+4. **Vercel caches aggressively.** Add `Cache-Control: no-store` headers to API routes that must always return fresh data. Don't rely on browser refresh — Vercel's edge cache is separate.
+5. **Preview deployments bypass ISR.** If the page looks correct on preview but stale on production, the issue is the production cache, not the code.
 
 ### OAuth flow failures
 
@@ -379,6 +395,10 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-12 — v1.6: Database migration coordination, ISR debugging**
+  - ADDED: Database migration coordination checklist (2L) — Supabase/Prisma migration-before-deploy sequencing, preview deployment migration access
+  - ADDED: ISR/SSG stale data debugging section — revalidation, cache headers, on-demand revalidation patterns
+  - Evidence: Supabase migrations in recs.community must run before Vercel deploy; ISR caching causes "stale content" reports
 - **2026-06-11 — v1.5: Post-deploy observability**
   - ADDED: Post-deploy verification checklist (2M) — hit prod URL, verify APIs, check function logs, test webhooks
   - ADDED: Monitoring setup table for Vercel projects (deploy alerts, runtime monitoring, uptime)
