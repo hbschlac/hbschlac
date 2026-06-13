@@ -176,6 +176,35 @@ No "various improvements" or "bug fixes and performance improvements." If you ca
 
 ---
 
+## Error and Status Copy
+
+User-facing error messages and status indicators are content too. The same banned-phrase and voice rules apply, plus:
+
+### Error messages
+
+- **Say what happened, not what went wrong internally.** "This book couldn't be delivered" not "EPUB validation failed: mimetype entry not STORED."
+- **Say what to do next.** Every error should have an action: retry, try another version, contact support. "Download failed" with no next step is a dead end.
+- **Be honest about what you know.** "Sent to Amazon — it may take a few minutes to appear" is better than "Delivered!" when you don't actually know if Amazon accepted it. (kindle-schlacter-me PR#16)
+- **Don't hide failures.** A download that fails silently is worse than one that shows an error. Make failures visible and persistent — they shouldn't disappear on page reload. (kindle-schlacter-me PR#13)
+
+### Status indicators
+
+- **Match the status to reality.** If the server completed but the client doesn't know, the status should resolve on the next check — not stay stuck on "Sending..." indefinitely. (kindle-schlacter-me PR#18)
+- **Use progressive disclosure.** "Sending to Kindle" → "Sent — check your Kindle in a few minutes" → "Delivered." Don't jump from "working" to done without the intermediate.
+- **Failure status should be sticky.** Success can auto-dismiss. Failure should stay visible until the user acknowledges it or retries.
+
+### Copy patterns for common states
+
+| State | Good | Bad |
+|---|---|---|
+| In progress | "Sending to Kindle..." | "Processing your request..." |
+| Completed | "Sent — should appear on your Kindle shortly" | "Success!" |
+| Failed (retryable) | "Download failed — [Try again] [Try another version]" | "Error occurred" |
+| Failed (terminal) | "This file can't be delivered to Kindle (format not supported)" | "An error has occurred. Please try again later." |
+| Partially completed | "Book sent, but cover image couldn't be loaded" | "Completed with warnings" |
+
+---
+
 ## Common Failure Modes
 
 1. **The "impressive rewrite" trap.** Don't make copy sound more impressive — make it more specific. "ML system behind ~400M daily product page views" beats "cutting-edge ML platform powering millions of interactions."
@@ -198,6 +227,11 @@ No "various improvements" or "bug fixes and performance improvements." If you ca
 
 ## Changelog
 
+- **2026-06-13 — v9: Error and status copy**
+  - ADDED: Error and status copy section — user-facing error messages, status indicators, and honest copy patterns
+  - ADDED: Copy patterns table for common states (in progress, completed, failed retryable, failed terminal, partially completed)
+  - ADDED: Rules for error messages (say what happened not internal details, always include next action, be honest about uncertainty, make failures visible)
+  - Evidence: kindle-schlacter-me PRs #13 (durable failures), #16 (honest "emailed to Amazon" copy), #18 (stuck "Sending" status). content-quality covered marketing/portfolio copy but not the error UX copy that every app produces.
 - **2026-06-12 — v8: Ship announcements and launch content**
   - ADDED: Ship announcement section — LinkedIn/social post template, release notes template
   - ADDED: Rules for launch content (no "excited to announce," lead with what it does, include one number)

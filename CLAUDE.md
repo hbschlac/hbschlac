@@ -16,15 +16,15 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v8.2 | Parallel drafts, self-scoring, debug loop, visual mode. Web session patterns. Learnings in LEARNINGS.md |
+| code-builder | v8.3 | Parallel drafts, self-scoring, debug loop, visual mode. Web session patterns. Learnings in LEARNINGS.md |
 | vercel-ship | v1.6 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + migration coordination + ISR debugging |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
-| content-quality | v8 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality |
-| session-safety | v12 | Groundhog Day + productive work accelerator + cross-repo management + rollback patterns |
+| content-quality | v9 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality, error/status copy |
+| session-safety | v13 | Groundhog Day + productive work accelerator + cross-repo management + rollback patterns + time-based PR escalation |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging + project-bootstrap cross-reference |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
-| debug-escalation | v8 | Fix-churn cycle breaker + production incident response + web session debugging |
+| debug-escalation | v9 | Fix-churn cycle breaker + production incident response + pipeline hardening + web session debugging |
 | research-pipeline | v1.1 | Scrape, classify, analyze, present research data + Claude API integration |
 
 ## Sandbox constraint
@@ -94,10 +94,18 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 26. **project-bootstrap and session-start-hook were disconnected.** Bootstrapping a repo should generate hooks too. project-bootstrap v1.3 cross-references session-start-hook.
 27. **ISR/SSG stale data debugging was missing from vercel-ship.** Added revalidation debugging patterns to vercel-ship v1.6.
 28. **research-pipeline had no Claude API integration guidance.** v1.1 adds model selection, batching patterns, and data viz library comparison.
+29. ~~**No pipeline hardening pattern.**~~ **RESOLVED**: code-builder LEARNINGS.md adds pipeline hardening checklist (map→audit→validate→escape hatch). debug-escalation v9 adds pipeline hardening section. Evidence: kindle-schlacter-me PRs #6-#20 (15 iterations on same pipeline).
+30. ~~**No PWA/mobile web patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds iOS Safari (auto-zoom, safe-area, lost responses), durable client state, and test-on-real-device guidance. Evidence: kindle-schlacter-me PR#4 (iPhone fixes).
+31. ~~**No file format compliance / content integrity patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md + pre-flight check for format validation before point of no return. Evidence: kindle-schlacter-me PR#7 (EPUB mimetype), PR#17 (fake torrents).
+32. ~~**No error/status copy patterns.**~~ **RESOLVED**: content-quality v9 adds error and status copy section (honest messaging, visible failures, actionable next steps). Evidence: kindle-schlacter-me PR#13, PR#16, PR#18.
+33. ~~**No search engineering patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds query parsing, multi-source ranking, user override, parallel fan-out. Evidence: kindle-schlacter-me PR#5 (recall), PR#12 (auto-pick).
+34. ~~**No client-server state sync patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds polling, durable status, failure visibility, optimistic UI reconciliation. Evidence: kindle-schlacter-me PR#18 (stuck "Sending"), PR#13 (lost state on reload).
+35. ~~**No feature gating patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds gate-risky-features-off, narrow gating point, env var pattern. Evidence: kindle-schlacter-me PR#14 (summary embed gated off for deliverability).
+36. **Stuck PR escalation lacked time-based urgency.** session-safety v13 adds escalation table: 7d→14d→21d→30d with progressively stronger actions (flag→block new PRs→rebase/squash→abandon). Evidence: recs.community #4-7 (17+ days) and muse-shopping #1 (22+ days) treated the same as 7-day-old PRs.
 
 ## What to work on next (not another skill review)
 
-The skills have been reviewed and improved 5 times in 6 days (Jun 4-10). They are comprehensive. Before doing another review, consider:
+The skills have been reviewed and improved 6 times in 9 days (Jun 4-13). They are comprehensive. Before doing another review, consider:
 
 **Productive work that moves projects forward:**
 - Merge the recs.community PR stack (#1-7, open 15+ days) — try `list_repos`/`add_repo` first, laptop if needed
