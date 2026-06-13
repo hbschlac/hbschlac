@@ -287,6 +287,67 @@ Debugging in web sessions has unique constraints. Before applying general debug 
 
 ---
 
+## Pipeline Hardening (not a bug — it's fragile)
+
+When multiple symptoms point to the same pipeline (e.g., search → download → validate → send), the problem isn't any single bug — it's an unhardened pipeline. Fix-churn on individual symptoms wastes time. Step back and audit the whole pipeline.
+
+### Trigger
+
+Activate when:
+- 3+ bug reports or fixes in the same session target different steps of the same pipeline
+- A fix for step N exposes a new failure in step N+1
+- The same user journey has been "fixed" multiple times but keeps breaking differently
+
+### Step PH1: Map the pipeline
+
+List every step from input to output:
+```
+Step 1: {input} → Step 2: {transform} → Step 3: {validate} → Step 4: {output} → Step 5: {confirm}
+```
+
+### Step PH2: Audit each step
+
+For each step, ask:
+| Question | If yes |
+|---|---|
+| Can the input be malformed? | Add input validation |
+| Can it timeout? | Add timeout + fallback |
+| Can it succeed silently with bad data? | Add output validation |
+| Does the user see failures? | Add visible error state |
+| Is there a manual fallback? | Add escape hatch |
+
+### Step PH3: Prioritize by blast radius
+
+Fix the step that causes the most user-visible damage first. Usually: the point of no return (the step where you can't undo — e.g., sending an email, writing to DB).
+
+Evidence: kindle-schlacter-me PRs #6-#20 — 15 PRs fixing the same download→validate→send pipeline. A pipeline audit upfront would have caught format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs.
+
+---
+
+## Rapid Production Iteration (healthy, not churn)
+
+Not every rapid iteration cycle is fix-churn. When shipping to real users and getting immediate feedback, rapid iteration is the RIGHT approach. The key difference from fix-churn:
+
+| Fix-churn (bad) | Rapid iteration (good) |
+|---|---|
+| Same symptom, different fixes | Different symptoms, each fixed once |
+| No new information between attempts | User feedback or logs provide new info |
+| Fixes contradict each other | Each fix builds on the previous |
+| No validation between fixes | Each fix is validated before moving on |
+
+### When to stay in rapid iteration (not escalate to debug-escalation):
+- Each PR addresses a DIFFERENT failure mode
+- You have evidence (logs, user feedback, screenshots) for each issue
+- Fixes don't regress previous fixes
+- The pipeline is getting measurably more robust
+
+### When rapid iteration has become fix-churn (escalate):
+- You're re-fixing something you already fixed
+- The same symptom returns after your fix
+- You don't have new evidence for the current attempt
+
+---
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -304,6 +365,10 @@ Debugging in web sessions has unique constraints. Before applying general debug 
 
 ## Changelog
 
+- **2026-06-13 — v9: Pipeline hardening, rapid iteration vs. churn**
+  - ADDED: Pipeline hardening section — when 3+ symptoms point to the same pipeline, audit all steps instead of fixing one at a time (map→audit→prioritize by blast radius)
+  - ADDED: Rapid production iteration section — distinguishes healthy rapid iteration (different symptoms, new evidence) from fix-churn (same symptom, no new info), with clear escalation criteria
+  - Evidence: kindle-schlacter-me PRs #6-#20 — 15 PRs on the same pipeline in one day. Productive but would have been faster with upfront pipeline audit. debug-escalation lacked the positive-pattern counterpart to fix-churn.
 - **2026-06-12 — v8: Claude Code web session debugging**
   - ADDED: Web session debugging table — ephemeral filesystem, no browser access, MCP tool failures, no long-running processes, context limits, network policy constraints
   - Evidence: debugging patterns assumed persistent environments and browser access; web sessions have neither

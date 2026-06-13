@@ -99,6 +99,8 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Task could duplicate existing utility? | `grep -r` for similar helpers before writing new ones. |
 | Task adds conditional logic around a hook? | No conditional calls, no hooks in callbacks/effects. |
 | Task adds user-facing text? | Run content-quality checks. |
+| Task outputs files for external systems? | Validate format compliance before the point of no return. Check: file structure, required metadata, size plausibility. See LEARNINGS.md "File Format Compliance." |
+| Task builds a multi-step pipeline? | Map all steps, add validation between them. See LEARNINGS.md "Pipeline Hardening." |
 
 ### 1C-2. Claude Code Environment (web sessions)
 
@@ -407,6 +409,10 @@ Last synced: 2026-06-10. GH Action deployed at `.github/workflows/code-builder-s
 
 ## Changelog
 
+- **2026-06-13 — v8.3: Pipeline hardening, format compliance, mobile/PWA pre-flight checks**
+  - ADDED: Pre-flight checks for file format compliance (validate before point of no return) and multi-step pipeline hardening
+  - ADDED: 6 new LEARNINGS.md sections — PWA/mobile web (iOS Safari, safe-area, lost responses), search engineering (query parsing, multi-source ranking), file format compliance (EPUB validation, stub detection), client-server state sync (polling, durable status, reconciliation), feature gating (gate risky features OFF), pipeline hardening (audit-all-steps pattern)
+  - Evidence: kindle-schlacter-me PRs #4-20 — 15 PRs hardening the download→validate→send pipeline; iOS Safari UX issues; "Sending" stuck state; search recall failures. These patterns were completely uncovered.
 - **2026-06-12 — v8.2: Claude Code web session patterns**
   - ADDED: Pre-flight check 1C-2 — Claude Code environment (ephemeral containers, MCP tool failures, subagent patterns, cross-repo access, context limits)
   - ADDED: Test framework setup section in LEARNINGS.md (Jest, Vitest, pytest initial config)

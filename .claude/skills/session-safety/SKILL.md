@@ -302,6 +302,19 @@ grep -A5 "stuck\|unmerged\|open.*days" CLAUDE.md
 
 If stuck PRs exist, the FIRST action should be attempting to add that repo and merge — not building new features on top of the stuck foundation.
 
+### Time-based escalation
+
+PRs get staler and riskier over time. Escalate based on age:
+
+| Age | Severity | Action |
+|---|---|---|
+| 7 days | Warning | Flag in session. Attempt `list_repos` → `add_repo` → merge. |
+| 14 days | High | Block new PRs to that repo until existing ones merge. Attempt merge every session. |
+| 21 days | Critical | The PR likely has merge conflicts now. Options: (1) rebase and force-push, (2) close and recreate from main, (3) squash the entire stack into one PR. |
+| 30+ days | Abandon threshold | Close the PR. Cherry-pick salvageable work into a new branch from current main. The original branch has drifted too far. |
+
+Evidence: recs.community PRs #4-7 open 17+ days, muse-shopping #1 open 22+ days. Both are now in "High" territory — conflicts likely, merge risk increasing daily.
+
 ## Rollback Patterns
 
 When a merged PR breaks production:
@@ -334,6 +347,9 @@ When a merged PR breaks production:
 
 ## Changelog
 
+- **2026-06-13 — v13: Time-based stuck PR escalation**
+  - ADDED: Time-based escalation table for stuck PRs (7d warning → 14d high → 21d critical/rebase → 30d+ abandon threshold)
+  - Evidence: recs.community PRs #4-7 (17+ days), muse-shopping #1 (22+ days). session-safety detected stuck PRs but had no escalation — a 7-day-old PR and a 30-day-old PR got the same treatment. Older PRs need stronger intervention (rebase, squash, or abandon).
 - **2026-06-12 — v12: Productive work accelerator**
   - ADDED: Productive work accelerator — when meta-review circuit breaker fires, actively suggest top unblocked items from CLAUDE.md instead of just saying "do productive work"
   - Evidence: circuit breaker correctly prevents reviews but leaves the session directionless; 4+ sessions stopped reviewing but didn't start building
