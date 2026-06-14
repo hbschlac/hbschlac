@@ -16,15 +16,15 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v8.3 | Parallel drafts, self-scoring, debug loop, visual mode. Web session patterns. Learnings in LEARNINGS.md |
+| code-builder | v8.4 | Parallel drafts, self-scoring, debug loop, visual mode. Rapid shipping mode. Learnings in LEARNINGS.md |
 | vercel-ship | v1.6 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + migration coordination + ISR debugging |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
-| content-quality | v9 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality, error/status copy |
-| session-safety | v13 | Groundhog Day + productive work accelerator + cross-repo management + rollback patterns + time-based PR escalation |
+| content-quality | v10 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality, in-app UX copy |
+| session-safety | v14 | Groundhog Day + automated system noise + cross-repo escalation + rollback patterns + time-based PR escalation |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging + project-bootstrap cross-reference |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
-| debug-escalation | v9 | Fix-churn cycle breaker + production incident response + pipeline hardening + web session debugging |
+| debug-escalation | v10 | Fix-churn cycle breaker + invisible downstream failures + pipeline hardening + web session debugging |
 | research-pipeline | v1.1 | Scrape, classify, analyze, present research data + Claude API integration |
 
 ## Sandbox constraint
@@ -101,19 +101,28 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 33. ~~**No search engineering patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds query parsing, multi-source ranking, user override, parallel fan-out. Evidence: kindle-schlacter-me PR#5 (recall), PR#12 (auto-pick).
 34. ~~**No client-server state sync patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds polling, durable status, failure visibility, optimistic UI reconciliation. Evidence: kindle-schlacter-me PR#18 (stuck "Sending"), PR#13 (lost state on reload).
 35. ~~**No feature gating patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md adds gate-risky-features-off, narrow gating point, env var pattern. Evidence: kindle-schlacter-me PR#14 (summary embed gated off for deliverability).
-36. **Stuck PR escalation lacked time-based urgency.** session-safety v13 adds escalation table: 7d→14d→21d→30d with progressively stronger actions (flag→block new PRs→rebase/squash→abandon). Evidence: recs.community #4-7 (17+ days) and muse-shopping #1 (22+ days) treated the same as 7-day-old PRs.
+36. ~~**Stuck PR escalation lacked time-based urgency.**~~ **RESOLVED**: session-safety v13 adds escalation table: 7d→14d→21d→30d with progressively stronger actions (flag→block new PRs→rebase/squash→abandon). Evidence: recs.community #4-7 (17+ days) and muse-shopping #1 (22+ days) treated the same as 7-day-old PRs.
+37. **mcp-contributor cron noise is escalating.** 7 identical "11 anchor misses" issues filed May 3 - Jun 14, all unactioned. This is negative-value automation — it trains people to ignore all alerts. session-safety v14 adds automated system noise triage with disable-or-fix rule.
+38. **No rapid shipping mode for batch feature development.** kindle-schlacter-me shipped 20 PRs in 2 sessions. PRs #6-20 all targeted the same pipeline, with each PR discovering a new failure mode reactively. code-builder v8.4 adds rapid shipping mode with scope management and the "5-PR pipeline audit" rule.
+39. **No invisible downstream failure patterns.** Amazon silently rejects EPUBs with no error callback. 6 kindle-schlacter-me PRs (#7, #8, #9, #14, #15, #17) discovered validation layers empirically. debug-escalation v10 adds invisible downstream failures section with progressive validation checklist.
+40. **No in-app UX copy guidance.** content-quality covered error/status messages (v9) but not button labels, modals, empty states, or confirmation dialogs. content-quality v10 adds full in-app UX copy section. Evidence: kindle-schlacter-me PRs #1-20 produced extensive UX copy.
+41. **`list_repos`/`add_repo` tools are not available in all web sessions.** session-safety v11 assumed they existed. Confirmed unavailable in Jun 14 session — no fallback existed. session-safety v14 adds concrete cross-repo escalation (GHA merge workflow, direct session in target repo).
+42. **recs.community PRs #4-7 are now 18+ days old and in "critical" territory.** PRs #1-3 were merged Jun 12, but #4-7 remain open. PR #6 still targets stale branch `hannah/supabase-auth` (needs retarget to main). Requires laptop or opening a web session directly in recs.community.
+43. **muse-shopping #1 is a draft PR open 23+ days.** Created by automated "vibe-improver" job, never promoted to ready-for-review. Vercel preview passed. session-safety v14 adds draft PR triage rules.
+44. **No two-person development patterns.** kindle-connector is co-developed with Sam (segiddins) with deploy coordination challenges (Hannah writes code, Sam controls k8s host). code-builder LEARNINGS.md adds two-person/multi-agent development patterns.
 
 ## What to work on next (not another skill review)
 
-The skills have been reviewed and improved 6 times in 9 days (Jun 4-13). They are comprehensive. Before doing another review, consider:
+The skills have been reviewed and improved 7 times in 10 days (Jun 4-14). They are comprehensive. Before doing another review, consider:
 
 **Productive work that moves projects forward:**
-- Merge the recs.community PR stack (#1-7, open 15+ days) — try `list_repos`/`add_repo` first, laptop if needed
-- Merge muse-shopping #1 (open 20+ days) — same approach
+- Merge the recs.community PR stack (#4-7, open 18+ days) — open a web session in recs.community, or laptop
+- Retarget recs.community PR #6 base branch from `hannah/supabase-auth` to `main` (then merge)
+- Merge or close muse-shopping #1 (draft, 23+ days) — promote to ready-for-review and merge, or close
+- Disable mcp-contributor cron (7 identical unactioned issues) — or fix the anchor bug
 - Build features on kindle-schlacter-me, kindle-connector, or recs.community
 - Update the portfolio site (schlacter.me) with new projects (see portfolio-dev end-to-end workflow)
-- Set up monitoring/health checks for any deployed project (see debug-escalation v8)
-- Set up CI for repos that don't have it yet
+- Set up monitoring/health checks for any deployed project (see debug-escalation v10)
 
 **Remaining structural issues (only if specifically asked):**
 - mcp-contributor: fix anchor bug or disable the cron (requires laptop, 5 min)

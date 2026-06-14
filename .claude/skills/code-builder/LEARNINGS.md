@@ -2,7 +2,7 @@
 
 Reference patterns extracted from real projects. Loaded on-demand, not on every skill activation.
 
-Last synced: 2026-06-13 (manual, from 40+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
+Last synced: 2026-06-14 (manual, from 40+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
 
 ---
 
@@ -215,6 +215,20 @@ When a pipeline (search → download → validate → send) has multiple failure
 5. **Add escape hatches.** When the automatic path fails, give the user a manual alternative ("Find another version," "Try a different source," "Skip this step").
 
 Evidence: kindle-schlacter-me PRs #6-#20 hardened the same pipeline over 15 iterations. A single upfront pipeline audit could have caught format compliance, content integrity, delivery confirmation, and fallback sources in 3-4 PRs instead of 15.
+
+## Invisible Downstream Failures
+
+- **No error ≠ success.** When a downstream system (Amazon Kindle, email providers, third-party APIs) provides no failure callback, build progressive validation before the point of no return. (kindle-schlacter-me: 6 PRs discovering validation layers)
+- **Test with known-good AND known-bad payloads.** If you only test happy paths, you'll discover silent failures from users. Deliberately send malformed inputs to learn what the downstream system rejects. (kindle-schlacter-me: fake EPUBs, HTML-instead-of-EPUB, DRM'd files)
+- **Isolate optional features from the core payload.** If an optional enhancement (AI summaries, cover images) can corrupt the core payload, gate it separately. Ship the core path first. (kindle-schlacter-me PR#14: summary embed gated off)
+- **Honest copy when you can't confirm delivery.** "Sent to your email" is a lie if you don't know if the email provider delivered it. Say "Emailed — check your inbox in a few minutes." (kindle-schlacter-me PR#16)
+
+## Two-Person / Multi-Agent Development
+
+- **Explicit deploy coordination when different people control different hosts.** If person A writes the code and person B controls the k8s host, the PR body must say who needs to deploy. "Needs a rebuild + redeploy of the k8s image (cc @sam)." (kindle-connector PR#2)
+- **Build on existing work, don't silently remove it.** When one person's session follows another's, explicitly call out what's preserved: "Builds on Sam's work — nothing removed." (kindle-connector PR#1)
+- **Deploy-then-commit is acceptable for rapid iteration.** When shipping fast, deploying to production before committing to git is fine as long as you catch up the commit quickly. Don't let git fall behind production for more than a day.
+- **Shared debugging across PRs.** When PR #2 fixes a bug but introduces a new edge case, PR #3 from a different author can close the gap. Track the chain in PR bodies: "This addresses the remaining case from PR #2."
 
 ## Working on Large Existing Codebases
 

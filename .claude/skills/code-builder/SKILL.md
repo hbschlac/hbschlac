@@ -399,16 +399,58 @@ Log entry (append to `{LOG_DIR}/{date}.jsonl`):
 
 ---
 
+## Rapid Shipping Mode
+
+When building 5+ features in a single session (e.g., kindle-schlacter-me shipped 20 PRs in 2 sessions), normal single-pass mode is correct but needs scoping discipline.
+
+### Activation
+
+- User provides a feature list, PRD, or backlog with 5+ items
+- Multiple related features share a codebase and deploy target
+- Features can be shipped incrementally (each PR is independently deployable)
+
+### Sequencing rules
+
+1. **Build the core path first.** The feature that everything else depends on ships first. Don't build the error UI before the happy path works.
+2. **Validation before polish.** PR order: core feature → input validation → error handling → edge cases → UX polish → escape hatches. kindle-schlacter-me: send (PR#1) → EPUB validation (PR#7) → failure visibility (PR#13) → fake detection (PR#17) → stuck status fix (PR#18).
+3. **Group by pipeline stage, not by feature type.** Don't do "all search features, then all send features." Do "search happy path + send happy path, then search edge cases + send edge cases."
+4. **Ship after each PR, not after the batch.** Each PR should be deployed and smoke-tested before starting the next. This surfaces real-world failures that inform the next PR.
+
+### Scope management (when to stop iterating)
+
+Rapid iteration on a pipeline (search → download → validate → send) generates a growing backlog of discovered issues. Without boundaries, this becomes unbounded:
+
+| Signal | Action |
+|---|---|
+| New issue is in the same pipeline step you just fixed | You're churning. Escalate to debug-escalation. |
+| New issue is a different failure mode you haven't seen | Healthy iteration. Keep going. |
+| You've shipped 10+ PRs and the core path works reliably | Declare the pipeline "hardened." Remaining issues go to a backlog, not the current session. |
+| Edge case affects <5% of users | Add it to the backlog. Don't optimize for rare cases during initial shipping. |
+| You're adding UX polish to a feature that has unhandled errors | Stop polishing. Fix the errors first. |
+
+### Anti-pattern: the 15-PR pipeline
+
+kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline over 15 iterations. A pipeline audit (see debug-escalation's pipeline hardening) at PR #6 would have identified format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs instead of 15 reactive ones.
+
+**Rule:** After 5 PRs targeting the same pipeline, STOP. Run debug-escalation's pipeline hardening audit (map all steps, audit each for failure modes, prioritize by blast radius). Then batch the remaining fixes into 2-3 comprehensive PRs.
+
+---
+
 ## Learnings Reference
 
 Patterns from real projects are in `LEARNINGS.md` (same directory). Read it when you need reference patterns for a specific domain (Supabase, API resilience, testing, CI, performance, etc.).
 
-Last synced: 2026-06-10. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
+Last synced: 2026-06-13. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
 
 ---
 
 ## Changelog
 
+- **2026-06-14 — v8.4: Rapid shipping mode, scope management**
+  - ADDED: Rapid shipping mode — sequencing rules for 5+ feature batches (core path first, validation before polish, group by pipeline stage, ship after each PR)
+  - ADDED: Scope management table — when to keep iterating vs. stop and backlog remaining issues
+  - ADDED: Anti-pattern "the 15-PR pipeline" — after 5 PRs targeting the same pipeline, stop and audit
+  - Evidence: kindle-schlacter-me shipped 20 PRs in 2 sessions. PRs #6-20 all targeted the same download→validate→send pipeline. A pipeline audit at PR #6 would have compressed 15 reactive PRs into 3-4 comprehensive ones.
 - **2026-06-13 — v8.3: Pipeline hardening, format compliance, mobile/PWA pre-flight checks**
   - ADDED: Pre-flight checks for file format compliance (validate before point of no return) and multi-step pipeline hardening
   - ADDED: 6 new LEARNINGS.md sections — PWA/mobile web (iOS Safari, safe-area, lost responses), search engineering (query parsing, multi-source ranking), file format compliance (EPUB validation, stub detection), client-server state sync (polling, durable status, reconciliation), feature gating (gate risky features OFF), pipeline hardening (audit-all-steps pattern)
