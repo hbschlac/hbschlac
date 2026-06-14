@@ -348,6 +348,40 @@ Not every rapid iteration cycle is fix-churn. When shipping to real users and ge
 
 ---
 
+## Invisible Downstream Failures
+
+The hardest production bugs are ones where your system reports success but the downstream system silently drops the payload. No error, no callback, no signal — the user just says "it didn't work."
+
+### Trigger
+
+- "It says sent/delivered/complete but nothing happened on the other end"
+- External system provides no error callback or delivery receipt
+- Multiple users report the same "it worked but didn't work" pattern
+- Your logs show 200 OK but the expected result never materializes
+
+### Investigation pattern
+
+1. **Confirm the downstream system actually received the payload.** Email providers: check delivery logs. APIs: check the third-party dashboard. File systems: verify the file arrived and was processed.
+2. **Reproduce with a known-good payload.** If a manually-constructed input works, the bug is in your payload generation, not the delivery.
+3. **Diff a working payload vs. a failing one.** Often a single field, header, or formatting difference causes silent rejection.
+4. **Build progressive validation before the point of no return.** Since the downstream system won't tell you what's wrong, validate everything you can before sending.
+
+### Progressive validation checklist
+
+When a downstream system silently rejects payloads, add validation layers iteratively:
+
+| Layer | What to check | Evidence |
+|---|---|---|
+| 1. Format compliance | Does the file meet the spec? (zip structure, required entries, encoding) | kindle-schlacter-me PR#7: EPUB mimetype DEFLATED instead of STORED |
+| 2. Content integrity | Is the content real? (not a stub, not a placeholder, not an error page) | PR#8: rate-limited HTML page sent as "EPUB"; PR#17: fake torrent stubs |
+| 3. Structural validity | Is the content well-formed? (no broken references, no empty sections) | PR#15: broken spines, DRM'd files, missing content documents |
+| 4. Feature isolation | Can optional features break the core payload? | PR#9, #14: AI summary embed corrupted the EPUB; gated off |
+| 5. Deliverability | Will the receiving system's specific rules accept this? | PR#16: honest copy since Amazon provides no receipt |
+
+**Key insight:** Each layer was discovered empirically when a book "sent" but never arrived. Six PRs (#7, #8, #9, #14, #15, #17) targeted the same silent-rejection pipeline. A single upfront validation audit would have identified most of these in 2-3 PRs.
+
+---
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -365,6 +399,9 @@ Not every rapid iteration cycle is fix-churn. When shipping to real users and ge
 
 ## Changelog
 
+- **2026-06-14 — v10: Invisible downstream failures**
+  - ADDED: Invisible downstream failures section — investigation pattern and progressive validation checklist for when a system reports success but the downstream system silently drops the payload
+  - Evidence: kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — six PRs targeting silent Amazon rejection of EPUBs. Each discovered a new validation layer empirically (format compliance → content integrity → structural validity → feature isolation → deliverability). The downstream system (Amazon Kindle) provided zero error feedback.
 - **2026-06-13 — v9: Pipeline hardening, rapid iteration vs. churn**
   - ADDED: Pipeline hardening section — when 3+ symptoms point to the same pipeline, audit all steps instead of fixing one at a time (map→audit→prioritize by blast radius)
   - ADDED: Rapid production iteration section — distinguishes healthy rapid iteration (different symptoms, new evidence) from fix-churn (same symptom, no new info), with clear escalation criteria

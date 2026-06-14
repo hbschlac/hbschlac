@@ -205,6 +205,48 @@ User-facing error messages and status indicators are content too. The same banne
 
 ---
 
+## In-App UX Copy
+
+Every interactive app produces copy beyond error messages: button labels, modal text, empty states, confirmation dialogs, onboarding text. The same voice and banned-phrase rules apply.
+
+### Button labels
+
+- **Use verbs, not nouns.** "Send to Kindle" not "Kindle Send." "Find another version" not "Alternative versions."
+- **Be specific about what happens.** "Resend this book" not "Retry." "Remove from library" not "Delete."
+- **Destructive actions get explicit labels.** "Remove from library" not "Remove." "Cancel download" not "Cancel."
+
+### Modal and dialog text
+
+- **Title states the action.** "Send to Kindle" not "Confirm action."
+- **Body explains consequences, not mechanics.** "This will email the book to your Kindle. It should appear in a few minutes." not "This action will trigger the send pipeline."
+- **One CTA per modal.** Primary action button + cancel. Don't offer 3 choices in a modal — use a picker component instead.
+- **Confirmation dialogs only for destructive or irreversible actions.** Don't confirm "Add to library." Do confirm "Remove from library."
+
+### Empty states
+
+- **Say what goes here and how to fill it.** "No books in your library yet. Search for a title to get started." not "No items found."
+- **Include the action.** Link or button to the action that would populate this view.
+- **Don't apologize.** Not "Sorry, nothing here yet!" — just state the fact and the next step.
+
+### Onboarding / first-run copy
+
+- **Lead with what they can do, not what the app is.** "Search for any book. We'll find it and send it to your Kindle." not "Welcome to Kindle Schlacter, a comprehensive book delivery platform."
+- **One instruction per step.** Don't explain the entire app on the first screen.
+- **Skip-able.** Power users don't need a tour. Make every onboarding step dismissable.
+
+### Patterns for common UX states
+
+| State | Good | Bad |
+|---|---|---|
+| Empty list | "No books yet — search to add one" | "No results" |
+| Loading | "Finding books..." | "Loading..." |
+| Confirmation | "Send *The Great Gatsby* to your Kindle?" | "Are you sure?" |
+| Success (dismissable) | "Sent — check your Kindle in a few minutes" | "Operation completed successfully" |
+| Feature unavailable | "Star ratings coming soon" | "This feature is not yet available" |
+| User override | "We picked the best version. [See all versions]" | "Auto-selected optimal result" |
+
+---
+
 ## Common Failure Modes
 
 1. **The "impressive rewrite" trap.** Don't make copy sound more impressive — make it more specific. "ML system behind ~400M daily product page views" beats "cutting-edge ML platform powering millions of interactions."
@@ -227,6 +269,10 @@ User-facing error messages and status indicators are content too. The same banne
 
 ## Changelog
 
+- **2026-06-14 — v10: In-app UX copy**
+  - ADDED: In-app UX copy section — button labels, modal text, empty states, onboarding, confirmation dialogs
+  - ADDED: UX copy patterns table (empty list, loading, confirmation, success, feature unavailable, user override)
+  - Evidence: kindle-schlacter-me PRs #1-20 produced extensive in-app copy (button labels for "Send to Kindle," "Find another version," "Resend," empty library states, picker modals). content-quality covered error/status copy (v9) but not the broader UX copy that every interactive app produces.
 - **2026-06-13 — v9: Error and status copy**
   - ADDED: Error and status copy section — user-facing error messages, status indicators, and honest copy patterns
   - ADDED: Copy patterns table for common states (in progress, completed, failed retryable, failed terminal, partially completed)
