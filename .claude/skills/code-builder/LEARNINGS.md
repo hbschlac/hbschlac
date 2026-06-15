@@ -2,7 +2,7 @@
 
 Reference patterns extracted from real projects. Loaded on-demand, not on every skill activation.
 
-Last synced: 2026-06-14 (manual, from 40+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
+Last synced: 2026-06-15 (manual, from 40+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
 
 ---
 
@@ -229,6 +229,64 @@ Evidence: kindle-schlacter-me PRs #6-#20 hardened the same pipeline over 15 iter
 - **Build on existing work, don't silently remove it.** When one person's session follows another's, explicitly call out what's preserved: "Builds on Sam's work — nothing removed." (kindle-connector PR#1)
 - **Deploy-then-commit is acceptable for rapid iteration.** When shipping fast, deploying to production before committing to git is fine as long as you catch up the commit quickly. Don't let git fall behind production for more than a day.
 - **Shared debugging across PRs.** When PR #2 fixes a bug but introduces a new edge case, PR #3 from a different author can close the gap. Track the chain in PR bodies: "This addresses the remaining case from PR #2."
+
+## Graceful Degradation
+
+When an optional feature (AI summaries, cover images, enrichment data) can break the core path, don't just gate it off — make it fail gracefully at runtime:
+
+1. **Try the enhancement in a try/catch.** The core path must work regardless of whether the enhancement succeeds.
+2. **Degrade visibly, not silently.** If the cover image fails to load, show a placeholder — don't crash the card. If the AI summary can't generate, skip it and log — don't block the send. (kindle-schlacter-me PR#9: summary embed non-fatal)
+3. **Separate the enhancement from the core payload.** Optional features should be composed onto the core output, not embedded in it. If embedding corrupts the core, the enhancement is architecturally wrong. (kindle-schlacter-me PR#14: summary embed gated after corruption)
+4. **Give the user the escape hatch.** When automatic processing fails, offer manual override: "Find another version," "Regenerate," "Hide." Don't dead-end. (kindle-schlacter-me PR#11, PR#20)
+5. **Log degradations for trend detection.** A feature that silently degrades 50% of the time needs fixing, not ignoring. Track degradation rate.
+
+**Pattern:**
+```typescript
+async function enrichWithOptionalFeature(corePayload, options) {
+  try {
+    const enhancement = await fetchEnhancement(options);
+    return { ...corePayload, enhancement };
+  } catch (err) {
+    log.warn('Enhancement failed, degrading gracefully', { err, options });
+    return corePayload; // core path unaffected
+  }
+}
+```
+
+**Key insight from kindle-schlacter-me:** PRs #9 and #14 discovered that the AI summary embed — an optional enhancement — could corrupt the entire EPUB, preventing Amazon delivery. The fix progression was: make it non-fatal (PR#9) → gate it off entirely (PR#14). The right architecture: core EPUB works without summaries, summaries are a post-process layer that can't corrupt the base.
+
+## Post-Ship UX Discovery Checklist
+
+After shipping a core feature, run this checklist BEFORE moving to the next feature. 15 of 20 kindle-schlacter-me PRs were reactive UX fixes that could have been caught proactively:
+
+1. **Test on the actual target device.** Not Chrome DevTools mobile emulation — the real device. iOS Safari, Android Chrome, the Kindle itself. (kindle-schlacter-me PR#4: iPhone safe-area, auto-zoom)
+2. **Test state persistence across reload.** Navigate away and back. Close the tab and reopen. Kill the app and restart. Does the UI reflect the server's state? (kindle-schlacter-me PR#13: download status lost on reload, PR#18: stuck "Sending")
+3. **Test every failure path.** Intentionally trigger: network timeout, invalid input, external service down, empty result set. Does the user see a useful error with a next step? (kindle-schlacter-me PR#6: dead torrent, PR#15: broken EPUB)
+4. **Test the "what just happened?" question.** After the action completes, does the user know what to do next? Is the copy honest about what actually happened? (kindle-schlacter-me PR#16: "emailed to Amazon" instead of "Delivered!")
+5. **Test deep links and direct navigation.** Bookmark the result page. Share the URL. Does it work without the preceding flow? (kindle-schlacter-me PR#10: deep-link broken from home page)
+6. **Test multi-item scenarios.** One item works. Do 5 items queue correctly? Do 10 items cause visible performance degradation? (kindle-schlacter-me PR#3: multi-download queue)
+7. **Test user correction flows.** The auto-pick was wrong. Can the user override it? Can they undo? Can they retry with different input? (kindle-schlacter-me PR#12: "Find another version" picker, PR#20: regenerate/hide feedback)
+
+**When to run this:** After every core feature PR. Before declaring the pipeline "hardened." The checklist takes 10 minutes and prevents 10+ reactive PRs.
+
+## Untrusted Source Validation
+
+When your app aggregates content from external sources (torrent networks, APIs, web scraping, user uploads), validate beyond just file format:
+
+| Layer | What to check | Example |
+|---|---|---|
+| **Format** | Does it match the expected file type? | Is this actually an EPUB, or HTML renamed .epub? |
+| **Authenticity** | Is this the real content, or a stub/placeholder? | Fake ebook torrents contain locked 10KB placeholder files |
+| **Plausibility** | Does the size/structure make sense? | A 5KB "book" is not a real book. A 2GB "ebook" is suspicious. |
+| **Integrity** | Is the content complete and well-formed? | Broken spines, missing chapters, DRM that prevents reading |
+| **Safety** | Could this content harm the user or downstream system? | Malicious payloads in zip files, XSS in HTML content |
+
+**Detection patterns:**
+- **Stub detection:** File size below threshold + known spam markers in filename/metadata ("VIP", "premium", "unlock"). (kindle-schlacter-me PR#17)
+- **Rate-limit detection:** Content that's actually an error page from the source (HTML page instead of EPUB). Check Content-Type headers AND file magic bytes. (kindle-schlacter-me PR#8)
+- **Parallel source verification:** When one source returns suspicious content, check another source for the same item. If they disagree, trust the more reliable source.
+
+Evidence: kindle-schlacter-me PRs #7, #8, #15, #17 all addressed different layers of content trust. A single upfront validation function with these layers would have consolidated 4 PRs into 1.
 
 ## Working on Large Existing Codebases
 

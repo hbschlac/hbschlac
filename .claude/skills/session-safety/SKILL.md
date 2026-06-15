@@ -315,6 +315,51 @@ PRs get staler and riskier over time. Escalate based on age:
 
 Evidence: recs.community PRs #4-7 open 17+ days, muse-shopping #1 open 22+ days. Both are now in "High" territory — conflicts likely, merge risk increasing daily.
 
+## Scheduled / Autonomous Sessions
+
+When running as a scheduled routine (no user watching), the session has different constraints than interactive sessions. The user set this up to run while they're away — the push notification is the deliverable, not the transcript.
+
+### When to notify (PushNotification)
+
+| Situation | Action |
+|---|---|
+| Found something the user set up this routine to catch | **Notify immediately** with what you found. Don't wait until you've investigated everything — timely > thorough. |
+| Routine couldn't run (access denied, tool failure, repo not reachable) | **Notify** — a silent failure is worse than a noisy one. Say what broke and what they need to do. |
+| Everything looks normal, nothing changed since last run | **Stay silent.** Don't notify "all clear" — that trains them to ignore notifications. |
+| Found something interesting but not actionable | **Stay silent.** Only notify if they should do something in response. |
+| Made changes and pushed (code fixes, PR comments) | **Notify** with what you changed and why. They need to know the repo state changed. |
+
+### Notification format
+
+Lead with the one sentence they'd read on a phone lock screen. Then include enough detail for them to act without opening the session:
+
+```
+<routine_summary>
+{One sentence: what happened and what to do about it.}
+{2-3 sentences: supporting detail — numbers, PR links, specific files.}
+{If action needed: what specifically to do next.}
+</routine_summary>
+```
+
+### Self-contained analysis
+
+Autonomous sessions must be self-contained:
+- Don't ask the user clarifying questions (they're not watching)
+- Don't leave work half-done waiting for input
+- If you hit ambiguity, make the conservative choice and note it in the notification
+- Commit and push any changes — the ephemeral container disappears after the session
+
+### What autonomous sessions should NOT do
+
+- **Don't make architectural decisions.** Refactoring, dependency upgrades, or design changes need interactive review.
+- **Don't merge PRs without explicit prior authorization.** Check-and-report, don't check-and-act on shared resources.
+- **Don't create new PRs for discovered issues.** Report findings via notification; let the user decide how to address them.
+- **Don't do unbounded work.** Set a scope at the start. If the analysis balloons, notify with what you've found so far and stop.
+
+Evidence: hbschlac/hbschlac has scheduled routines running skill reviews and health checks. Prior autonomous sessions produced transcripts nobody read — the notification is the only output that reaches the user.
+
+---
+
 ## Rollback Patterns
 
 When a merged PR breaks production:
@@ -397,6 +442,9 @@ When `list_repos`/`add_repo` tools don't exist in the current session (confirmed
 
 ## Changelog
 
+- **2026-06-15 — v15: Scheduled/autonomous session patterns**
+  - ADDED: Scheduled/autonomous session section — notification thresholds (notify on findings and failures, stay silent on all-clear), notification format (phone-banner first line, actionable detail in body), self-contained analysis rules, prohibited actions for autonomous sessions
+  - Evidence: hbschlac/hbschlac runs scheduled routines for skill reviews and health checks. Prior autonomous sessions produced transcripts nobody read — the PushNotification is the only output that reaches the user. No skill covered when to notify vs. stay silent, or how to structure self-contained autonomous work.
 - **2026-06-14 — v14: Automated system noise, draft PR triage, cross-repo escalation fallback**
   - ADDED: Automated system noise section — detecting and triaging noisy crons and abandoned automated PRs
   - ADDED: Draft PR triage rules (promote, merge, or close — draft limbo is worse than no PR)
