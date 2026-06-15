@@ -101,6 +101,8 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Task adds user-facing text? | Run content-quality checks. |
 | Task outputs files for external systems? | Validate format compliance before the point of no return. Check: file structure, required metadata, size plausibility. See LEARNINGS.md "File Format Compliance." |
 | Task builds a multi-step pipeline? | Map all steps, add validation between them. See LEARNINGS.md "Pipeline Hardening." |
+| Task adds an optional enhancement to an existing feature? | Make it fail gracefully — try/catch with degradation, don't let it break the core path. See LEARNINGS.md "Graceful Degradation." |
+| Task consumes content from external/untrusted sources? | Validate format, authenticity, plausibility, integrity, safety. See LEARNINGS.md "Untrusted Source Validation." |
 
 ### 1C-2. Claude Code Environment (web sessions)
 
@@ -428,6 +430,12 @@ Rapid iteration on a pipeline (search → download → validate → send) genera
 | Edge case affects <5% of users | Add it to the backlog. Don't optimize for rare cases during initial shipping. |
 | You're adding UX polish to a feature that has unhandled errors | Stop polishing. Fix the errors first. |
 
+### Post-ship UX discovery (before moving to the next feature)
+
+After shipping each core feature PR, run the UX discovery checklist (LEARNINGS.md "Post-Ship UX Discovery Checklist") BEFORE starting the next feature. This takes 10 minutes and prevents 10+ reactive PRs. Key checks: real device, state persistence across reload, failure paths, deep links, user correction flows.
+
+If running in a web session where you can't test the UI directly, write the checklist into the PR body and ask the user to test before you continue building on top of that feature.
+
 ### Anti-pattern: the 15-PR pipeline
 
 kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline over 15 iterations. A pipeline audit (see debug-escalation's pipeline hardening) at PR #6 would have identified format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs instead of 15 reactive ones.
@@ -440,12 +448,17 @@ kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline o
 
 Patterns from real projects are in `LEARNINGS.md` (same directory). Read it when you need reference patterns for a specific domain (Supabase, API resilience, testing, CI, performance, etc.).
 
-Last synced: 2026-06-13. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
+Last synced: 2026-06-15. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
 
 ---
 
 ## Changelog
 
+- **2026-06-15 — v8.5: Graceful degradation, post-ship UX discovery, untrusted source validation**
+  - ADDED: Pre-flight checks for graceful degradation (optional enhancements must not break core path) and untrusted source validation (format + authenticity + plausibility + integrity + safety)
+  - ADDED: Post-ship UX discovery step in rapid shipping mode — 7-point checklist to run after each core feature before moving on
+  - ADDED: 3 new LEARNINGS.md sections — Graceful Degradation (try/catch/degrade pattern, enhancement isolation), Post-Ship UX Discovery Checklist (real device, state persistence, failure paths, deep links, correction flows), Untrusted Source Validation (5-layer trust model, stub detection, rate-limit detection)
+  - Evidence: kindle-schlacter-me PRs #9, #14 (summary embed corrupted EPUBs — needed graceful degradation, not just feature flags). PRs #4, #10, #13, #16, #18 (UX issues found by dogfooding that a post-ship checklist would have caught proactively). PRs #7, #8, #15, #17 (4 PRs addressing different layers of content trust from untrusted torrent sources — a single validation function would have consolidated them).
 - **2026-06-14 — v8.4: Rapid shipping mode, scope management**
   - ADDED: Rapid shipping mode — sequencing rules for 5+ feature batches (core path first, validation before polish, group by pipeline stage, ship after each PR)
   - ADDED: Scope management table — when to keep iterating vs. stop and backlog remaining issues

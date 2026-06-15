@@ -382,6 +382,39 @@ When a downstream system silently rejects payloads, add validation layers iterat
 
 ---
 
+## Client-State Debugging (UI stuck, state lost, stale display)
+
+Browser-specific state bugs require different debugging than server-side issues. The server returns 200 OK, the database is correct, but the user sees something wrong.
+
+### Trigger
+
+- "The button is stuck on [state]" / "It says Sending but it's already done"
+- "It worked but the UI didn't update"
+- "I refreshed and lost my progress/status"
+- Server logs show success but user reports failure
+
+### Investigation pattern
+
+1. **Confirm the server state is correct.** Hit the API directly (curl, browser devtools Network tab). If the server returns the right data, the bug is client-side.
+2. **Check state persistence.** Is the status stored in React state only? React state dies on: page reload, tab switch (iOS background kill), navigation away and back, PWA restart. If the status should survive these, it needs server-side storage (DB/KV) with client-side reconciliation on mount.
+3. **Check for lost HTTP responses.** The server completed, the client sent the request, but the response never arrived (network blip, iOS background kill during fetch, timeout). The client shows "in progress" forever because it never got the completion signal. Fix: poll for status after long operations, don't rely on the response. (kindle-schlacter-me PR#18)
+4. **Check for stale closures.** React effects capturing stale state is the #1 cause of "the UI shows old data." If a `useEffect` or callback references state that was set before the current render, it's stale. Fix: dependency arrays, refs, or reducer patterns.
+5. **Check optimistic UI reconciliation.** If the UI optimistically shows a new state but the server hasn't confirmed, what happens when the server disagrees or doesn't respond? The UI must reconcile back to server truth.
+
+### Client-state bug patterns
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Stuck "Sending/Loading" forever | Lost HTTP response — client waiting for a callback that will never come | Poll for server-side status on timeout |
+| Status disappears on reload | State stored in React state, not persisted | Persist to server (KV/DB) and reconcile on mount |
+| Stale data after action | Server updated but client cache is stale | Invalidate relevant queries/cache after mutation |
+| UI flickers between states | Optimistic update + server response race condition | Use server state as source of truth after confirmation |
+| Action works once, fails on retry | Event handler bound to stale closure | Check dependency arrays, use refs for latest values |
+
+Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React state not persisted), PR#18 (stuck "Sending" — HTTP response lost, no polling fallback). Both required client-state debugging, not server-side debugging.
+
+---
+
 ## When to Abandon vs. Keep Debugging
 
 **Abandon the current approach when:**
@@ -399,6 +432,10 @@ When a downstream system silently rejects payloads, add validation layers iterat
 
 ## Changelog
 
+- **2026-06-15 — v11: Client-state debugging**
+  - ADDED: Client-state debugging section — investigation pattern for browser-specific state bugs where the server is correct but the UI is wrong
+  - ADDED: Client-state bug patterns table (stuck loading, state lost on reload, stale data, flickering, stale closures)
+  - Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React state not persisted to server), PR#18 (stuck "Sending" — HTTP response lost during fetch, no polling fallback). Both required client-side debugging, not server-side — debug-escalation had no patterns for this.
 - **2026-06-14 — v10: Invisible downstream failures**
   - ADDED: Invisible downstream failures section — investigation pattern and progressive validation checklist for when a system reports success but the downstream system silently drops the payload
   - Evidence: kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — six PRs targeting silent Amazon rejection of EPUBs. Each discovered a new validation layer empirically (format compliance → content integrity → structural validity → feature isolation → deliverability). The downstream system (Amazon Kindle) provided zero error feedback.
