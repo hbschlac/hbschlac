@@ -114,6 +114,7 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Need to work across repos? | Check `mcp__claude-code-remote__list_repos` first. If the repo is available, use `add_repo`. If not, write laptop instructions in CLAUDE.md. Don't silently skip cross-repo work. |
 | Spawning subagents for parallel work? | Use `Agent` tool with `run_in_background: true` for independent tasks. For research: specify "report in under 200 words" to keep context lean. For code changes: use `isolation: "worktree"`. Never spawn more than 3 subagents for one task. |
 | Session nearing context limits? | Conversation gets auto-compressed. Keep skill activations minimal after the first 3 — suppress announcements. Prefer direct tool calls over subagent delegation for simple tasks. |
+| Using MCP tools for GitHub/Vercel operations? | Load tool schemas via `ToolSearch` before calling. MCP results can be huge — use `jq` or Python to extract what you need. If a tool returns an error, try a different tool (e.g., `search_pull_requests` instead of `list_pull_requests` when the repo isn't in session scope). Chain MCP calls: `list_pull_requests` → `pull_request_read` → `merge_pull_request`. Always verify the result matches expectations. |
 
 ### 1D. Deployment & Integration
 
@@ -454,6 +455,11 @@ Last synced: 2026-06-15. GH Action deployed at `.github/workflows/code-builder-s
 
 ## Changelog
 
+- **2026-06-16 — v8.6: User feedback loops, autonomous improvement agents, MCP tool usage**
+  - ADDED: LEARNINGS.md — User feedback loops / correction UX (regenerate, hide, manual override, star ratings, correction-feeds-forward pattern)
+  - ADDED: LEARNINGS.md — Autonomous improvement agents (draft PR triage deadlines, agent labeling, queue limits, auto-CI-verify, revert instructions)
+  - ADDED: Pre-flight 1C-2 — MCP tool usage patterns (schema loading, large result handling, tool chaining, cross-repo fallbacks)
+  - Evidence: kindle-schlacter-me PRs #19-20 (personal star ratings, cover/summary feedback with regenerate/hide/override — user correction patterns uncovered). muse-shopping #1 (vibe-improver draft PR open 24+ days — autonomous agent creating unmanaged PRs).
 - **2026-06-15 — v8.5: Graceful degradation, post-ship UX discovery, untrusted source validation**
   - ADDED: Pre-flight checks for graceful degradation (optional enhancements must not break core path) and untrusted source validation (format + authenticity + plausibility + integrity + safety)
   - ADDED: Post-ship UX discovery step in rapid shipping mode — 7-point checklist to run after each core feature before moving on

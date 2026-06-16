@@ -193,11 +193,12 @@ Format: CSV for broad compatibility, JSON for structured data, both if possible.
 
 When using Claude for automated classification (Step 3B), use the cheapest model that meets accuracy targets:
 
-| Model | Use when | Cost per 1K items (~200 tokens each) |
+| Model | Model ID | Use when |
 |---|---|---|
-| Haiku | Simple categorization (3-5 categories), sentiment analysis | ~$0.05 |
-| Sonnet | Complex taxonomy (10+ categories), theme extraction, nuanced sentiment | ~$0.60 |
-| Opus | Multi-dimensional coding, disagreement resolution, taxonomy generation | ~$3.00 |
+| Haiku 4.5 | `claude-haiku-4-5-20251001` | Simple categorization (3-5 categories), sentiment analysis |
+| Sonnet 4.6 | `claude-sonnet-4-6` | Complex taxonomy (10+ categories), theme extraction, nuanced sentiment |
+| Opus 4.6 | `claude-opus-4-6` | Multi-dimensional coding, disagreement resolution, taxonomy generation |
+| Fable 5 | `claude-fable-5` | Long-context research analysis, creative synthesis |
 
 **Batching pattern:**
 ```python
@@ -216,7 +217,7 @@ def classify_batch(items, categories, batch_size=20):
         prompt += "\nRespond with one category per line, numbered to match."
         
         response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
+            model="claude-haiku-4-5-20251001",  # or claude-sonnet-4-6 for complex taxonomies
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -257,6 +258,9 @@ For research dashboards (Step 5A), default to Recharts with Next.js. It handles 
 
 ## Changelog
 
+- **2026-06-16 — v1.2: Updated model IDs to current Claude 4.X family**
+  - UPDATED: Model selection table — added Fable 5, updated all model IDs to current versions (claude-haiku-4-5-20251001, claude-sonnet-4-6, claude-opus-4-6, claude-fable-5)
+  - Evidence: model IDs were stale; Fable 5 is now available for long-context research analysis
 - **2026-06-12 — v1.1: Claude API integration, data visualization**
   - ADDED: Claude API for classification — model selection table (Haiku/Sonnet/Opus by use case), batching pattern, Batch API note
   - ADDED: Data visualization library comparison table (Recharts, Chart.js, D3, Observable Plot)

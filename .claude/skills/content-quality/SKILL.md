@@ -247,6 +247,34 @@ Every interactive app produces copy beyond error messages: button labels, modal 
 
 ---
 
+## Conversational / Wizard Flow Copy
+
+Multi-step flows (search → results → pick → action → confirm → feedback) need copy at each stage that guides the user through without feeling like a form. These are the most common interactive patterns in Hannah's apps.
+
+### Step-by-step copy rules
+
+| Step | Copy pattern | Bad pattern |
+|---|---|---|
+| **Search/input** | "Search for a book" | "Enter your query" |
+| **Results** | "3 versions found — we picked the best one" | "Displaying results" |
+| **Auto-pick explanation** | "Picked: EPUB from Library Genesis (best format, most reliable)" | "Auto-selected optimal result" |
+| **Override prompt** | "[See all 3 versions]" | "[View alternatives]" |
+| **Action confirmation** | "Send *The Great Gatsby* to your Kindle?" | "Confirm action?" |
+| **In-progress** | "Sending to your Kindle..." | "Processing..." |
+| **Completion** | "Sent — should appear in a few minutes" | "Operation completed" |
+| **Feedback/correction** | "Wrong book? [Find another version]" | "Report an issue" |
+
+### Wizard anti-patterns
+
+- **Don't number the steps.** "Step 2 of 4" makes a 30-second flow feel like a tax form. Let the UI flow naturally.
+- **Don't explain what the system is doing internally.** "Querying 3 download sources in parallel" → "Finding your book..."
+- **Don't ask for confirmation on low-stakes actions.** Searching, browsing results, adding to library — just do it. Confirm only: sending to external service, deleting, paying.
+- **Each step should answer: what happened, and what's next.** If the user has to guess what to do, the copy failed.
+
+Evidence: kindle-schlacter-me PRs #1-20 built a full search → download → validate → send → feedback flow. Each PR refined the copy at different stages. The best copy was discovered by dogfooding, not by design upfront.
+
+---
+
 ## Common Failure Modes
 
 1. **The "impressive rewrite" trap.** Don't make copy sound more impressive — make it more specific. "ML system behind ~400M daily product page views" beats "cutting-edge ML platform powering millions of interactions."
@@ -269,6 +297,9 @@ Every interactive app produces copy beyond error messages: button labels, modal 
 
 ## Changelog
 
+- **2026-06-16 — v11: Conversational/wizard flow copy**
+  - ADDED: Conversational/wizard flow copy section — step-by-step copy patterns for multi-step flows (search → results → pick → action → confirm → feedback), wizard anti-patterns (don't number steps, don't expose internals, don't over-confirm)
+  - Evidence: kindle-schlacter-me PRs #1-20 built a complete multi-step flow. Each PR refined copy at different stages. content-quality covered individual UI elements (buttons, modals, errors) but not the end-to-end flow that ties them together.
 - **2026-06-14 — v10: In-app UX copy**
   - ADDED: In-app UX copy section — button labels, modal text, empty states, onboarding, confirmation dialogs
   - ADDED: UX copy patterns table (empty list, loading, confirmation, success, feature unavailable, user override)
