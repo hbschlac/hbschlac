@@ -2,7 +2,7 @@
 
 Reference patterns extracted from real projects. Loaded on-demand, not on every skill activation.
 
-Last synced: 2026-06-15 (manual, from 40+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
+Last synced: 2026-06-16 (manual, from 41+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
 
 ---
 
@@ -287,6 +287,44 @@ When your app aggregates content from external sources (torrent networks, APIs, 
 - **Parallel source verification:** When one source returns suspicious content, check another source for the same item. If they disagree, trust the more reliable source.
 
 Evidence: kindle-schlacter-me PRs #7, #8, #15, #17 all addressed different layers of content trust. A single upfront validation function with these layers would have consolidated 4 PRs into 1.
+
+## User Feedback Loops / Correction UX
+
+When users interact with auto-selected or auto-generated content (covers, summaries, search results, recommendations), they need ways to correct mistakes:
+
+- **Regenerate.** "This isn't right — try again." Give the system a second chance with different parameters. (kindle-schlacter-me PR#20: cover/summary regenerate)
+- **Hide / dismiss.** "This is wrong but I don't want to fix it." Remove the bad result without requiring the user to provide a correction. (kindle-schlacter-me PR#20: hide still-wrong cover)
+- **Manual override.** "I know what I want." Let the user bypass the auto-selection entirely with their own input. (kindle-schlacter-me PR#20: manual override for covers)
+- **Star ratings / personal preferences.** Per-user persistent data that informs future auto-selections. Store per-account, not per-session. (kindle-schlacter-me PR#19: personal star ratings with Goodreads integration)
+- **Correction feeds forward.** When a user corrects an auto-pick, use that signal to improve future picks for this user. Even simple "don't show this again" is valuable.
+
+**Pattern for correction UI:**
+```
+[Auto-selected content]
+[✓ Accept]  [↻ Regenerate]  [✕ Hide]  [✎ Override]
+```
+
+Don't force all four options — match to the content type:
+| Content type | Accept | Regenerate | Hide | Override |
+|---|---|---|---|---|
+| Cover image | implicit (do nothing) | yes | yes | yes (upload) |
+| AI summary | implicit | yes | yes | no |
+| Search result auto-pick | implicit | n/a | n/a | yes ("Find another") |
+| Star rating | yes (tap) | n/a | n/a | yes (tap different) |
+
+**Key insight:** kindle-schlacter-me shipped auto-pick first (PR#12), then learned users need escape hatches (PR#12 "Find another version"), then learned they need feedback on the auto-generated content itself (PR#20). Build the correction UI proactively — don't wait for users to be stuck.
+
+## Autonomous Improvement Agents
+
+When building systems that auto-create PRs or improvements (vibe-improver, Dependabot-like tools, scheduled code health jobs):
+
+- **Draft PRs need human triage.** A draft PR that sits for 20+ days is worse than no PR — it's noise that blocks the PR list. Set a deadline: if nobody promotes it in 7 days, the agent should close it or auto-promote. (muse-shopping #1: vibe-improver draft open 24+ days)
+- **Autonomous PRs need clear labels.** Tag with the agent name so humans can filter/triage: `vibe-improver`, `dependabot`, `code-health`. (muse-shopping #1: labeled `vibe-improver`)
+- **Don't create autonomous PRs faster than humans merge them.** If 3 auto-PRs are unmerged, stop creating new ones until the queue clears. Otherwise you're generating noise.
+- **Autonomous agents should verify their own PRs pass CI.** If the PR fails CI, the agent should fix it or close the PR — not leave a broken PR for humans.
+- **Include revert instructions.** Every autonomous PR body should end with "How to revert: close this PR + delete the branch."
+
+Evidence: schlacter.me's vibe-improver creates weekly improvement PRs. muse-shopping #1 (draft, 24+ days) demonstrates the failure mode when nobody triages the output.
 
 ## Working on Large Existing Codebases
 

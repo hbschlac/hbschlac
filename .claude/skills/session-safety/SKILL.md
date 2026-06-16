@@ -315,6 +315,15 @@ PRs get staler and riskier over time. Escalate based on age:
 
 Evidence: recs.community PRs #4-7 open 17+ days, muse-shopping #1 open 22+ days. Both are now in "High" territory — conflicts likely, merge risk increasing daily.
 
+### Execution over documentation
+
+Cross-repo merge has been documented in session-safety v11, v13, v14, and v15. Four versions of guidance. Zero stuck PRs merged by these versions. The problem is not documentation — it's execution. When you detect stuck PRs:
+
+1. **Try to merge RIGHT NOW, not "document for later."** Use `mcp__github__search_pull_requests` (works across repos even when `list_pull_requests` doesn't). If the PR has passing CI and is non-controversial, merge it.
+2. **If MCP merge tools work:** merge immediately. Don't add to "Laptop instructions."
+3. **If MCP tools can't reach the repo:** send a PushNotification with the exact commands. Don't write them in CLAUDE.md where they'll be read in 3 weeks — send them NOW.
+4. **If you're in a scheduled/autonomous session and find stuck PRs:** the notification IS the action. Don't add another known issue.
+
 ## Scheduled / Autonomous Sessions
 
 When running as a scheduled routine (no user watching), the session has different constraints than interactive sessions. The user set this up to run while they're away — the push notification is the deliverable, not the transcript.
@@ -442,6 +451,9 @@ When `list_repos`/`add_repo` tools don't exist in the current session (confirmed
 
 ## Changelog
 
+- **2026-06-16 — v16: Cross-repo execution over documentation**
+  - ADDED: "Execution over documentation" subsection to cross-repo management — 4 versions of merge guidance produced 0 merges, the problem is execution not docs. New rules: try to merge NOW via MCP tools, send PushNotification with exact commands if tools can't reach the repo, don't add more "Laptop instructions" that sit for weeks.
+  - Evidence: session-safety v11-v15 all documented cross-repo merge patterns. recs.community PRs #4-7 are now 20+ days old. muse-shopping #1 is 25+ days old. Zero stuck PRs were resolved by the documentation — the guidance was correct but never executed.
 - **2026-06-15 — v15: Scheduled/autonomous session patterns**
   - ADDED: Scheduled/autonomous session section — notification thresholds (notify on findings and failures, stay silent on all-clear), notification format (phone-banner first line, actionable detail in body), self-contained analysis rules, prohibited actions for autonomous sessions
   - Evidence: hbschlac/hbschlac runs scheduled routines for skill reviews and health checks. Prior autonomous sessions produced transcripts nobody read — the PushNotification is the only output that reaches the user. No skill covered when to notify vs. stay silent, or how to structure self-contained autonomous work.
