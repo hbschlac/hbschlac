@@ -190,6 +190,13 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 4. **Vercel caches aggressively.** Add `Cache-Control: no-store` headers to API routes that must always return fresh data. Don't rely on browser refresh — Vercel's edge cache is separate.
 5. **Preview deployments bypass ISR.** If the page looks correct on preview but stale on production, the issue is the production cache, not the code.
 
+### When to escalate to debug-escalation
+
+vercel-ship handles deploy and config issues. If the problem is deeper, hand off:
+- **Build failure fix attempted 2+ times** → debug-escalation Step 2 (the root cause isn't a type error — it's architectural)
+- **500 error traced to upstream API, not Vercel config** → debug-escalation Step 0 (production incident response with resilience patterns)
+- **Runtime error not in any debugging table above** → debug-escalation Step 1 (stop and investigate before more config changes)
+
 ### OAuth flow failures
 
 Diagnosis order:
@@ -395,6 +402,9 @@ Real failures from 10 Vercel projects, 13 failed deployments. All TypeScript typ
 
 ## Changelog
 
+- **2026-06-17 — v1.7: Escalation path to debug-escalation**
+  - ADDED: "When to escalate to debug-escalation" section — clear handoff criteria (2+ build fix attempts, upstream API issues, unrecognized runtime errors)
+  - Evidence: vercel-ship and debug-escalation both covered 500 errors with no routing guidance. Sessions applied config fixes when the problem was architectural.
 - **2026-06-12 — v1.6: Database migration coordination, ISR debugging**
   - ADDED: Database migration coordination checklist (2L) — Supabase/Prisma migration-before-deploy sequencing, preview deployment migration access
   - ADDED: ISR/SSG stale data debugging section — revalidation, cache headers, on-demand revalidation patterns

@@ -16,15 +16,15 @@ Between April 14 and June 4, 2026, **30+ Claude Code web sessions** audited thes
 
 | Skill | Status | What it does |
 |-------|--------|-------------|
-| code-builder | v8.6 | Parallel drafts, self-scoring, debug loop, visual mode. Rapid shipping mode. Graceful degradation + UX discovery + user feedback loops + autonomous agents. Learnings in LEARNINGS.md |
-| vercel-ship | v1.6 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + migration coordination + ISR debugging |
+| code-builder | v8.7 | Parallel drafts, self-scoring, debug loop, visual mode. Rapid shipping mode. Third-party integration + async queues + file validation audit. Learnings in LEARNINGS.md |
+| vercel-ship | v1.7 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + migration coordination + escalation to debug-escalation |
 | mcp-contributor | v4.1 | MCP governance contribution workflow (FROZEN) |
 | content-quality | v11 | Anti-AI-slop, voice matching, hallucination prevention, ship announcements, commit/PR quality, in-app UX copy, conversational/wizard flow copy |
-| session-safety | v16 | Groundhog Day + automated system noise + cross-repo execution-over-documentation + rollback patterns + scheduled/autonomous sessions |
+| session-safety | v17 | Groundhog Day + BLOCKING meta-review circuit breaker + cross-repo execution-over-documentation + scheduled review loop prevention |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging + project-bootstrap cross-reference |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
-| debug-escalation | v11 | Fix-churn cycle breaker + invisible downstream failures + pipeline hardening + client-state debugging |
+| debug-escalation | v12 | Fix-churn cycle breaker + cross-skill routing + generalized invisible downstream failures + pipeline audit automation |
 | research-pipeline | v1.2 | Scrape, classify, analyze, present research data + Claude API integration + updated model IDs |
 
 ## Sandbox constraint
@@ -123,10 +123,16 @@ git branch -r | grep 'claude/eloquent-euler' | xargs -I{} basename {} | xargs -I
 55. ~~**No autonomous improvement agent patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md v8.6 adds autonomous agent patterns (draft triage deadlines, labeling, queue limits, CI verification). Evidence: muse-shopping #1 vibe-improver draft open 25+ days.
 56. **Cross-repo merge is an execution problem, not a documentation problem.** session-safety has had 4 versions of cross-repo guidance (v11-v15), zero stuck PRs merged. recs.community #4-7 now 20+ days, muse-shopping #1 now 25+ days. session-safety v16 adds "execution over documentation" rule: try to merge NOW, send PushNotification if tools can't reach the repo, stop adding to laptop instructions nobody reads.
 57. **No skill covers effective MCP tool usage patterns.** Every web session has MCP tools (GitHub, Vercel, etc.) but guidance is scattered. Common patterns: loading schemas via ToolSearch, handling large results with jq/Python, tool chaining, fallback tools when primary is scoped. code-builder v8.6 adds MCP tool usage to web session pre-flight.
+58. ~~**No third-party integration patterns (email, webhooks, payment).**~~ **RESOLVED**: code-builder LEARNINGS.md v8.7 adds third-party integration (silent failure default, webhook idempotency, delivery verification, email failure modes). Evidence: kindle-schlacter-me PRs #2, #16, #18 — 3 PRs addressing different aspects of third-party integration.
+59. ~~**No async operation queue management patterns.**~~ **RESOLVED**: code-builder LEARNINGS.md v8.7 adds async queue management (per-op state machines, per-op timeouts, batch status UX, cancellation, rate limiting). Evidence: kindle-schlacter-me PRs #3, #13, #18 — queue state lost on reload, stuck operations, missing per-item status.
+60. ~~**File validation was reactive (6 PRs) instead of proactive (1 audit).**~~ **RESOLVED**: code-builder v8.7 adds file validation audit as a pre-ship gate in rapid shipping mode. 5-layer validation function before point of no return. Evidence: kindle-schlacter-me PRs #7-#17 — 6 reactive validation PRs consolidatable to 1-2 upfront.
+61. ~~**Cross-skill routing had no handoff protocol.**~~ **RESOLVED**: debug-escalation v12 adds cross-skill routing table. vercel-ship v1.7 adds escalation criteria. code-builder/debug-escalation/vercel-ship now have explicit handoff triggers.
+62. **Scheduled routines configured to review skills create a review addiction loop.** 12 consecutive sessions (Jun 4-16) did skill reviews despite explicit instructions not to. session-safety v17 makes the meta-review circuit breaker BLOCKING and adds scheduled review loop prevention. **Action needed**: reconfigure any scheduled routine that says "review skills" to do productive work instead.
+63. **code-builder parallel mode is still UNTESTED after 8 versions.** v8.7 adds a web-session compatibility check (worktree test), but the mode has never been run. First real run should be on a laptop where worktrees are guaranteed to work.
 
 ## What to work on next (not another skill review)
 
-The skills have been reviewed and improved 9 times in 12 days (Jun 4-16). They are comprehensive. Before doing another review, consider:
+The skills have been reviewed and improved 13 times in 13 days (Jun 4-17). They are comprehensive. **Do not configure more scheduled routines to review skills.** Instead:
 
 **Productive work that moves projects forward:**
 - **CRITICAL:** Merge the recs.community PR stack (#4-7, open 20+ days, approaching abandon threshold) — open a web session in recs.community, or laptop

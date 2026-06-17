@@ -81,6 +81,21 @@ After the fix, proceed to Step 5 to write the root-cause report.
 
 ---
 
+## Cross-Skill Routing (when to escalate here)
+
+Other skills handle initial debugging. debug-escalation takes over when they've failed:
+
+| Coming from | Escalation trigger | debug-escalation starts at |
+|---|---|---|
+| **code-builder debug loop** | Hit 5-hypothesis limit, or same area fixed 3+ times | Step 2 (audit the churn) |
+| **vercel-ship** | Build failure fix attempted 2+ times, or runtime error not in the debugging table | Step 1 (stop writing code) — the build/deploy context is config, not just code |
+| **vercel-ship + external dep** | 500 error traced to upstream API, not Vercel config | Step 0 (production incident) — vercel-ship handles config, debug-escalation handles resilience |
+| **Scheduled routine** | Health check found failures; routine can't diagnose root cause | Step 0 (production incident) with notification — don't silently log findings |
+
+**Key distinction:** vercel-ship owns "the deploy broke" (config, types, env vars). debug-escalation owns "the deploy works but the feature doesn't" (logic, state, external deps, resilience). If vercel-ship's debugging table doesn't cover the symptom, escalate here.
+
+---
+
 ## Step 1: Stop writing code
 
 Do NOT write any code. The instinct to "try one more thing" is exactly the problem.
@@ -297,6 +312,13 @@ Activate when:
 - 3+ bug reports or fixes in the same session target different steps of the same pipeline
 - A fix for step N exposes a new failure in step N+1
 - The same user journey has been "fixed" multiple times but keeps breaking differently
+- code-builder's rapid shipping mode flags 5+ PRs targeting the same pipeline (automatic handoff)
+
+**Detecting the 5-PR threshold:** At the start of each PR in a rapid shipping session, count recent commits to the pipeline:
+```bash
+git log --oneline --since="7 days ago" -- {pipeline-directory} | wc -l
+```
+If >=5, this section activates automatically. Don't wait for code-builder to hand off — both skills can check.
 
 ### Step PH1: Map the pipeline
 
@@ -368,17 +390,19 @@ The hardest production bugs are ones where your system reports success but the d
 
 ### Progressive validation checklist
 
-When a downstream system silently rejects payloads, add validation layers iteratively:
+When a downstream system silently rejects payloads, add validation layers. This applies to ANY silent-rejection scenario — file delivery, API payloads, email content, payment submissions:
 
-| Layer | What to check | Evidence |
-|---|---|---|
-| 1. Format compliance | Does the file meet the spec? (zip structure, required entries, encoding) | kindle-schlacter-me PR#7: EPUB mimetype DEFLATED instead of STORED |
-| 2. Content integrity | Is the content real? (not a stub, not a placeholder, not an error page) | PR#8: rate-limited HTML page sent as "EPUB"; PR#17: fake torrent stubs |
-| 3. Structural validity | Is the content well-formed? (no broken references, no empty sections) | PR#15: broken spines, DRM'd files, missing content documents |
-| 4. Feature isolation | Can optional features break the core payload? | PR#9, #14: AI summary embed corrupted the EPUB; gated off |
-| 5. Deliverability | Will the receiving system's specific rules accept this? | PR#16: honest copy since Amazon provides no receipt |
+| Layer | What to check | File delivery example | API/email example |
+|---|---|---|---|
+| 1. Format compliance | Does the payload meet the spec? | zip structure, mimetype encoding | content-type header, required fields, payload size limits |
+| 2. Content integrity | Is this real content, not a stub? | file size, page count, structure | not an error page, not empty, not a rate-limit response |
+| 3. Structural validity | Is it well-formed internally? | no broken references, parseable | valid JSON/XML, no circular refs, required nested objects present |
+| 4. Feature isolation | Can optional enhancements break it? | AI summary corrupts EPUB | enrichment metadata exceeds field length limits |
+| 5. Deliverability | Undocumented receiving-system rules? | Amazon silently rejects certain EPUBs | spam filter triggers, attachment restrictions, character encoding |
 
-**Key insight:** Each layer was discovered empirically when a book "sent" but never arrived. Six PRs (#7, #8, #9, #14, #15, #17) targeted the same silent-rejection pipeline. A single upfront validation audit would have identified most of these in 2-3 PRs.
+**Key insight:** Each layer was discovered empirically across kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — six PRs targeting the same pipeline. A single upfront validation audit would have identified most of these in 2-3 PRs. This pattern generalizes to any system that returns 200 OK but silently drops your payload.
+
+**Triggering a validation audit proactively:** When building ANY feature that sends data to an external system with no error callback, walk through all 5 layers BEFORE shipping. See code-builder's "File validation audit" in Rapid Shipping Mode.
 
 ---
 
@@ -432,6 +456,11 @@ Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React st
 
 ## Changelog
 
+- **2026-06-17 — v12: Cross-skill routing, generalized invisible failures, pipeline audit automation**
+  - ADDED: Cross-skill routing table — clear handoff protocol from code-builder, vercel-ship, and scheduled routines with specific entry points
+  - CHANGED: Progressive validation checklist generalized beyond EPUB/file delivery to include API payloads, email content, payment submissions — with parallel examples for each layer
+  - ADDED: Pipeline hardening trigger now includes automatic 5-PR threshold detection via git log, connecting to code-builder's rapid shipping mode rule
+  - Evidence: Cross-skill overlap between vercel-ship (500 errors) and debug-escalation (resilience patterns) had no clear handoff — sessions would apply config fixes when the problem was architectural. Progressive validation was EPUB-specific but the pattern applies to any silent-rejection system.
 - **2026-06-15 — v11: Client-state debugging**
   - ADDED: Client-state debugging section — investigation pattern for browser-specific state bugs where the server is correct but the UI is wrong
   - ADDED: Client-state bug patterns table (stuck loading, state lost on reload, stale data, flickering, stale closures)

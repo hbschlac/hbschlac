@@ -103,6 +103,8 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Task builds a multi-step pipeline? | Map all steps, add validation between them. See LEARNINGS.md "Pipeline Hardening." |
 | Task adds an optional enhancement to an existing feature? | Make it fail gracefully — try/catch with degradation, don't let it break the core path. See LEARNINGS.md "Graceful Degradation." |
 | Task consumes content from external/untrusted sources? | Validate format, authenticity, plausibility, integrity, safety. See LEARNINGS.md "Untrusted Source Validation." |
+| Task sends data to a third party (email, API, payment)? | Assume silent failure. Build "sent, not confirmed" UX. Add webhook idempotency. See LEARNINGS.md "Third-Party Integration." |
+| Task involves multiple concurrent long-running operations? | Model per-operation state machine in server, not client memory. Add per-op timeouts, per-item status UI, cancellation. See LEARNINGS.md "Async Operation Queue Management." |
 
 ### 1C-2. Claude Code Environment (web sessions)
 
@@ -211,7 +213,11 @@ Escalate when ANY fire:
 
 ## Step 4a — Parallel Path
 
-**Status: UNTESTED in production.** As of 2026-06-11, no run log exists for parallel mode. The first real parallel run should: (1) use N=3 (not N=5), (2) log the full score breakdown, (3) commit the run log, (4) note whether worktrees worked in the environment (web session vs. laptop). If worktrees fail in a web session sandbox, fall back to single-pass — don't debug the environment.
+**Status: UNTESTED in production.** As of 2026-06-17, no run log exists for parallel mode.
+
+**Web session constraint: parallel mode may not work.** Ephemeral containers may not support git worktrees (sandbox filesystem restrictions, missing git config). Before spawning N agents: test `git worktree add /tmp/test-wt HEAD 2>/dev/null && git worktree remove /tmp/test-wt`. If the test fails, skip parallel — fall back to single-pass immediately. Don't spend time debugging worktree issues in a web session.
+
+The first real parallel run should: (1) use N=3 (not N=5), (2) log the full score breakdown, (3) commit the run log, (4) note whether the environment was web session or laptop.
 
 1. **Git repo gate (BLOCKING):** `git rev-parse --git-dir` must succeed. If not, abort parallel — do NOT silently fall back to single.
 
@@ -437,6 +443,20 @@ After shipping each core feature PR, run the UX discovery checklist (LEARNINGS.m
 
 If running in a web session where you can't test the UI directly, write the checklist into the PR body and ask the user to test before you continue building on top of that feature.
 
+### File validation audit (before shipping any file-output feature)
+
+When your feature generates, transforms, or relays files to an external system, build a validation function BEFORE shipping the feature — not after 4 reactive PRs:
+
+1. **Format compliance:** Does the file match the spec? (zip structure, required entries, encoding, magic bytes)
+2. **Content integrity:** Is this real content or a stub/placeholder? (file size, page count, structure)
+3. **Structural validity:** Is it well-formed? (no broken internal references, DRM-free, parseable)
+4. **Feature isolation:** Can optional enhancements (AI summaries, metadata enrichment) corrupt the base file? If yes, gate them separately.
+5. **Deliverability:** Will the receiving system's undocumented rules accept this?
+
+Write the validation function as a single pre-send gate. Run all 5 layers before the point of no return (send, upload, write to DB). Fail with a user-facing error, not silently.
+
+Evidence: kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — 6 PRs discovering these layers one at a time. A single upfront validation function would have caught 5 of 6 in one PR.
+
 ### Anti-pattern: the 15-PR pipeline
 
 kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline over 15 iterations. A pipeline audit (see debug-escalation's pipeline hardening) at PR #6 would have identified format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs instead of 15 reactive ones.
@@ -449,12 +469,19 @@ kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline o
 
 Patterns from real projects are in `LEARNINGS.md` (same directory). Read it when you need reference patterns for a specific domain (Supabase, API resilience, testing, CI, performance, etc.).
 
-Last synced: 2026-06-15. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
+Last synced: 2026-06-17. GH Action deployed at `.github/workflows/code-builder-sync.yml`.
 
 ---
 
 ## Changelog
 
+- **2026-06-17 — v8.7: Third-party integration, async queues, file validation audit, parallel mode web-session guard**
+  - ADDED: Pre-flight checks for third-party integration (email, webhooks, payment — assume silent failure) and async operation queue management (per-op state machines, batch failure UX, cancellation)
+  - ADDED: LEARNINGS.md — Third-Party Integration (silent failure default, webhook idempotency, delivery verification, email-specific failure modes)
+  - ADDED: LEARNINGS.md — Async Operation Queue Management (per-op state machines, per-op timeouts, batch status UX, cancellation, rate limiting, queue persistence)
+  - ADDED: File validation audit in rapid shipping mode — 5-layer validation function as a pre-ship gate for file-output features, preventing the "4 reactive PRs" pattern
+  - CHANGED: Parallel mode now tests worktree compatibility before spawning agents in web sessions, with explicit fallback to single-pass
+  - Evidence: kindle-schlacter-me PRs #2/#16/#18 (third-party integration gaps), PRs #3/#13/#18 (async queue gaps), PRs #7/#8/#9/#14/#15/#17 (6 reactive file validation PRs consolidatable to 1-2 upfront). Parallel mode remains untested; web session sandbox may prevent worktrees.
 - **2026-06-16 — v8.6: User feedback loops, autonomous improvement agents, MCP tool usage**
   - ADDED: LEARNINGS.md — User feedback loops / correction UX (regenerate, hide, manual override, star ratings, correction-feeds-forward pattern)
   - ADDED: LEARNINGS.md — Autonomous improvement agents (draft PR triage deadlines, agent labeling, queue limits, auto-CI-verify, revert instructions)
