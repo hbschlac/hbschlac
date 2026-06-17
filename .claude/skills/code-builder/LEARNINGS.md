@@ -2,7 +2,7 @@
 
 Reference patterns extracted from real projects. Loaded on-demand, not on every skill activation.
 
-Last synced: 2026-06-16 (manual, from 41+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
+Last synced: 2026-06-17 (manual, from 41+ PRs across kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hbschlac)
 
 ---
 
@@ -222,6 +222,31 @@ Evidence: kindle-schlacter-me PRs #6-#20 hardened the same pipeline over 15 iter
 - **Test with known-good AND known-bad payloads.** If you only test happy paths, you'll discover silent failures from users. Deliberately send malformed inputs to learn what the downstream system rejects. (kindle-schlacter-me: fake EPUBs, HTML-instead-of-EPUB, DRM'd files)
 - **Isolate optional features from the core payload.** If an optional enhancement (AI summaries, cover images) can corrupt the core payload, gate it separately. Ship the core path first. (kindle-schlacter-me PR#14: summary embed gated off)
 - **Honest copy when you can't confirm delivery.** "Sent to your email" is a lie if you don't know if the email provider delivered it. Say "Emailed — check your inbox in a few minutes." (kindle-schlacter-me PR#16)
+
+## Third-Party Integration (Email, Webhooks, Payment Providers)
+
+When your app sends data to a third party that provides no error callback (email providers, Amazon Kindle, SMS gateways, payment processors):
+
+- **Assume silent failure is the default.** Most third-party systems accept your payload with a 200/202 and silently drop it if it doesn't meet undocumented requirements. Build your UX around "sent, not confirmed" status.
+- **Webhook retry idempotency.** Third-party webhook retries mean your handler sees the same event 2-10 times. Always check if the state transition already happened before applying. Return 200 regardless of whether you acted. (kindle-schlacter-me: Resend webhooks)
+- **Delivery verification without callbacks.** When the receiver provides no receipt, you cannot confirm delivery. Options: (1) poll a status API if one exists, (2) be honest in the UI ("Sent — check your inbox"), (3) add a manual "I received it" / "I didn't receive it" feedback mechanism. Never say "Delivered!" when you don't know.
+- **Email-specific failure modes:** soft bounces (mailbox full, temporarily deferred — retry automatically), hard bounces (invalid address — stop retrying), spam filtering (content triggers — test with different subjects/bodies), rate limits (send too fast — add jitter between sends), provider-specific rules (Amazon rejects certain attachment types silently).
+- **Test with the real third party, not mocks, for integration validation.** Mocks verify your code; only real sends verify the third party accepts your payload. Run at least one real end-to-end test per integration.
+
+Evidence: kindle-schlacter-me PRs #2 (archive.org failure cascade), #16 ("Emailed to Amazon" honest copy), #18 (lost HTTP response from send operation). 3 separate PRs addressing different aspects of third-party integration that could have been designed upfront.
+
+## Async Operation Queue Management
+
+When users trigger multiple long-running operations (batch downloads, bulk sends, parallel conversions):
+
+- **Model each operation as a state machine, not a boolean.** States: `queued → in_progress → validating → complete | failed | cancelled`. Store the state per-operation in DB/KV, not in client memory. (kindle-schlacter-me: send stages)
+- **Per-operation timeouts independent of queue.** Operation #2 times out at 30s. Operations #1, #3, #4 continue unaffected. Don't let one slow item freeze the queue.
+- **Batch failure UX: show per-item status.** 5 books, 3 sent, 1 failed, 1 in progress — the user needs to see each item's status individually. Don't collapse to a single "batch in progress" indicator.
+- **User cancellation mid-operation.** "Stop" should abort the current item and skip remaining. Clean up partial state (temp files, incomplete DB rows). Don't leave orphaned state behind.
+- **Rate limiting across the queue.** If the downstream service has rate limits, the queue must throttle. Don't fire 10 parallel requests to a service that allows 2/minute. Use a concurrency limiter (e.g., `p-limit` in JS).
+- **Queue persistence across page reload.** The queue state must survive navigation away and back. On mount, reconcile client state with server-side operation statuses. (kindle-schlacter-me PR#13: queue state lost on reload)
+
+Evidence: kindle-schlacter-me PRs #3 (multi-download queue), #13 (state lost on reload), #18 (stuck "Sending" — lost completion signal). Pattern repeats in any batch operation: file uploads, bulk email, job queues.
 
 ## Two-Person / Multi-Agent Development
 

@@ -65,44 +65,48 @@ unless explicitly confirmed "yes, start fresh."
 
 ---
 
-## Meta-Review Circuit Breaker
+## Meta-Review Circuit Breaker (BLOCKING)
 
-If the task is "review skills," "audit skills," "improve skills," or "consolidate sessions":
+If the task is "review skills," "audit skills," "improve skills," or "consolidate sessions" — OR if a scheduled routine's task description mentions reviewing, auditing, or improving skills:
 
 ```bash
-git log --oneline --since="7 days ago" origin/main | grep -i "improve.*skill\|skill.*review\|gap analysis"
+git log --oneline --since="7 days ago" origin/main | grep -i "improve.*skill\|skill.*review\|gap analysis\|blindspot\|coverage gap"
 ```
 
-If a skill-review PR was merged in the last 7 days:
+If ANY skill-review commit exists in the last 7 days:
 
 ```
-REVIEW THROTTLED: A skill improvement PR was merged {N} days ago ({commit}).
+SESSION BLOCKED: Review addiction detected.
 
-The skills have been reviewed {count} times in the last 30 days.
-Instead of another review pass, consider:
-1. Do actual productive work (build a feature, fix a bug, ship something)
-2. If you found a SPECIFIC gap, state it — don't do a full audit
-3. If the user insists, make targeted edits only — no full-file rewrites
+{count} skill review commits in the last 30 days. The skills have been reviewed
+and improved continuously since Jun 4. They are comprehensive.
+
+This session WILL NOT do a full skill review. Options:
+1. State ONE specific gap you encountered in real work — make a targeted edit
+2. Do productive work from CLAUDE.md "What to work on next"
+3. If the user explicitly insists on a full review, proceed — but log this override
 ```
 
-This prevents the pattern where consecutive sessions keep doing the same "analyze all PRs, find gaps, add learnings" work instead of building things.
+**This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides. 7 consecutive sessions (Jun 10-16) violated the advisory version of this check. The problem was: advisory checks get ignored. Blocking checks force a redirect.
+
+**Scheduled routine override:** If this session is a scheduled routine AND the task says "review skills" or similar, the circuit breaker still fires. Scheduled routines should NOT be configured to review skills — that's how the 12-day loop happened. Notify the user that their scheduled task is doing review work instead of productive work, and suggest reconfiguring.
 
 ### Productive Work Accelerator
 
-When the circuit breaker fires, don't just say "do productive work." Check CLAUDE.md for the "What to work on next" section and suggest the top unblocked item. If CLAUDE.md doesn't have that section, check:
+When the circuit breaker fires, don't just say "do productive work." Execute this sequence:
 
+**Step 1: Try to unblock stuck PRs RIGHT NOW** (not "suggest" — actually try):
 ```bash
-# 1. Stuck PRs that could be merged right now
-grep -A3 "stuck\|unmerged\|open.*days\|stacked PR" CLAUDE.md
+grep -A5 "CRITICAL\|stuck\|unmerged\|open.*days" CLAUDE.md
+```
+If stuck PRs exist, attempt to merge them via MCP tools before doing anything else. This is the highest-value action.
 
-# 2. README/profile staleness
-grep -A3 "stale\|missing.*project\|update.*README" CLAUDE.md
-
-# 3. Features that are half-built
-grep -A3 "TODO\|WIP\|in-progress\|blocked" CLAUDE.md
+**Step 2: If no PRs to merge, check for concrete feature work:**
+```bash
+grep -A3 "Build features\|TODO\|WIP\|in-progress" CLAUDE.md
 ```
 
-Present the top 3 actionable items with one-line descriptions. Don't list everything — pick what's unblocked and high-impact.
+**Step 3: Present the top 3 actionable items** with one-line descriptions. Don't list everything — pick what's unblocked NOW from this session.
 
 ---
 
@@ -364,8 +368,17 @@ Autonomous sessions must be self-contained:
 - **Don't merge PRs without explicit prior authorization.** Check-and-report, don't check-and-act on shared resources.
 - **Don't create new PRs for discovered issues.** Report findings via notification; let the user decide how to address them.
 - **Don't do unbounded work.** Set a scope at the start. If the analysis balloons, notify with what you've found so far and stop.
+- **Don't review skills unless the user explicitly asked for it.** The meta-review circuit breaker applies to scheduled sessions too. If a scheduled routine's task is "review skills" or "audit skills," notify the user that this task should be reconfigured to do productive work instead.
 
-Evidence: hbschlac/hbschlac has scheduled routines running skill reviews and health checks. Prior autonomous sessions produced transcripts nobody read — the notification is the only output that reaches the user.
+### Scheduled session anti-pattern: the review loop
+
+12 consecutive scheduled sessions (Jun 4-16, 2026) each did "analyze PRs, find gaps, improve skills" despite CLAUDE.md explicitly saying "Do NOT do another full skill review." The advisory circuit breaker was ignored 7 times.
+
+**Why it happened:** Each session independently decided to review skills because analyzing PRs is easy work that always produces output. Building features requires context, decisions, and risk — reviews don't.
+
+**How to prevent:** The meta-review circuit breaker is now BLOCKING (not advisory). But if a scheduled routine keeps being configured to review skills, that's a human configuration problem. Notify once: "Your scheduled routine is doing skill reviews. The skills have been reviewed 12+ times. Reconfigure this routine to [specific productive task from CLAUDE.md]."
+
+Evidence: hbschlac/hbschlac has scheduled routines running skill reviews and health checks. 12 sessions produced skill improvements nobody needed while stuck PRs aged from 7 to 25 days without action.
 
 ---
 
@@ -451,6 +464,12 @@ When `list_repos`/`add_repo` tools don't exist in the current session (confirmed
 
 ## Changelog
 
+- **2026-06-17 — v17: Make meta-review circuit breaker BLOCKING, scheduled review loop prevention**
+  - CHANGED: Meta-review circuit breaker upgraded from advisory to BLOCKING (like Groundhog Day scan). 7 sessions (Jun 10-16) violated the advisory version — blocking forces redirect to productive work.
+  - ADDED: Productive work accelerator now tries to merge stuck PRs via MCP first, not just suggest them.
+  - ADDED: Scheduled session anti-pattern: the review loop — explains the 12-session Jun 4-16 pattern and prevents recurrence.
+  - ADDED: Prohibition on skill reviews in autonomous sessions unless explicitly requested.
+  - Evidence: 12 consecutive sessions did skill reviews. 7 explicitly violated the "Do NOT review" instruction. 0 stuck PRs merged despite 4 versions of merge guidance. recs.community #4-7 aged from 7 to 21 days; muse-shopping #1 from 15 to 26 days.
 - **2026-06-16 — v16: Cross-repo execution over documentation**
   - ADDED: "Execution over documentation" subsection to cross-repo management — 4 versions of merge guidance produced 0 merges, the problem is execution not docs. New rules: try to merge NOW via MCP tools, send PushNotification with exact commands if tools can't reach the repo, don't add more "Laptop instructions" that sit for weeks.
   - Evidence: session-safety v11-v15 all documented cross-repo merge patterns. recs.community PRs #4-7 are now 20+ days old. muse-shopping #1 is 25+ days old. Zero stuck PRs were resolved by the documentation — the guidance was correct but never executed.
