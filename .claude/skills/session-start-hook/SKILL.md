@@ -205,18 +205,3 @@ Provide summary with:
 - Note: merge to default branch for all future sessions to use it
 
 ---
-
-## Changelog
-
-- **2026-06-12 — v6: Hook debugging, project-bootstrap cross-reference**
-  - ADDED: Hook debugging table (Step 6B) — silent failures, missing deps, venv issues, timeout, cross-ref to project-bootstrap
-  - Evidence: hooks fail silently in web sessions and there was no troubleshooting guide; project-bootstrap creates CLAUDE.md but not hooks
-- **2026-06-05 — v5: Monorepo workspaces, database migrations, Python system deps**
-  - ADDED: Monorepo workspace detection and handling guidance
-  - ADDED: Database migration handling in hooks (prisma generate, not migrate deploy)
-  - ADDED: Python system dependency installation pattern
-- **2026-05-29 — v4: carried forward, no substantive changes needed**
-  - This skill is stable and well-structured. No changes from v3.
-- **2026-05-27 — v3: carried forward from v2 with minor cleanup**
-- **2026-05-24 — v2: multi-language, async race fix, CI mining**
-- **2026-04-15 — v1: initial version**
