@@ -196,22 +196,3 @@ MCP auth is actively evolving. Key specs and SEPs:
 6. **Over-maintenance without usage.** This skill has been iterated 4 times across 30+ sessions without a single real MCP contribution. Future sessions should NOT audit/improve this skill — instead, use it to make an actual contribution.
 
 ---
-
-## Changelog
-
-- **2026-06-05 — v4.1: Added over-investment warning, frozen for maintenance**
-  - ADDED: "OVER-INVESTED" warning — no further iteration until anchor bug fixed and one real contribution made
-  - ADDED: Known issue #6 — over-maintenance without usage
-- **2026-05-29 — v4: Applied staleness patches, expanded coverage**
-  - FIXED: Replaced hardcoded protocol version with "check the spec repo" instruction
-  - FIXED: Replaced hardcoded SEP counts with "check the current index" instruction
-  - FIXED: Replaced hardcoded working group list with "fetch current" instruction
-  - FIXED: Replaced hardcoded Discord link with community page reference
-  - Added: Inspector, Registry, ext-*, access, .github to repo map
-  - Added: Renamed Step 4 to clarify it applies to all non-spec repos, not just SDKs
-  - Added: Auth landscape section (Step 8) expanding the shallow OAuth coverage
-  - Added: "Finding a sponsor" playbook for SEPs
-  - Added: Cross-reference from triage to lifecycle spec for capability-affecting changes
-- **2026-05-27 — v3: added zero-usage disclosure and known issues section**
-- **2026-05-24 — v2: consolidated from 25 session branches**
-- **2026-04-17 — v1: initial version**

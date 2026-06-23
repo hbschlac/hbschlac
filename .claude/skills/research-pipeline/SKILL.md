@@ -255,17 +255,3 @@ For research dashboards (Step 5A), default to Recharts with Next.js. It handles 
 - **Don't over-automate one-time research.** If you're doing this once, a Python script + CSV is fine. You don't need a pipeline framework.
 
 ---
-
-## Changelog
-
-- **2026-06-16 — v1.2: Updated model IDs to current Claude 4.X family**
-  - UPDATED: Model selection table — added Fable 5, updated all model IDs to current versions (claude-haiku-4-5-20251001, claude-sonnet-4-6, claude-opus-4-6, claude-fable-5)
-  - Evidence: model IDs were stale; Fable 5 is now available for long-context research analysis
-- **2026-06-12 — v1.1: Claude API integration, data visualization**
-  - ADDED: Claude API for classification — model selection table (Haiku/Sonnet/Opus by use case), batching pattern, Batch API note
-  - ADDED: Data visualization library comparison table (Recharts, Chart.js, D3, Observable Plot)
-  - Evidence: classification step referenced LLMs but had no concrete API guidance; dashboard step recommended Recharts without comparing alternatives
-- **2026-06-05 — v1: Initial skill based on 4 research repos**
-  - Covers: data collection, classification (manual + LLM), analysis, presentation
-  - Sources: twitch-community-research, workspace-ai-research, claude-code-insights-dashboard, managed-agents-pulse
-  - Addresses CLAUDE.md known issue #5

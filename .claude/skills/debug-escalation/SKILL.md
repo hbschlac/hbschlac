@@ -263,29 +263,9 @@ debug-escalation is reactive by default. This section covers what to configure B
 2. **External dependency health check.** A scheduled job (GHA cron or Vercel cron) that pings external APIs and records status. This is how you catch "archive.org is down" BEFORE users report download failures.
 3. **Error budget tracking.** After a production incident, add a regression check: a test or health probe that would have caught the specific failure mode.
 
-### Health check pattern (GHA cron)
+### Health check pattern
 
-```yaml
-name: Health Check
-on:
-  schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
-  workflow_dispatch:
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          for url in "https://your-app.vercel.app/api/health" "https://external-api.example.com"; do
-            status=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 10 "$url")
-            if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
-              echo "ALERT: $url returned $status"
-              exit 1
-            fi
-          done
-```
-
-Evidence: kindle-schlacter-me PR#2 was triggered by an archive.org outage discovered reactively. A 6-hour health check on archive.org endpoints would have caught it hours earlier.
+Set up a GHA cron (`schedule: cron: '0 */6 * * *'` + `workflow_dispatch`) that curls each external dependency and fails on non-2xx status. This catches outages before users report them.
 
 ## Claude Code Web Session Debugging
 
@@ -341,8 +321,6 @@ For each step, ask:
 ### Step PH3: Prioritize by blast radius
 
 Fix the step that causes the most user-visible damage first. Usually: the point of no return (the step where you can't undo — e.g., sending an email, writing to DB).
-
-Evidence: kindle-schlacter-me PRs #6-#20 — 15 PRs fixing the same download→validate→send pipeline. A pipeline audit upfront would have caught format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs.
 
 ---
 
@@ -400,9 +378,7 @@ When a downstream system silently rejects payloads, add validation layers. This 
 | 4. Feature isolation | Can optional enhancements break it? | AI summary corrupts EPUB | enrichment metadata exceeds field length limits |
 | 5. Deliverability | Undocumented receiving-system rules? | Amazon silently rejects certain EPUBs | spam filter triggers, attachment restrictions, character encoding |
 
-**Key insight:** Each layer was discovered empirically across kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — six PRs targeting the same pipeline. A single upfront validation audit would have identified most of these in 2-3 PRs. This pattern generalizes to any system that returns 200 OK but silently drops your payload.
-
-**Triggering a validation audit proactively:** When building ANY feature that sends data to an external system with no error callback, walk through all 5 layers BEFORE shipping. See code-builder's "File validation audit" in Rapid Shipping Mode.
+When building ANY feature that sends data to an external system with no error callback, walk through all 5 layers BEFORE shipping. See code-builder's "File validation audit" in Rapid Shipping Mode.
 
 ---
 
@@ -435,8 +411,6 @@ Browser-specific state bugs require different debugging than server-side issues.
 | UI flickers between states | Optimistic update + server response race condition | Use server state as source of truth after confirmation |
 | Action works once, fails on retry | Event handler bound to stale closure | Check dependency arrays, use refs for latest values |
 
-Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React state not persisted), PR#18 (stuck "Sending" — HTTP response lost, no polling fallback). Both required client-state debugging, not server-side debugging.
-
 ---
 
 ## When to Abandon vs. Keep Debugging
@@ -453,49 +427,3 @@ Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React st
 - You haven't yet read the callers/configuration/adjacent files (Step 4 incomplete)
 
 ---
-
-## Changelog
-
-- **2026-06-17 — v12: Cross-skill routing, generalized invisible failures, pipeline audit automation**
-  - ADDED: Cross-skill routing table — clear handoff protocol from code-builder, vercel-ship, and scheduled routines with specific entry points
-  - CHANGED: Progressive validation checklist generalized beyond EPUB/file delivery to include API payloads, email content, payment submissions — with parallel examples for each layer
-  - ADDED: Pipeline hardening trigger now includes automatic 5-PR threshold detection via git log, connecting to code-builder's rapid shipping mode rule
-  - Evidence: Cross-skill overlap between vercel-ship (500 errors) and debug-escalation (resilience patterns) had no clear handoff — sessions would apply config fixes when the problem was architectural. Progressive validation was EPUB-specific but the pattern applies to any silent-rejection system.
-- **2026-06-15 — v11: Client-state debugging**
-  - ADDED: Client-state debugging section — investigation pattern for browser-specific state bugs where the server is correct but the UI is wrong
-  - ADDED: Client-state bug patterns table (stuck loading, state lost on reload, stale data, flickering, stale closures)
-  - Evidence: kindle-schlacter-me PR#13 (download status lost on reload — React state not persisted to server), PR#18 (stuck "Sending" — HTTP response lost during fetch, no polling fallback). Both required client-side debugging, not server-side — debug-escalation had no patterns for this.
-- **2026-06-14 — v10: Invisible downstream failures**
-  - ADDED: Invisible downstream failures section — investigation pattern and progressive validation checklist for when a system reports success but the downstream system silently drops the payload
-  - Evidence: kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — six PRs targeting silent Amazon rejection of EPUBs. Each discovered a new validation layer empirically (format compliance → content integrity → structural validity → feature isolation → deliverability). The downstream system (Amazon Kindle) provided zero error feedback.
-- **2026-06-13 — v9: Pipeline hardening, rapid iteration vs. churn**
-  - ADDED: Pipeline hardening section — when 3+ symptoms point to the same pipeline, audit all steps instead of fixing one at a time (map→audit→prioritize by blast radius)
-  - ADDED: Rapid production iteration section — distinguishes healthy rapid iteration (different symptoms, new evidence) from fix-churn (same symptom, no new info), with clear escalation criteria
-  - Evidence: kindle-schlacter-me PRs #6-#20 — 15 PRs on the same pipeline in one day. Productive but would have been faster with upfront pipeline audit. debug-escalation lacked the positive-pattern counterpart to fix-churn.
-- **2026-06-12 — v8: Claude Code web session debugging**
-  - ADDED: Web session debugging table — ephemeral filesystem, no browser access, MCP tool failures, no long-running processes, context limits, network policy constraints
-  - Evidence: debugging patterns assumed persistent environments and browser access; web sessions have neither
-- **2026-06-11 — v7: Proactive monitoring setup**
-  - ADDED: Proactive monitoring section (deploy alerts, external dep health checks, error budgets)
-  - ADDED: Health check GHA cron pattern for external dependency monitoring
-  - ADDED: Per-deployment monitoring table (Vercel, k8s, GHA, external APIs)
-  - Evidence: kindle-schlacter-me archive.org outage was discovered reactively; health check would have caught it hours earlier
-- **2026-06-09 — v6: Performance escalation**
-  - ADDED: Performance escalation section (measure→categorize→fix→benchmark cycle)
-  - ADDED: Bottleneck category table (sequential I/O, single slow dep, cold start, N+1)
-  - Evidence: kindle-connector PR#1 (30s→3s from profiling + parallelization, not micro-optimization)
-- **2026-06-08 — v5: Production incident response protocol**
-  - ADDED: Production incident triggers (external dep failures, "broken in prod", cascading errors)
-  - ADDED: Step 0 — Production incident response (triage, external dep probing, data/state check)
-  - ADDED: Resilient fix patterns table (cross-source fallback, dead-resource fast-fail, quota-after-success, parallel fan-out, negative caching)
-  - Evidence: kindle-schlacter-me PR#2 (archive.org outage → cascading download failures → quota burn), kindle-connector PR#2 (dead-torrent fast-fail)
-- **2026-06-05 — v4: Environment-specific debugging, abandon vs. continue framework**
-  - ADDED: Environment-specific investigation table (Vercel, GHA, Docker, Python, cron, web session)
-  - ADDED: "When to Abandon vs. Keep Debugging" decision framework
-- **2026-05-29 — v3: Integrated with code-builder debug loop, added shared assumption patterns**
-  - Added: explicit relationship to code-builder's debug loop
-  - Added: "shared assumption" patterns table
-  - Added: expanded investigation radius step
-  - Added: regression test requirement before fix
-  - Consolidated from GpVa7 (v2) + 358hG audit findings
-- **2026-05-17 — v2: initial version on GpVa7 branch**

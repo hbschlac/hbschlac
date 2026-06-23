@@ -201,21 +201,3 @@ These are Hannah's other projects. They deploy independently and use different p
 **Do NOT apply portfolio-dev conventions to these projects.** They have their own CLAUDE.md files and conventions. Use code-builder for execution and vercel-ship (or project-specific docs) for deployment.
 
 ---
-
-## Changelog
-
-- **2026-06-12 — v3.2: End-to-end new project workflow**
-  - ADDED: Complete "add a shipped project to the portfolio" workflow — verify shipped, add to projects.ts, screenshots, case study, profile README update, deploy
-  - Evidence: portfolio-dev had pieces but no complete flow; profile README stayed stale because step 6 (update README) was never explicit
-- **2026-06-06 — v3.1: Related projects table**
-  - ADDED: Related projects table clarifying which projects are NOT portfolio-dev
-  - Evidence: kindle-schlacter-me, kindle-connector, recs.community, muse-shopping are all independent
-- **2026-06-05 — v3: SEO/metadata patterns, multi-project site guidance**
-  - ADDED: SEO and metadata section (og:image, dynamic metadata, verification)
-  - ADDED: Multi-project site guidance (kindle-schlacter-me etc. are NOT portfolio-dev)
-- **2026-05-29 — v2: Added vercel-ship cross-references, subdomain docs, tsc check**
-  - Added: relationship to vercel-ship skill
-  - Added: subdomain content section (jamie's bach pattern)
-  - Added: `tsc --noEmit` to pre-deploy checklist (data-driven: #1 failure mode)
-  - Added: note about schlacter-me vs hannah-portfolio Vercel project naming
-- **2026-05-27 — v1: initial skill (addresses 65% of actual usage)**

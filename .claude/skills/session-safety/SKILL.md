@@ -87,9 +87,9 @@ This session WILL NOT do a full skill review. Options:
 3. If the user explicitly insists on a full review, proceed — but log this override
 ```
 
-**This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides. 7 consecutive sessions (Jun 10-16) violated the advisory version of this check. The problem was: advisory checks get ignored. Blocking checks force a redirect.
+**This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides.
 
-**Scheduled routine override:** If this session is a scheduled routine AND the task says "review skills" or similar, the circuit breaker still fires. Scheduled routines should NOT be configured to review skills — that's how the 12-day loop happened. Notify the user that their scheduled task is doing review work instead of productive work, and suggest reconfiguring.
+**Scheduled routines:** If the task says "review skills" or similar, the circuit breaker still fires. Notify the user that their routine should be reconfigured to do productive work instead.
 
 ### Productive Work Accelerator
 
@@ -258,75 +258,27 @@ None have merged. Options:
 3. Ask the owner what's blocking
 ```
 
-Evidence: recs.community PRs #1-7 opened May 27, zero merged by June 9. 13 days of stale stacked PRs.
-
 ---
 
 ## Cross-Repo Management from Web Sessions
 
-Web sessions are scope-locked to one repo's MCP tools. This is the #1 cause of stuck PRs — work gets created in other repos but can never be merged from subsequent web sessions.
+Web sessions are scope-locked to one repo. Before assuming you can't reach another repo, check `mcp__claude-code-remote__list_repos` and `add_repo`.
 
-### Check what repos are accessible
+### Time-based escalation for stuck PRs
 
-Before assuming you can't reach a repo:
-```
-mcp__claude-code-remote__list_repos → shows all repos available to add
-```
-
-If the target repo appears, add it to the session:
-```
-mcp__claude-code-remote__add_repo → adds repo to current session's MCP scope
-```
-
-After adding, you can use `mcp__github__merge_pull_request`, `mcp__github__list_pull_requests`, etc. on that repo.
-
-### When a repo can't be added
-
-If the repo isn't in `list_repos` or `add_repo` fails:
-
-1. **Write a self-contained merge script** in CLAUDE.md under "Laptop instructions." Not "merge the PRs" — the exact commands:
-   ```bash
-   cd ~/recs.community
-   gh pr merge 1 --squash
-   gh pr edit 2 --base main && gh pr merge 2 --squash
-   # Continue for each PR in the stack
-   ```
-
-2. **Track stuck PRs explicitly** in CLAUDE.md's known issues with: repo, PR numbers, days open, what's blocking.
-
-3. **Don't create more stacked PRs if existing ones haven't merged.** A stack of 7 unmerged PRs is worse than no stack. Evidence: recs.community #1-7 (15+ days, zero merges).
-
-### Stuck PR triage (extends stuck stack detection)
-
-At session start, also check for PRs in known repos that aren't the current session's scope:
-```bash
-# Check CLAUDE.md for known stuck PRs
-grep -A5 "stuck\|unmerged\|open.*days" CLAUDE.md
-```
-
-If stuck PRs exist, the FIRST action should be attempting to add that repo and merge — not building new features on top of the stuck foundation.
-
-### Time-based escalation
-
-PRs get staler and riskier over time. Escalate based on age:
-
-| Age | Severity | Action |
-|---|---|---|
-| 7 days | Warning | Flag in session. Attempt `list_repos` → `add_repo` → merge. |
-| 14 days | High | Block new PRs to that repo until existing ones merge. Attempt merge every session. |
-| 21 days | Critical | The PR likely has merge conflicts now. Options: (1) rebase and force-push, (2) close and recreate from main, (3) squash the entire stack into one PR. |
-| 30+ days | Abandon threshold | Close the PR. Cherry-pick salvageable work into a new branch from current main. The original branch has drifted too far. |
-
-Evidence: recs.community PRs #4-7 open 17+ days, muse-shopping #1 open 22+ days. Both are now in "High" territory — conflicts likely, merge risk increasing daily.
+| Age | Action |
+|---|---|
+| 7 days | Flag. Attempt `list_repos` → `add_repo` → merge. |
+| 14 days | Block new PRs to that repo until existing ones merge. |
+| 21 days | Rebase and force-push, close and recreate from main, or squash the stack into one PR. |
+| 30+ days | Close the PR. Cherry-pick salvageable work into a new branch from current main. |
 
 ### Execution over documentation
 
-Cross-repo merge has been documented in session-safety v11, v13, v14, and v15. Four versions of guidance. Zero stuck PRs merged by these versions. The problem is not documentation — it's execution. When you detect stuck PRs:
-
-1. **Try to merge RIGHT NOW, not "document for later."** Use `mcp__github__search_pull_requests` (works across repos even when `list_pull_requests` doesn't). If the PR has passing CI and is non-controversial, merge it.
-2. **If MCP merge tools work:** merge immediately. Don't add to "Laptop instructions."
-3. **If MCP tools can't reach the repo:** send a PushNotification with the exact commands. Don't write them in CLAUDE.md where they'll be read in 3 weeks — send them NOW.
-4. **If you're in a scheduled/autonomous session and find stuck PRs:** the notification IS the action. Don't add another known issue.
+When you detect stuck PRs, try to merge NOW:
+1. Use `mcp__github__search_pull_requests` (works across repos) to find and merge them.
+2. If MCP tools can't reach the repo, send a PushNotification with exact commands.
+3. Don't write laptop instructions that will sit unread. Notifications reach the user; CLAUDE.md doesn't.
 
 ## Scheduled / Autonomous Sessions
 
@@ -369,16 +321,6 @@ Autonomous sessions must be self-contained:
 - **Don't create new PRs for discovered issues.** Report findings via notification; let the user decide how to address them.
 - **Don't do unbounded work.** Set a scope at the start. If the analysis balloons, notify with what you've found so far and stop.
 - **Don't review skills unless the user explicitly asked for it.** The meta-review circuit breaker applies to scheduled sessions too. If a scheduled routine's task is "review skills" or "audit skills," notify the user that this task should be reconfigured to do productive work instead.
-
-### Scheduled session anti-pattern: the review loop
-
-12 consecutive scheduled sessions (Jun 4-16, 2026) each did "analyze PRs, find gaps, improve skills" despite CLAUDE.md explicitly saying "Do NOT do another full skill review." The advisory circuit breaker was ignored 7 times.
-
-**Why it happened:** Each session independently decided to review skills because analyzing PRs is easy work that always produces output. Building features requires context, decisions, and risk — reviews don't.
-
-**How to prevent:** The meta-review circuit breaker is now BLOCKING (not advisory). But if a scheduled routine keeps being configured to review skills, that's a human configuration problem. Notify once: "Your scheduled routine is doing skill reviews. The skills have been reviewed 12+ times. Reconfigure this routine to [specific productive task from CLAUDE.md]."
-
-Evidence: hbschlac/hbschlac has scheduled routines running skill reviews and health checks. 12 sessions produced skill improvements nobody needed while stuck PRs aged from 7 to 25 days without action.
 
 ---
 
@@ -436,86 +378,10 @@ When a scheduled workflow creates the same issue/alert repeatedly:
 2. **If the alert is a false positive:** Fix the detection logic. A cron that files 7 identical false-positive issues is negative-value automation.
 3. **Disable-or-fix rule:** If 3+ identical alerts go unactioned, either fix the root cause or disable the automation. Don't let it keep running.
 
-Evidence: mcp-contributor refresh.sh creates identical "11 anchor misses" issues weekly (May 3 - Jun 14, 7 issues). The anchor bug is known, documented in CLAUDE.md #2 and #17, but nobody fixes it because it requires laptop access. The cron should be disabled until the anchor pattern is fixed.
+### When list_repos is unavailable
 
-### Concrete cross-repo escalation (when list_repos is unavailable)
-
-When `list_repos`/`add_repo` tools don't exist in the current session (confirmed: not all web sessions have them):
-
-1. **Create a GitHub Action in hbschlac/hbschlac** that merges PRs in other repos:
-   ```yaml
-   name: Cross-Repo Merge
-   on: workflow_dispatch
-     inputs:
-       repo: { required: true, type: string }
-       pr_number: { required: true, type: number }
-   jobs:
-     merge:
-       runs-on: ubuntu-latest
-       steps:
-         - run: gh pr merge ${{ inputs.pr_number }} --repo hbschlac/${{ inputs.repo }} --squash
-           env:
-             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-   ```
-2. **Or: open the web session directly in the target repo.** Each repo can have its own session — merge from there.
-3. **Last resort: laptop instructions with exact commands.** The CLAUDE.md already has this, but if stuck >21 days, escalate to: email yourself the commands (via PushNotification), or schedule a reminder.
+If `list_repos`/`add_repo` tools don't exist in the current session:
+1. Open a web session directly in the target repo and merge from there.
+2. Send a PushNotification with exact merge commands (don't write them in CLAUDE.md where they'll sit for weeks).
 
 ---
-
-## Changelog
-
-- **2026-06-17 — v17: Make meta-review circuit breaker BLOCKING, scheduled review loop prevention**
-  - CHANGED: Meta-review circuit breaker upgraded from advisory to BLOCKING (like Groundhog Day scan). 7 sessions (Jun 10-16) violated the advisory version — blocking forces redirect to productive work.
-  - ADDED: Productive work accelerator now tries to merge stuck PRs via MCP first, not just suggest them.
-  - ADDED: Scheduled session anti-pattern: the review loop — explains the 12-session Jun 4-16 pattern and prevents recurrence.
-  - ADDED: Prohibition on skill reviews in autonomous sessions unless explicitly requested.
-  - Evidence: 12 consecutive sessions did skill reviews. 7 explicitly violated the "Do NOT review" instruction. 0 stuck PRs merged despite 4 versions of merge guidance. recs.community #4-7 aged from 7 to 21 days; muse-shopping #1 from 15 to 26 days.
-- **2026-06-16 — v16: Cross-repo execution over documentation**
-  - ADDED: "Execution over documentation" subsection to cross-repo management — 4 versions of merge guidance produced 0 merges, the problem is execution not docs. New rules: try to merge NOW via MCP tools, send PushNotification with exact commands if tools can't reach the repo, don't add more "Laptop instructions" that sit for weeks.
-  - Evidence: session-safety v11-v15 all documented cross-repo merge patterns. recs.community PRs #4-7 are now 20+ days old. muse-shopping #1 is 25+ days old. Zero stuck PRs were resolved by the documentation — the guidance was correct but never executed.
-- **2026-06-15 — v15: Scheduled/autonomous session patterns**
-  - ADDED: Scheduled/autonomous session section — notification thresholds (notify on findings and failures, stay silent on all-clear), notification format (phone-banner first line, actionable detail in body), self-contained analysis rules, prohibited actions for autonomous sessions
-  - Evidence: hbschlac/hbschlac runs scheduled routines for skill reviews and health checks. Prior autonomous sessions produced transcripts nobody read — the PushNotification is the only output that reaches the user. No skill covered when to notify vs. stay silent, or how to structure self-contained autonomous work.
-- **2026-06-14 — v14: Automated system noise, draft PR triage, cross-repo escalation fallback**
-  - ADDED: Automated system noise section — detecting and triaging noisy crons and abandoned automated PRs
-  - ADDED: Draft PR triage rules (promote, merge, or close — draft limbo is worse than no PR)
-  - ADDED: Noisy cron triage with disable-or-fix rule (3+ unactioned identical alerts → disable or fix)
-  - ADDED: Concrete cross-repo escalation when `list_repos`/`add_repo` don't exist (GHA merge workflow, direct session, laptop escalation)
-  - Evidence: mcp-contributor cron filed 7 identical "11 anchor misses" issues (May 3 - Jun 14), all ignored. muse-shopping #1 (vibe-improver draft) open 23+ days with no human action. This session confirmed `list_repos`/`add_repo` tools are NOT available in all web sessions.
-- **2026-06-13 — v13: Time-based stuck PR escalation**
-  - ADDED: Time-based escalation table for stuck PRs (7d warning → 14d high → 21d critical/rebase → 30d+ abandon threshold)
-  - Evidence: recs.community PRs #4-7 (17+ days), muse-shopping #1 (22+ days). session-safety detected stuck PRs but had no escalation — a 7-day-old PR and a 30-day-old PR got the same treatment. Older PRs need stronger intervention (rebase, squash, or abandon).
-- **2026-06-12 — v12: Productive work accelerator**
-  - ADDED: Productive work accelerator — when meta-review circuit breaker fires, actively suggest top unblocked items from CLAUDE.md instead of just saying "do productive work"
-  - Evidence: circuit breaker correctly prevents reviews but leaves the session directionless; 4+ sessions stopped reviewing but didn't start building
-- **2026-06-11 — v11: Cross-repo management, rollback patterns**
-  - ADDED: Cross-repo management from web sessions (list_repos → add_repo → merge workflow)
-  - ADDED: Concrete guidance for when repos can't be added (merge scripts, stuck PR tracking)
-  - ADDED: Rollback patterns for Vercel, k8s/Docker, and databases
-  - Evidence: recs.community #1-7 stuck 15+ days, muse-shopping #1 stuck 20+ days — both because no session could reach them
-- **2026-06-10 — v10: Meta-review circuit breaker**
-  - ADDED: Meta-review circuit breaker — throttles "review all skills" sessions if a review was merged in the last 7 days
-  - Evidence: 4 consecutive review sessions (Jun 5-9) all doing "analyze PRs, find gaps, add learnings" instead of building things
-- **2026-06-09 — v9: Stacked PR management and stuck stack detection**
-  - ADDED: Stacked PR management section (merge immediately, retarget, rebase, stuck detection)
-  - Evidence: recs.community PRs #1-7 open for 13+ days with zero merges despite correct stacking
-- **2026-06-08 — v8: Cross-repo coordination**
-  - ADDED: Cross-repo coordination section (coupled repos, deploy order, sandbox limitation)
-  - Evidence: kindle-schlacter-me + kindle-connector coupled PRs (PR#2 in both repos)
-- **2026-06-06 — v7: Multi-developer coordination**
-  - ADDED: Multi-developer coordination section (COORDINATION.md, PR stacking, self-onboarding)
-  - Evidence: recs.community multi-Claude workflow (PRs #1-7)
-- **2026-06-05 — v6: Concurrent session safety, branch naming/hygiene**
-  - ADDED: Concurrent session guidance (check for recent branches, avoid shared file contention)
-  - ADDED: Branch naming conventions and stale branch detection threshold
-- **2026-06-04 — v5: Add PR-merge workflow to break Groundhog Day cycle**
-  - Added: "Land Your Work" section with explicit PR creation + merge via MCP tools
-  - Fixed: Groundhog Day scan now fetches remote branches first (web sessions start with no local branches)
-  - Context: session #31 proved that pushing to branches without merging is the root cause of Groundhog Day
-- **2026-05-29 — v4: Tightened anti-orphan rules, removed gendered assumptions**
-  - Kept: all v3 blocking Groundhog Day behavior
-  - Tightened: session end checklist (removed "tell Hannah to merge" — that's CLAUDE.md's job)
-  - Carried forward: all v2/v3 improvements
-- **2026-05-27 — v3: Groundhog Day prevention made blocking**
-- **2026-05-24 — v2: consolidated from 25 session branches**
-- **2026-05-16 — v1: initial version**
