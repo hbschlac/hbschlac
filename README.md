@@ -21,7 +21,7 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 
 🏪 &nbsp;**Walmart BuyBox** (2024–present) · Senior PM · ML system across ~30% of marketplace volume · 7% CVR improvement YoY · Secondary BuyBox launch (~45M daily impressions) · built internal GenAI assistant scaling knowledge across 200+ person org
 
-💼 &nbsp;**Uprising VC** (2019–2022) · Chief of Staff → Director of Platform · $400M+ raised · KPI platform with 90% adoption across 30 portfolio startups
+💼 &nbsp;**Uprising VC** (2019–2022) · Chief of Staff → Director of Platform · $750M+ raised · KPI platform with 90% adoption across 30 portfolio startups
 
 📊 &nbsp;**Accenture** (2017–2019) · Senior Consulting Analyst · strategy consulting for Silicon Valley tech clients
 
