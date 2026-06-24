@@ -19,6 +19,7 @@ Between April 14 and June 17, 2026, **43+ Claude Code web sessions** audited and
 | code-builder | v8.7 | Execution engine: parallel drafts, debug loop, visual mode, rapid shipping. Learnings in LEARNINGS.md |
 | vercel-ship | v1.7 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + escalation to debug-escalation |
 | content-quality | v11 | Anti-AI-slop, voice matching, hallucination prevention, UX copy, wizard flow copy |
+| voice | v1 | Hannah's first-person voice for DMs/posts/outreach: register switch (casual vs polished) + not-AI checklist. Defers to content-quality for banned phrases |
 | session-safety | v17 | Groundhog Day prevention, BLOCKING review circuit breaker, cross-repo execution |
 | debug-escalation | v12 | Fix-churn breaker, cross-skill routing, pipeline hardening, invisible downstream failures |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
