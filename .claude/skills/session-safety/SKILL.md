@@ -67,46 +67,67 @@ unless explicitly confirmed "yes, start fresh."
 
 ## Meta-Review Circuit Breaker (BLOCKING)
 
-If the task is "review skills," "audit skills," "improve skills," or "consolidate sessions" — OR if a scheduled routine's task description mentions reviewing, auditing, or improving skills:
+**This fires broadly.** It applies to ANY task that involves reading multiple skill files and proposing changes to them — whether called a "review," "audit," "gap analysis," "improvement pass," "blindspot scan," or "compare skills to recent work." The label doesn't matter; the pattern does: if you're reading skills to find things to change in skills, this section applies.
 
 ```bash
-git log --oneline --since="7 days ago" origin/main | grep -i "improve.*skill\|skill.*review\|gap analysis\|blindspot\|coverage gap"
+git log --oneline --since="30 days ago" origin/main | grep -ci "improve\|skill\|gap\|blindspot\|coverage\|review\|audit"
 ```
 
-If ANY skill-review commit exists in the last 7 days:
+If the count is **>0**, this session has NO novel ground to cover. 14 consecutive PRs (Jun 4-23, 2026) reviewed skills against 50+ PRs across 5 repos. Every discoverable gap has been discovered.
 
 ```
 SESSION BLOCKED: Review addiction detected.
 
-{count} skill review commits in the last 30 days. The skills have been reviewed
-and improved continuously since Jun 4. They are comprehensive.
+{count} skill-related commits in the last 30 days. 43+ sessions have reviewed
+these skills since April 14. 14 PRs merged Jun 4-23 alone. Every PR across
+kindle-schlacter-me (25), recs.community (7), kindle-connector (3), and
+muse-shopping (1) has been analyzed for skill gaps. The skills are comprehensive.
 
-This session WILL NOT do a full skill review. Options:
-1. State ONE specific gap you encountered in real work — make a targeted edit
-2. Do productive work from CLAUDE.md "What to work on next"
-3. If the user explicitly insists on a full review, proceed — but log this override
+This session WILL NOT review, audit, or improve skills — not even "just one gap."
+
+Instead: execute the Productive Work Accelerator below.
 ```
 
-**This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides.
-
-**Scheduled routines:** If the task says "review skills" or similar, the circuit breaker still fires. Notify the user that their routine should be reconfigured to do productive work instead.
+**Override requires the user to type an explicit override** — "yes, do a full review" or equivalent. Vague task descriptions like "review and improve" do NOT count as explicit override. If the task came from a scheduled routine, send a PushNotification telling the user to reconfigure the routine to do productive work instead.
 
 ### Productive Work Accelerator
 
-When the circuit breaker fires, don't just say "do productive work." Execute this sequence:
+When the circuit breaker fires — or when any session has no specific task — execute this decision tree IN ORDER. Stop at the first step that produces action.
 
-**Step 1: Try to unblock stuck PRs RIGHT NOW** (not "suggest" — actually try):
+**Step 1: Unblock stuck cross-repo PRs.** This is always the highest-value action.
 ```bash
-grep -A5 "CRITICAL\|stuck\|unmerged\|open.*days" CLAUDE.md
+# Search for open PRs across repos you can reach
 ```
-If stuck PRs exist, attempt to merge them via MCP tools before doing anything else. This is the highest-value action.
+Use `mcp__github__search_pull_requests` with `author:hbschlac is:open` to find stuck PRs. For each one older than 7 days:
+- If CI is green → merge it via MCP tools
+- If CI is failing → diagnose and fix
+- If you can't access the repo → send a PushNotification with exact commands:
+  ```
+  gh pr merge {number} --repo hbschlac/{repo} --squash
+  ```
 
-**Step 2: If no PRs to merge, check for concrete feature work:**
+**Step 2: Close negative-value automation.** Check for noisy crons filing identical issues:
 ```bash
-grep -A3 "Build features\|TODO\|WIP\|in-progress" CLAUDE.md
+# Example: mcp-contributor files identical issues weekly
 ```
+Use `mcp__github__search_issues` to find bot-filed issues with zero comments. If 3+ identical issues exist, send a PushNotification to disable the cron or fix the root cause.
 
-**Step 3: Present the top 3 actionable items** with one-line descriptions. Don't list everything — pick what's unblocked NOW from this session.
+**Step 3: Do feature work.** Read CLAUDE.md "What to work on" section and pick the first unblocked item. Prefer shipping features over structural improvements.
+
+**Step 4: If nothing above is actionable from this session,** report what's blocked and why via PushNotification, then end. Do NOT fall back to reviewing skills.
+
+---
+
+## Inline Learning Capture (prevents review-loop buildup)
+
+The review addiction loop starts when sessions skip capturing learnings during work, creating a backlog that a future session "discovers" and writes up. Break the cycle: capture learnings DURING work, not in a separate review pass.
+
+When you encounter a pattern worth remembering during normal coding work:
+1. Append ONE line to `LEARNINGS.md` in the relevant skill directory. Format: `- **{pattern name}:** {one sentence} ({repo} PR#{n})`
+2. Do NOT open a separate PR for the learning. Include it in the same commit as the code change.
+3. Do NOT read through all of LEARNINGS.md to check for duplicates — just append. Dedup is cheaper than a review loop.
+
+This replaces the previous pattern where sessions accumulated gaps over 2 weeks, then a review session spent its entire budget analyzing and documenting them.
 
 ---
 
@@ -314,13 +335,20 @@ Autonomous sessions must be self-contained:
 - If you hit ambiguity, make the conservative choice and note it in the notification
 - Commit and push any changes — the ephemeral container disappears after the session
 
+### What autonomous sessions SHOULD do (when no specific task is given)
+
+Run the Productive Work Accelerator (above). The most valuable autonomous actions, in order:
+1. Search for stuck PRs across repos and attempt to merge them
+2. Search for noisy bot issues and send a notification to disable them
+3. Check deployed project health (if monitoring is configured)
+4. Report findings and blockers via PushNotification
+
 ### What autonomous sessions should NOT do
 
+- **Don't review skills.** The meta-review circuit breaker applies to scheduled sessions. If the task says "review skills," send a PushNotification telling the user to reconfigure the routine.
 - **Don't make architectural decisions.** Refactoring, dependency upgrades, or design changes need interactive review.
-- **Don't merge PRs without explicit prior authorization.** Check-and-report, don't check-and-act on shared resources.
-- **Don't create new PRs for discovered issues.** Report findings via notification; let the user decide how to address them.
+- **Don't create new PRs for discovered issues.** Report findings via notification; let the user decide.
 - **Don't do unbounded work.** Set a scope at the start. If the analysis balloons, notify with what you've found so far and stop.
-- **Don't review skills unless the user explicitly asked for it.** The meta-review circuit breaker applies to scheduled sessions too. If a scheduled routine's task is "review skills" or "audit skills," notify the user that this task should be reconfigured to do productive work instead.
 
 ---
 

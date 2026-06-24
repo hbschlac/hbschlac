@@ -457,11 +457,19 @@ Write the validation function as a single pre-send gate. Run all 5 layers before
 
 Evidence: kindle-schlacter-me PRs #7, #8, #9, #14, #15, #17 — 6 PRs discovering these layers one at a time. A single upfront validation function would have caught 5 of 6 in one PR.
 
-### Anti-pattern: the 15-PR pipeline
+### Anti-pattern: the reactive spiral
 
-kindle-schlacter-me PRs #6-20 hardened the download→validate→send pipeline over 15 iterations. A pipeline audit (see debug-escalation's pipeline hardening) at PR #6 would have identified format compliance (#7), content integrity (#17), delivery confirmation (#18), and fallback sources (#11) in 3-4 comprehensive PRs instead of 15 reactive ones.
+kindle-schlacter-me shipped 25 PRs over 2 sessions. PRs #6-20 hardened the same pipeline over 15 reactive iterations. A pipeline audit at PR #6 would have compressed that to 3-4 PRs.
 
-**Rule:** After 5 PRs targeting the same pipeline, STOP. Run debug-escalation's pipeline hardening audit (map all steps, audit each for failure modes, prioritize by blast radius). Then batch the remaining fixes into 2-3 comprehensive PRs.
+**The rule exists but sessions don't apply it** because they start fresh and don't count prior PRs. Fix: check at session start.
+
+**Rule (proactive):** Before starting work on a project, count recent PRs:
+```bash
+git log --oneline --since="14 days ago" -- {project-relevant-files} | wc -l
+```
+If >5 PRs in the last 14 days target the same area, STOP. Run debug-escalation's pipeline hardening audit BEFORE writing any more code. Map all remaining failure modes, then batch into 2-3 comprehensive PRs.
+
+**Rule (during work):** After your 5th commit in one session targeting the same pipeline, STOP and audit. Don't ship PR #6 without mapping what PRs #7-10 would need to fix.
 
 ---
 
