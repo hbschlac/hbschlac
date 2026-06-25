@@ -91,6 +91,7 @@ Other skills handle initial debugging. debug-escalation takes over when they've 
 | **vercel-ship** | Build failure fix attempted 2+ times, or runtime error not in the debugging table | Step 1 (stop writing code) — the build/deploy context is config, not just code |
 | **vercel-ship + external dep** | 500 error traced to upstream API, not Vercel config | Step 0 (production incident) — vercel-ship handles config, debug-escalation handles resilience |
 | **Scheduled routine** | Health check found failures; routine can't diagnose root cause | Step 0 (production incident) with notification — don't silently log findings |
+| **Scheduled routine — tool failure** | MCP tools fail (timeout, auth, 403/405), repo not in scope, `list_repos` unavailable | Step 0A triage — determine if it's transient (retry) or permanent (notify user to reconfigure) |
 
 **Key distinction:** vercel-ship owns "the deploy broke" (config, types, env vars). debug-escalation owns "the deploy works but the feature doesn't" (logic, state, external deps, resilience). If vercel-ship's debugging table doesn't cover the symptom, escalate here.
 

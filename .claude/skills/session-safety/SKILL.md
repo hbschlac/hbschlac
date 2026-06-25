@@ -93,20 +93,29 @@ This session WILL NOT do a full skill review. Options:
 
 ### Productive Work Accelerator
 
-When the circuit breaker fires, don't just say "do productive work." Execute this sequence:
+When the circuit breaker fires, don't just say "do productive work." Route to concrete work using this decision tree:
 
-**Step 1: Try to unblock stuck PRs RIGHT NOW** (not "suggest" — actually try):
-```bash
-grep -A5 "CRITICAL\|stuck\|unmerged\|open.*days" CLAUDE.md
-```
-If stuck PRs exist, attempt to merge them via MCP tools before doing anything else. This is the highest-value action.
+**Priority 1: Unblock stuck PRs (highest value — try MCP merge NOW)**
 
-**Step 2: If no PRs to merge, check for concrete feature work:**
 ```bash
-grep -A3 "Build features\|TODO\|WIP\|in-progress" CLAUDE.md
+grep -A5 "CRITICAL\|stuck\|unmerged\|open.*days\|draft PR" CLAUDE.md
 ```
 
-**Step 3: Present the top 3 actionable items** with one-line descriptions. Don't list everything — pick what's unblocked NOW from this session.
+If stuck PRs exist, use `mcp__github__search_pull_requests` to find them, `mcp__github__pull_request_read` to check CI status, and `mcp__github__merge_pull_request` to merge if green. This is always the highest-value action because it unblocks everything downstream.
+
+**Priority 2: Disable broken automation**
+
+Check for noisy crons or false-positive alerts mentioned in CLAUDE.md. If a cron is filing identical issues, disable it via GitHub Actions settings or open a PR to fix the detection logic. Negative-value automation actively wastes time.
+
+**Priority 3: Build features or fix bugs in actual projects**
+
+Read CLAUDE.md "What to work on" section. Pick the top item that's unblocked from this session's environment. If the target repo isn't in scope, use `mcp__github__search_pull_requests` (which works across repos) to check its state before deciding to work on something else.
+
+**Priority 4: Add monitoring to deployed projects**
+
+If no features or bugs are actionable, set up health checks. Use Vercel MCP tools (`mcp__Vercel__list_deployments`, `mcp__Vercel__get_runtime_logs`) to check deployment health. Create a GitHub Actions cron workflow that pings production URLs.
+
+**Never do:** another skill review, another gap analysis, another audit of this repo.
 
 ---
 
@@ -305,6 +314,35 @@ Lead with the one sentence they'd read on a phone lock screen. Then include enou
 {If action needed: what specifically to do next.}
 </routine_summary>
 ```
+
+### Scheduled Routine Templates
+
+Most scheduled routines fall into one of these patterns. Pick the closest match and adapt.
+
+**Health Check Routine (deployment monitoring)**
+1. Load Vercel MCP tools via ToolSearch. Run `mcp__Vercel__list_projects` to get projects, then `mcp__Vercel__list_deployments` for each to check recent deploy status.
+2. For each project, hit the production URL with `WebFetch` and verify a 200 response.
+3. Check `mcp__Vercel__get_runtime_logs` for any 500 errors in the last 24h.
+4. Notify only if: a deployment failed, a site is down, or runtime errors are spiking. Stay silent if all healthy.
+
+**PR Hygiene Routine (stuck work detection)**
+1. Use `mcp__github__search_pull_requests` with `is:open author:hbschlac` to find all open PRs across repos.
+2. For each PR open >7 days: check CI status with `mcp__github__pull_request_read` (method: `get_check_runs`).
+3. If CI is green and PR is >14 days old: notify with the PR link and recommend merging or closing.
+4. If CI is red: note which check failed. Notify if it's a simple fix the user could unblock quickly.
+5. Check for draft PRs >30 days old — these should be closed or promoted.
+
+**Dependency/Freshness Routine**
+1. Check if portfolio README projects table matches what's deployed (compare README links to Vercel projects).
+2. Look for repos with no commits in 30+ days that have open issues or PRs.
+3. Notify if the portfolio is missing a shipped project, or if a project has gone stale with unresolved work.
+
+**Cross-Repo Status Routine**
+1. For each repo in the user's portfolio (kindle-schlacter-me, kindle-connector, recs.community, muse-shopping, hannah-portfolio):
+   - Use `mcp__github__search_pull_requests` to check for open PRs
+   - Use `mcp__github__list_issues` (if repo is in scope) to check for open issues
+2. Aggregate: total open PRs, oldest PR age, repos with stuck work.
+3. Notify with a summary if any repo has stuck work. Include the specific PR numbers and ages.
 
 ### Self-contained analysis
 

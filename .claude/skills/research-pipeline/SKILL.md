@@ -245,6 +245,50 @@ For research dashboards (Step 5A), default to Recharts with Next.js. It handles 
 
 ---
 
+## Claude Code Session Research (no Python setup needed)
+
+When researching inside a Claude Code web session, you don't need Python/PRAW/BeautifulSoup. Use the tools already available:
+
+### Data collection with WebSearch + WebFetch
+
+```
+Step 1: WebSearch for the topic. Get URLs and summaries.
+Step 2: WebFetch specific pages for detailed content.
+Step 3: Use Agent tool (subagent_type: "Explore") for parallel fetches across multiple sources.
+```
+
+**WebSearch** returns summaries and URLs — use it for breadth (finding sources, getting an overview). **WebFetch** returns full page content — use it for depth (reading specific articles, extracting data from specific pages).
+
+### Research workflow in a session
+
+| Step | Tool | Output |
+|---|---|---|
+| Define question | (manual) | One-sentence research question |
+| Find sources | `WebSearch` | List of 10-20 relevant URLs |
+| Read key sources | `WebFetch` on top 5-10 | Extracted facts, quotes, data points |
+| Cross-reference | `WebSearch` for verification | Confirm claims from multiple sources |
+| Synthesize | (manual analysis) | Findings with citations |
+| Present | Write to file or PushNotification | Report or notification to user |
+
+### When to use Python vs. session tools
+
+| Use Python (Steps 2-3) when | Use session tools when |
+|---|---|
+| >100 data points to collect | <100 data points or qualitative research |
+| Need structured API access (Reddit, Twitter) | Need web page content or search results |
+| Repeated/ongoing collection | One-time research question |
+| Need to store raw data for re-processing | Findings go directly into a report or notification |
+| Building a dashboard or dataset | Answering a question or informing a decision |
+
+### Google Drive integration for research
+
+If the session has Google Drive MCP tools, use them for research I/O:
+- `mcp__Google-Drive__search_files` to find existing research docs or data
+- `mcp__Google-Drive__read_file_content` to read shared research inputs
+- `mcp__Google-Drive__create_file` to store research outputs where the user can access them
+
+---
+
 ## Anti-patterns
 
 - **Don't collect first, ask questions later.** Define the question before scraping.
@@ -253,5 +297,6 @@ For research dashboards (Step 5A), default to Recharts with Next.js. It handles 
 - **Don't re-scrape when you can cache.** Raw data is expensive to collect, cheap to store.
 - **Don't publish user PII.** Anonymize usernames in published datasets. Keep raw data private.
 - **Don't over-automate one-time research.** If you're doing this once, a Python script + CSV is fine. You don't need a pipeline framework.
+- **Don't use Python scraping when WebSearch/WebFetch will do.** In a Claude Code session, you already have web access. Don't install PRAW and write a script to scrape Reddit when you can WebSearch the topic and WebFetch the top threads directly.
 
 ---
