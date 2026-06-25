@@ -306,22 +306,39 @@ When renaming a domain, subdomain, or repo (e.g., community.recs → recs.commun
 
 ## Step 8: MCP tools for deployment verification
 
-When running in a Claude Code web session with Vercel MCP tools available, use them for deployment verification instead of (or in addition to) manual checks:
+When running in a Claude Code web session with Vercel MCP tools available, use them for deployment verification instead of (or in addition to) manual checks.
 
-```
-mcp__Vercel__list_deployments — Check recent deploy status
-mcp__Vercel__get_deployment — Get specific deployment details  
-mcp__Vercel__get_deployment_build_logs — Read build logs for failures
-mcp__Vercel__get_runtime_logs — Debug runtime errors
-mcp__Vercel__get_project — Verify project config (env vars, domains)
-mcp__Vercel__list_toolbar_threads — Check for user-reported issues via Vercel toolbar
-```
+**Important:** Load tool schemas via `ToolSearch` before calling. Use `ToolSearch` with query `+Vercel deploy` or `select:mcp__Vercel__list_deployments` to get the schemas.
+
+### Concrete MCP workflows
+
+**Check if a deploy succeeded:**
+1. `mcp__Vercel__list_projects` → find the project
+2. `mcp__Vercel__list_deployments` (with project name) → check most recent deploy state
+3. If state is "ERROR": `mcp__Vercel__get_deployment_build_logs` → read the actual error
+
+**Debug a runtime 500 error:**
+1. `mcp__Vercel__get_runtime_logs` → find the stack trace (build logs won't show runtime errors)
+2. If the error is a missing env var: `mcp__Vercel__get_project` → check which env vars are set
+3. Fix in code → push → `mcp__Vercel__list_deployments` to watch the new deploy land
+
+**Verify production after deploy:**
+1. `WebFetch` the production URL → check for 200 response and correct content
+2. `mcp__Vercel__get_runtime_logs` → check for errors in the first 5 minutes
+3. If the site uses subdomains: `WebFetch` each subdomain separately
+
+**Scheduled health monitoring (for routines):**
+1. `mcp__Vercel__list_projects` → enumerate all projects
+2. For each: `mcp__Vercel__list_deployments` → check latest deploy state + age
+3. `WebFetch` each production URL → verify the site responds
+4. Only notify if something is down or a deploy failed
 
 **When to use MCP tools vs. manual checks:**
 - **Pre-deploy (Step 2):** Still run `tsc --noEmit` locally. MCP tools don't replace local validation.
 - **Post-deploy debugging:** Use `get_deployment_build_logs` first — faster than scrolling the Vercel dashboard.
 - **Runtime errors:** Use `get_runtime_logs` to see server-side errors that don't appear in build logs.
 - **Verifying config:** Use `get_project` to confirm env vars are set without needing dashboard access.
+- **Health checks:** Use `list_deployments` + `WebFetch` in scheduled routines to catch outages before users report them.
 
 ---
 

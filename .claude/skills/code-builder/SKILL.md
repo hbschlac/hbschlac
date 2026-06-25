@@ -113,10 +113,28 @@ Read from `package.json` scripts when available — don't assume `npm test` exis
 | Running in ephemeral container? | No persistent filesystem between sessions. Anything worth keeping must be committed and pushed. |
 | Need to search/fetch external info? | Use subagents (`Agent` tool with `subagent_type: "Explore"`) for broad searches. Use `WebFetch`/`WebSearch` for specific URLs. Don't shell out to `curl` for APIs when MCP tools exist. |
 | Using MCP tools (GitHub, Vercel, etc.)? | MCP tools can timeout or fail silently. Always verify the result — don't assume success. If a tool returns an error, retry once, then fall back to an alternative approach or flag the user. |
-| Need to work across repos? | Check `mcp__claude-code-remote__list_repos` first. If the repo is available, use `add_repo`. If not, write laptop instructions in CLAUDE.md. Don't silently skip cross-repo work. |
+| Need to work across repos? | Check `mcp__claude-code-remote__list_repos` first. If the repo is available, use `add_repo`. If not, send a PushNotification with exact commands — don't write laptop instructions in CLAUDE.md that sit unread. |
 | Spawning subagents for parallel work? | Use `Agent` tool with `run_in_background: true` for independent tasks. For research: specify "report in under 200 words" to keep context lean. For code changes: use `isolation: "worktree"`. Never spawn more than 3 subagents for one task. |
 | Session nearing context limits? | Conversation gets auto-compressed. Keep skill activations minimal after the first 3 — suppress announcements. Prefer direct tool calls over subagent delegation for simple tasks. |
-| Using MCP tools for GitHub/Vercel operations? | Load tool schemas via `ToolSearch` before calling. MCP results can be huge — use `jq` or Python to extract what you need. If a tool returns an error, try a different tool (e.g., `search_pull_requests` instead of `list_pull_requests` when the repo isn't in session scope). Chain MCP calls: `list_pull_requests` → `pull_request_read` → `merge_pull_request`. Always verify the result matches expectations. |
+| Considering parallel mode (Step 4a)? | **Skip it in web sessions.** Worktrees don't work in ephemeral containers. Use single-pass or debug loop. |
+
+### 1C-3. MCP Integration Tools
+
+Web sessions have access to powerful MCP integrations beyond GitHub. Use `ToolSearch` to load schemas before calling. Key tools by category:
+
+| Category | Tools | Use for |
+|---|---|---|
+| **GitHub** | `mcp__github__search_pull_requests`, `pull_request_read`, `merge_pull_request`, `create_pull_request`, `list_issues` | PR management, code search, issue triage. `search_pull_requests` works across repos even when not in session scope. |
+| **Vercel** | `mcp__Vercel__list_deployments`, `get_deployment_build_logs`, `get_runtime_logs`, `get_project` | Deploy verification, runtime debugging, env var checks. Faster than the dashboard. |
+| **Google Drive** | `mcp__Google-Drive__search_files`, `read_file_content`, `create_file` | Read/write docs, access shared files, store analysis outputs. |
+| **Gmail** | `mcp__Gmail__search_threads`, `create_draft` | Check for relevant emails, draft notifications. |
+| **Canva** | `mcp__Canva__generate-design`, `search-designs`, `export-design` | Generate social images, OG images, design assets for portfolio. |
+
+**MCP tool patterns:**
+- Always load schemas via `ToolSearch` before calling — direct calls fail with InputValidationError.
+- Chain calls: `list_pull_requests` → `pull_request_read` → check status → `merge_pull_request`.
+- Large results: MCP search tools can return >100KB. Use specific queries and pagination to keep results manageable.
+- Cross-repo: `mcp__github__search_pull_requests` with `owner:hbschlac` works even for repos not in session scope. Use it for status checks before deciding what to work on.
 
 ### 1D. Deployment & Integration
 
@@ -213,11 +231,9 @@ Escalate when ANY fire:
 
 ## Step 4a — Parallel Path
 
-**Status: UNTESTED in production.** As of 2026-06-17, no run log exists for parallel mode.
+**SKIP in web sessions.** Parallel mode requires git worktrees, which don't work in ephemeral containers. If you're in a web session, fall back to single-pass immediately. Don't test worktrees, don't debug worktree issues — just use single-pass or debug loop.
 
-**Web session constraint: parallel mode may not work.** Ephemeral containers may not support git worktrees (sandbox filesystem restrictions, missing git config). Before spawning N agents: test `git worktree add /tmp/test-wt HEAD 2>/dev/null && git worktree remove /tmp/test-wt`. If the test fails, skip parallel — fall back to single-pass immediately. Don't spend time debugging worktree issues in a web session.
-
-The first real parallel run should: (1) use N=3 (not N=5), (2) log the full score breakdown, (3) commit the run log, (4) note whether the environment was web session or laptop.
+**Laptop only, untested.** As of 2026-06-25, no run log exists for parallel mode across 8 versions. First real run should use N=3, log the full score breakdown, and commit the run log.
 
 1. **Git repo gate (BLOCKING):** `git rev-parse --git-dir` must succeed. If not, abort parallel — do NOT silently fall back to single.
 
