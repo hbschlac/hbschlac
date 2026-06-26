@@ -65,6 +65,41 @@ unless explicitly confirmed "yes, start fresh."
 
 ---
 
+## Step 0: Do Productive Work First (before anything else)
+
+Every session should start by doing the highest-value work available, not by reviewing skills. Run this BEFORE any other task analysis:
+
+**Priority 1: Unblock stuck PRs (try MCP merge NOW)**
+
+```bash
+# Find all open PRs across repos
+```
+Use `mcp__github__search_pull_requests` with `is:open author:hbschlac` to find stuck PRs. For each one: `mcp__github__pull_request_read` to check CI. If CI is green → `mcp__github__merge_pull_request`. This is always the highest-value action.
+
+**Priority 2: Clean up orphaned branches**
+
+```bash
+git fetch origin --prune 2>/dev/null
+git branch -r --merged origin/main | grep -v 'main$' | sed 's|origin/||' | head -20
+```
+For each merged branch: `git push origin --delete {branch}`. For unmerged branches older than 14 days with no open PR: delete them too. 50+ orphaned branches in this repo are pure noise.
+
+**Priority 3: Disable broken automation**
+
+Check CLAUDE.md for noisy crons or false-positive alerts. If a cron files identical issues weekly, disable it or fix the detection logic.
+
+**Priority 4: Build features or fix bugs in actual projects**
+
+Read CLAUDE.md "What to work on" section. Pick the top unblocked item. If the target repo isn't in scope, use `mcp__github__search_pull_requests` (works across repos) to check its state.
+
+**Priority 5: Add monitoring to deployed projects**
+
+Use Vercel MCP tools (`mcp__Vercel__list_deployments`, `mcp__Vercel__get_runtime_logs`) to check deployment health. Create a GHA cron that pings production URLs.
+
+**Never do:** another skill review, another gap analysis, another audit of this repo. Read the circuit breaker below.
+
+---
+
 ## Meta-Review Circuit Breaker (BLOCKING)
 
 If the task is "review skills," "audit skills," "improve skills," or "consolidate sessions" — OR if a scheduled routine's task description mentions reviewing, auditing, or improving skills:
@@ -83,39 +118,22 @@ and improved continuously since Jun 4. They are comprehensive.
 
 This session WILL NOT do a full skill review. Options:
 1. State ONE specific gap you encountered in real work — make a targeted edit
-2. Do productive work from CLAUDE.md "What to work on next"
+2. Do productive work (see Step 0 above — the priorities are concrete)
 3. If the user explicitly insists on a full review, proceed — but log this override
 ```
 
 **This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides.
 
-**Scheduled routines:** If the task says "review skills" or similar, the circuit breaker still fires. Notify the user that their routine should be reconfigured to do productive work instead.
+**Scheduled routines:** If a scheduled routine's task says "review skills" or similar, the circuit breaker fires AND you must send a PushNotification telling the user to reconfigure:
 
-### Productive Work Accelerator
-
-When the circuit breaker fires, don't just say "do productive work." Route to concrete work using this decision tree:
-
-**Priority 1: Unblock stuck PRs (highest value — try MCP merge NOW)**
-
-```bash
-grep -A5 "CRITICAL\|stuck\|unmerged\|open.*days\|draft PR" CLAUDE.md
 ```
-
-If stuck PRs exist, use `mcp__github__search_pull_requests` to find them, `mcp__github__pull_request_read` to check CI status, and `mcp__github__merge_pull_request` to merge if green. This is always the highest-value action because it unblocks everything downstream.
-
-**Priority 2: Disable broken automation**
-
-Check for noisy crons or false-positive alerts mentioned in CLAUDE.md. If a cron is filing identical issues, disable it via GitHub Actions settings or open a PR to fix the detection logic. Negative-value automation actively wastes time.
-
-**Priority 3: Build features or fix bugs in actual projects**
-
-Read CLAUDE.md "What to work on" section. Pick the top item that's unblocked from this session's environment. If the target repo isn't in scope, use `mcp__github__search_pull_requests` (which works across repos) to check its state before deciding to work on something else.
-
-**Priority 4: Add monitoring to deployed projects**
-
-If no features or bugs are actionable, set up health checks. Use Vercel MCP tools (`mcp__Vercel__list_deployments`, `mcp__Vercel__get_runtime_logs`) to check deployment health. Create a GitHub Actions cron workflow that pings production URLs.
-
-**Never do:** another skill review, another gap analysis, another audit of this repo.
+<routine_summary>
+Your scheduled routine is configured to review skills — this is blocked by the circuit breaker
+(15 skill-review PRs merged since Jun 4, 0 feature work PRs). Reconfigure this routine to do
+one of: health check monitoring, PR hygiene sweep, or dependency freshness audit. See
+session-safety's "Scheduled Routine Templates" section for ready-to-use templates.
+</routine_summary>
+```
 
 ---
 
@@ -389,6 +407,31 @@ When a merged PR breaks production:
   git push origin --delete {branch-name}
   ```
 - **Stale branch threshold**: Any branch not updated in 14 days with no PR is likely orphaned. Flag it.
+
+---
+
+## Branch Cleanup (batch)
+
+When orphaned branches accumulate (30+ branches with no open PRs):
+
+```bash
+# List all remote branches merged into main — safe to delete
+git fetch origin --prune
+git branch -r --merged origin/main | grep -v 'main$' | sed 's|origin/||'
+
+# Delete merged branches in bulk
+git branch -r --merged origin/main | grep -v 'main$' | sed 's|origin/||' | xargs -I{} git push origin --delete {}
+
+# For unmerged branches: check age and PR status before deleting
+git for-each-ref --sort=-committerdate --format='%(refname:short) %(committerdate:short)' refs/remotes/origin/ | head -30
+```
+
+**Rules:**
+- Delete merged branches without asking — they're noise.
+- For unmerged branches >14 days old with no open PR: delete. The work was either abandoned or landed via a different branch.
+- For unmerged branches with an open PR: leave them. The PR is the record.
+- Never delete `main` or any branch with an active PR.
+- Log how many branches were cleaned up in the commit message.
 
 ---
 

@@ -229,33 +229,11 @@ Escalate when ANY fire:
 
 ---
 
-## Step 4a — Parallel Path
+## Step 4a — Parallel Path (laptop only — skip in web sessions)
 
-**SKIP in web sessions.** Parallel mode requires git worktrees, which don't work in ephemeral containers. If you're in a web session, fall back to single-pass immediately. Don't test worktrees, don't debug worktree issues — just use single-pass or debug loop.
+**SKIP in web sessions.** Parallel mode requires git worktrees, which don't work in ephemeral containers. Fall back to single-pass immediately.
 
-**Laptop only, untested.** As of 2026-06-25, no run log exists for parallel mode across 8 versions. First real run should use N=3, log the full score breakdown, and commit the run log.
-
-1. **Git repo gate (BLOCKING):** `git rev-parse --git-dir` must succeed. If not, abort parallel — do NOT silently fall back to single.
-
-2. `mkdir -p ~/.claude/skills/code-builder/runs/`
-
-3. Spawn **N `Agent` calls in parallel** (single message), each with:
-   - `isolation: "worktree"`, `run_in_background: true`, `subagent_type: "general-purpose"`
-   - Differentiation bias:
-     - Draft 1: simplest possible — fewest lines, no abstractions
-     - Draft 2: most idiomatic to this repo — match existing patterns exactly
-     - Draft 3: optimize for readability — clearest naming, smallest functions
-     - (N=5) Draft 4: optimize for edge cases and defensive correctness
-     - (N=5) Draft 5: best instinct — free choice
-   - Each prompt includes: the detected test/lint/typecheck commands from Step 1B (not hardcoded npm/pytest). "Before coding, `grep -r` for existing utilities. After coding, run [detected test cmd], [detected typecheck cmd], and [detected lint cmd]."
-
-4. Each draft: commit on worktree branch, report approach (2 lines), files touched, LOC, SHA, edge cases.
-
-5. **Quorum and failure handling:**
-   - Wait for all N. Timeout: 5 minutes per draft.
-   - If 1-2 drafts fail/timeout: continue with survivors. Score normally.
-   - If 3+ drafts fail (N=5) or 2+ fail (N=3): **abort parallel.** Report which failed and why. Fall back to single-pass with the best surviving draft as starting point, or debug-loop if failures suggest an integration issue.
-   - If ALL fail: do NOT retry parallel. Switch to debug-loop mode. The task likely has an environmental or integration issue that parallel drafts won't solve.
+**Status:** Untested after 8 versions and 50+ sessions. Requires laptop with persistent filesystem. When first used: run N=3, log full score breakdown, commit the run log. Spawn N `Agent` calls with `isolation: "worktree"` and differentiated biases (simplest, most idiomatic, most readable). Score with the rubric in Step 5. See git history for the full parallel mode spec.
 
 ## Step 4b — Single Path
 
