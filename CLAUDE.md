@@ -16,10 +16,10 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 
 | Skill | Version | What it does |
 |-------|---------|-------------|
-| code-builder | v8.8 | Execution engine: single-pass, debug loop, visual mode, rapid shipping. MCP integration patterns. Parallel mode laptop-only. Learnings in LEARNINGS.md |
+| code-builder | v8.9 | Execution engine: single-pass, debug loop, visual mode, rapid shipping. MCP integration patterns. Parallel mode collapsed to stub. Learnings in LEARNINGS.md |
 | vercel-ship | v1.8 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + concrete MCP deployment workflows |
 | content-quality | v11 | Anti-AI-slop, voice matching, hallucination prevention, UX copy, wizard flow copy |
-| session-safety | v18 | Groundhog Day prevention, BLOCKING review circuit breaker, scheduled routine templates, actionable work routing |
+| session-safety | v19 | Groundhog Day prevention, BLOCKING review circuit breaker, Step 0 productive work routing, branch cleanup, scheduled routine templates |
 | debug-escalation | v12.1 | Fix-churn breaker, cross-skill routing, pipeline hardening, scheduled routine failure handling |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
@@ -39,17 +39,20 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 - Set up monitoring/health checks for any deployed project
 
 **Structural (only if specifically asked):**
-- First real code-builder parallel mode run with N=3 and full logging
-- Clean up orphaned branches (35+ across hbschlac/hbschlac)
+- Clean up orphaned branches (54 across hbschlac/hbschlac — commands now in session-safety)
+- Reconfigure scheduled routines from "review skills" to health checks/PR hygiene
 
 ## Active known issues
 
 1. **mcp-contributor anchor bug.** refresh.sh grep expects `## Step 11.1:` but SKILL.md uses `### 11.1`. Creates false-positive issues weekly. Fix: update sources.yml anchors (requires laptop, 5 min).
 2. **mcp-contributor cron noise.** 8+ identical "11 anchor misses" issues filed, all unactioned. Disable the cron or fix the bug.
-3. **code-builder parallel mode untested.** 8 versions, zero production runs. Now marked laptop-only — web sessions should skip it entirely.
+3. **code-builder parallel mode collapsed.** Stub-only in SKILL.md (full spec in git history). Laptop-only, never tested.
 4. **No project has monitoring configured.** Incidents are discovered reactively. Use Vercel MCP tools + WebFetch in scheduled routines for health checks.
 5. **muse-shopping #1 draft PR.** Created by vibe-improver, 50+ days in draft limbo. Close or merge.
-6. **100% of sessions since Jun 4 did skill reviews, 0% did feature work.** The circuit breaker exists but doesn't redirect effectively. Productive Work Accelerator updated with concrete task routing.
+6. **100% of sessions since Jun 4 did skill reviews, 0% did feature work.** Productive Work Accelerator moved to Step 0 (first thing sessions see). Circuit breaker now sends PushNotification when routines are misconfigured.
+7. **Scheduled routines misconfigured.** Routines configured to "review skills" hit the circuit breaker every time. Reconfigure to: health check, PR hygiene, or dependency freshness.
+8. **54 orphaned branches.** Branch cleanup commands now in session-safety. Run them.
+9. **recs.community 4 stacked PRs open 30+ days.** PRs #4-7 in dependency chain, none merged. Merge #4 first.
 
 ## Sandbox constraint
 
