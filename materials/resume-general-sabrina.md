@@ -3,7 +3,9 @@
 **Hannah Schlacter**
 847-404-8501 | hbschlac@gmail.com | linkedin.com/in/hannahschlacter | schlacter.me
 
-_Product manager spanning strategy and operations — from setting product vision to deploying and scaling it — with AI/ML shipping experience across Walmart eComm (Fortune 1), Uprising VC ($750M), and Accenture. Open to product management and product-deployment roles._
+_Product manager spanning strategy and operations — AI/ML product and platform shipping experience across Walmart eComm (Fortune 1), Uprising VC ($750M), and Accenture. Open to product management and product-deployment roles._
+
+> Live Google Doc: https://docs.google.com/document/d/1EH6_2k-uHW7WzPiYJZP0jV8gr-of6nFXsZ_PMbG4rmY/edit (copied from the Fractional resume, tagline retuned — formatting preserved)
 
 ---
 
