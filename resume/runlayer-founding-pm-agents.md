@@ -1,50 +1,50 @@
 # Hannah Schlacter
-Senior Product Manager · PM who builds — I spec it, design it, ship it.
+847-404-8501 | hbschlac@gmail.com | linkedin.com/in/hannahschlacter | schlacter.me
 
-hbschlac@gmail.com · schlacter.me · linkedin.com/in/hannahschlacter · github.com/hbschlac
+Product Manager building AI agents and operating ML platforms at scale — focused on enterprise AI that actually gets used
 
-Tailored for: **Founding Product Manager, Agents — Runlayer**
-
----
-
-I own the ML system behind ~400M daily product-page views at Walmart, and I build agentic
-products solo on the side — an agentic shopping checkout across 264 brands, and a tool that makes
-Claude's skills and MCP usable for people who don't write code. I want to build the product layer
-that lets a whole company run AI agents without the risk.
-
-## Experience
-
-**Senior Product Manager, BuyBox · Walmart** — 2024–Present
-Own the ML ranking system that picks the winning offer across ~30% of marketplace volume.
-- Own the BuyBox — the ML system that decides the winning offer behind ~400M daily product-page views.
-- Ran the experiments that lifted conversion 7% year over year.
-- Launched the Secondary BuyBox, a new placement generating ~45M daily impressions.
-- Built an internal GenAI assistant that scaled product knowledge across a 200+ person org — outside my formal scope.
-
-**Chief of Staff → Director of Platform · Uprising VC** — 2019–2022
-- Built the KPI platform used across 30 portfolio startups, reaching 90% adoption.
-- Supported portfolio companies through $400M+ raised.
-
-**Senior Consulting Analyst · Accenture** — 2017–2019
-- Strategy consulting for Silicon Valley tech clients.
-
-## Selected Builds (shipped solo)
-
-- **Muse** (app.muse.shopping) — Personalized shopping platform: 264 brands, 10 retailers, one agentic
-  checkout, Gmail receipt parsing. Node.js · PostgreSQL · Stripe.
-- **Claude Skills** (schlacter.me/projects) — Makes Claude's persistent-instruction and MCP system
-  understandable for non-engineers. Next.js · Vercel.
-- **Kindle × Schlacter** (kindle.schlacter.me) — Unattended library-to-Kindle delivery with fallback
-  across 3 providers. Next.js · Vercel KV · Python · k8s.
-- **recs.community** (github.com/hbschlac/recs.community) — Community recommendations platform,
-  Supabase auth, built from a PRD with a stacked-PR architecture. Next.js · Supabase.
+*Tailored for: Founding Product Manager, Agents — Runlayer*
 
 ## Education
 
-- **UC Berkeley, Haas School of Business** — MBA
-- **University of Illinois (UIUC)** — BS, Entrepreneurship & Marketing · High Honors
+**University of California, Berkeley, Haas School of Business — Berkeley, CA — May 2024**
+*Master of Business Administration · Merit Scholarship, Beyond Yourself Fellowship*
+- Co-founded an advocacy platform scaled to 20+ universities; raised $30K for a national summit connecting students with tech leaders
 
-## What I work in
+**University of Illinois at Urbana-Champaign, Gies College of Business — Champaign, IL — May 2017**
+*Bachelor of Science in Entrepreneurship and Marketing · Graduated High Honors, Gies Scholars*
 
-- **Product:** ML ranking & experimentation · agentic product design · 0→1 · enterprise AI rollout
-- **Build:** Next.js · Node.js · PostgreSQL · Supabase · Stripe · Python · Vercel · k8s · Claude Code / MCP / Skills
+## Experience
+
+**Walmart eComm | Senior Product Manager – AI/ML Platform | Bay Area — 2024–Present**
+*Machine-learning platform powering ~30% of the marketplace and ~400M daily product impressions*
+- Own the ML platform that decides which seller's offer customers see across ~400M daily impressions; shipped ranking features driving ~$107M in GMV and a +0.66% add-to-cart lift
+- Built "BuyBox Engineer," an internal GenAI agent that diagnoses ML system behavior and dependencies, scaling system knowledge across a 200+ person product organization
+- Mapped dependencies across 10+ upstream systems feeding the platform, cutting engineering investigation time ~80% when diagnosing production issues
+- Launched the Secondary Buy Box, expanding offer visibility to ~45M daily impressions and lifting multi-offer add-to-cart +0.46% by surfacing alternatives when the top offer doesn't dominate
+
+**Siemens eMobility | Global Strategy MBA Intern | Remote — 2023**
+*Internal startup EV-charging business unit serving residential and commercial markets*
+- Defined the product roadmap for new EV-charging software from 15+ customer interviews; the executive recommendation projected 6x growth in customer lifetime value
+
+**Uprising Venture Capital | Director of Platform (2021–2022), Chief of Staff (2019–2021) | San Francisco — 2019–2022**
+*Technology-focused venture fund managing $750M+ across 30 startups*
+- Scaled a KPI reporting platform to 30 portfolio startups at 90% adoption, cutting data-collection time 50% year over year
+- Led cross-fund prioritization across seven consecutive fundraises, contributing to $400M+ raised from 300+ investors
+
+**Accenture | Senior Consulting Analyst (2018–2019), Consulting Analyst (2017–2018) | San Francisco — 2017–2019**
+*Strategy and management consulting for major Silicon Valley technology clients*
+- Designed an asset-production calculator giving 50+ stakeholders across 5+ teams transparency on resource allocation, cutting planning from six weeks to two days
+
+## Additional
+
+**Projects: Muse Shopping | Solo Builder | app.muse.shopping — 2024–Present**
+*Personalized fashion shopping platform — 13,000+ products across 264 brands and 10 retailers, one agentic checkout*
+- Shipped a solo agentic checkout that routes purchases through one Stripe cart, built as a non-engineer with Claude Code across 120 API endpoints and 20+ production deploys
+- Created a Gmail-receipt feedback loop so every order sharpens the next recommendation across retailers
+
+**Community Impact:** National student advocacy leader; featured on CNN, Fox, and Forbes; advised the CA Governor's office and US Dept. of Education
+
+**Skills:** AI agent prototyping (Claude Code) | MCP & agentic workflows | ML-powered product systems | Enterprise AI adoption | Growth experimentation & A/B testing | Product analytics (SQL, Python) | API & data contract design
+
+**Interests:** Kindle reading; vibe-coding AI prototypes and LLM tools; skiing; hosting communal dinners; travel
