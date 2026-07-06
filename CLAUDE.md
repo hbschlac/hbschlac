@@ -27,6 +27,15 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
+## Personal skills live in a SEPARATE repo (add_repo first)
+
+Hannah's personal **resume, outreach, and networking** skill is NOT in this repo and NOT in `.claude/skills/` here — don't search for it locally. It lives in **`hbschlac/product-networking-skills`** (old name `career-skills`, which still redirects).
+
+- **Trigger phrase:** "use the product networking skill"
+- **Entry file:** `skills/product-networking/SKILL.md` → routes to `references/resume-subskill.md` (rules/format/publishing) → `references/resume.md` (base content + verb bank) → `references/hannah-profile.md` (story bank).
+- **Attach it first:** a remote session does NOT clone it automatically. Run `add_repo` before use. **Redirect gotcha:** the session access grant currently resolves the OLD name — if `add_repo hbschlac/product-networking-skills` returns "not accessible," retry with `hbschlac/career-skills`.
+- **Resume editing needs the Google Docs (Workspace) MCP**, not just Drive — see that skill's Step 2 preflight for the Drive-only fallback.
+
 ## What to work on (not another skill review)
 
 **High-priority (stuck work):**
