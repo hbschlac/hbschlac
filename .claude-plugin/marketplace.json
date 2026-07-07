@@ -8,6 +8,11 @@
       "name": "job-fetch",
       "source": "./plugins/job-fetch",
       "description": "Fetch + ingest a job description past a proxy-blocked host (Claude Code web egress allowlist), via ATS public APIs and a remote-exec MCP (Composio) fallback. Auto-fires on job URLs via a UserPromptSubmit hook; ingest-and-acknowledge, no JD echoed back."
+    },
+    {
+      "name": "linkedin-networking",
+      "source": "./plugins/linkedin-networking",
+      "description": "Compliant networking helper: find companies to research and Haas / MBA alumni to contact, build Sales Navigator + Alumni-tool searches to run manually, draft outreach (via the product-networking skill), and track contacts in a private Google Sheet. Never scrapes/reads/automates LinkedIn and never sends messages. Auto-fires on LinkedIn URLs / networking intent via a UserPromptSubmit hook."
     }
   ]
 }

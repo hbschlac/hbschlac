@@ -1,0 +1,10 @@
+{
+  "name": "linkedin-networking",
+  "displayName": "LinkedIn Networking",
+  "version": "1.0.0",
+  "description": "Compliant networking helper: find companies to research and Haas / MBA alumni to reach out to, then draft outreach and track it. NEVER touches LinkedIn (no scraping, no reading profiles, no auto-send) — it sources companies from off-LinkedIn data, builds Sales Navigator search URLs for you to click manually, drafts messages via the product-networking skill, and logs contacts to a private Google Sheet. Auto-fires on LinkedIn URLs / networking intent via a UserPromptSubmit hook.",
+  "author": {
+    "name": "Hannah Schlacter"
+  },
+  "keywords": ["linkedin", "networking", "alumni", "haas", "mba", "sales-navigator", "outreach", "prospecting"]
+}
