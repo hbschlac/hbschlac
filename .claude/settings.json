@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "hbschlac": {
+      "source": {
+        "source": "github",
+        "repo": "hbschlac/hbschlac"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "job-fetch@hbschlac": true
+  }
+}
