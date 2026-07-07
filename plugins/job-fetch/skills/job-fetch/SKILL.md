@@ -110,7 +110,7 @@ skill *and* the auto-trigger hook travel together.
     "extraKnownMarketplaces": {
       "hbschlac": { "source": { "source": "github", "repo": "hbschlac/hbschlac" } }
     },
-    "enabledPlugins": ["job-fetch@hbschlac"]
+    "enabledPlugins": { "job-fetch@hbschlac": true }
   }
   ```
 

@@ -7,7 +7,7 @@
       }
     }
   },
-  "enabledPlugins": [
-    "job-fetch@hbschlac"
-  ]
+  "enabledPlugins": {
+    "job-fetch@hbschlac": true
+  }
 }
