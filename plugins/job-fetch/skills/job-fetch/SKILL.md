@@ -94,14 +94,24 @@ Do not do any of this on your own — ingest-and-acknowledge is the whole job un
 
 ## Install it everywhere (desktop + web)
 
-Config in this repo only fires in sessions working in this repo. To make the skill + auto-trigger
-hook fire in **every** session:
+This skill ships as a **plugin** (`job-fetch`) hosted from the `hbschlac/hbschlac` marketplace, so the
+skill *and* the auto-trigger hook travel together.
 
-- **Desktop (global, all repos):** run `python3 .claude/skills/job-fetch/install.py`. It copies the
-  skill to `~/.claude/skills/job-fetch/` and merges the `UserPromptSubmit` hook into
-  `~/.claude/settings.json` (idempotent). After that, every desktop session on the machine picks it up,
-  regardless of which repo is open.
-- **Web:** each web session loads `.claude/` from the repo it's attached to (the home dir is
-  ephemeral), so keep these files committed in the repos you job-search from — this repo already has
-  them. To get it in *all* web sessions regardless of repo, either add `.claude/skills/job-fetch` +
-  the hook to those repos, or package it as a plugin and install it in your web environment.
+- **Desktop (global, all repos, persists):** add the marketplace and install once —
+  `/plugin marketplace add hbschlac/hbschlac` then `/plugin install job-fetch`. Every desktop session
+  on the machine then auto-fires it, regardless of which repo is open.
+- **Web (per repo you use):** web has **no** account-global scope — each session loads config only from
+  the repo it's cloned from, and `~/.claude` is ephemeral. So enable the plugin in the repo's committed
+  `.claude/settings.json`; web re-fetches it from GitHub (allowlisted) at session start. Snippet to add
+  to any repo you job-search from:
+
+  ```json
+  {
+    "extraKnownMarketplaces": {
+      "hbschlac": { "source": { "source": "github", "repo": "hbschlac/hbschlac" } }
+    },
+    "enabledPlugins": ["job-fetch@hbschlac"]
+  }
+  ```
+
+  (`hbschlac/hbschlac` itself enables it from its local clone — no fetch needed.)

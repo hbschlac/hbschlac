@@ -1,14 +1,13 @@
 {
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/detect-job-url.py\""
-          }
-        ]
+  "extraKnownMarketplaces": {
+    "hbschlac": {
+      "source": {
+        "source": "github",
+        "repo": "hbschlac/hbschlac"
       }
-    ]
-  }
+    }
+  },
+  "enabledPlugins": [
+    "job-fetch@hbschlac"
+  ]
 }

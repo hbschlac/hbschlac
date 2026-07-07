@@ -1,0 +1,13 @@
+{
+  "name": "hbschlac",
+  "owner": {
+    "name": "Hannah Schlacter"
+  },
+  "plugins": [
+    {
+      "name": "job-fetch",
+      "source": "./plugins/job-fetch",
+      "description": "Fetch + ingest a job description past a proxy-blocked host (Claude Code web egress allowlist), via ATS public APIs and a remote-exec MCP (Composio) fallback. Auto-fires on job URLs via a UserPromptSubmit hook; ingest-and-acknowledge, no JD echoed back."
+    }
+  ]
+}

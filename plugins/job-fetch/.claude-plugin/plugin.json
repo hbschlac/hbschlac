@@ -1,0 +1,10 @@
+{
+  "name": "job-fetch",
+  "displayName": "Job Fetch",
+  "version": "1.0.0",
+  "description": "Fetch + ingest a job description past a proxy-blocked host (Claude Code web egress allowlist), via the ATS public APIs and, when in-sandbox fetch is 403-blocked, a remote-exec MCP (Composio). Auto-fires on job URLs via a UserPromptSubmit hook. Ingest-and-acknowledge; no JD echoed back.",
+  "author": {
+    "name": "Hannah Schlacter"
+  },
+  "keywords": ["jobs", "ats", "ashby", "greenhouse", "lever", "proxy", "fetch", "recruiting"]
+}
