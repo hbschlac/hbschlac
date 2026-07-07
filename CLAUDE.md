@@ -25,6 +25,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
+| job-fetch | v1.0 | Fetch + ingest a job description past the sandbox's 403 egress block, via the Composio remote-exec MCP + ATS public APIs. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
 ## Personal skills live in a SEPARATE repo (add_repo first)
