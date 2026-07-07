@@ -33,11 +33,11 @@ CAREERS_PATH = re.compile(
 
 INSTRUCTION = (
     "The user shared what looks like a job-posting URL: {url}\n"
-    "This host is almost certainly proxy-blocked (403) in this sandbox, so WebFetch/curl will fail. "
-    "Use the `job-fetch` skill: fetch the description OUT of the sandbox via the Composio remote-bash "
-    "tool and the ATS public API (see the skill for the URL->API mapping), parse the role, INGEST it "
-    "into context, and reply with a single one-line acknowledgment. Do NOT paste the job description "
-    "back to the user, and do NOT fall back to a web search."
+    "Use the `job-fetch` skill. Fetch the ATS public API for this URL (see the skill for the "
+    "URL->API mapping): try WebFetch directly first (works on desktop). If it returns a 403 / proxy "
+    "block (you're on Claude Code web), retry the SAME url via the Composio remote-bash MCP. Then "
+    "parse the role, INGEST it into context, and reply with a single one-line acknowledgment. Do NOT "
+    "paste the job description back to the user, and do NOT fall back to a web search."
 )
 
 
