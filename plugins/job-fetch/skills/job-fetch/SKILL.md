@@ -53,19 +53,27 @@ the HTML. Use the ATS's public posting API, which returns clean JSON (title, loc
 | `jobs.lever.co/<org>/<id>` | `https://api.lever.co/v0/postings/<org>/<id>` → `text`, `descriptionPlain`, `categories` |
 | `*.myworkdayjobs.com/...` | the site's `/wday/cxs/<tenant>/<site>/jobs` POST/GET JSON endpoint; if the tenant/site path isn't obvious, use the fallback below |
 
-Example that is known to work (verified):
-`curl -sSL "https://api.ashbyhq.com/posting-api/job-board/runlayer?includeCompensation=true"`
+Example that is known to work (verified end-to-end):
+`curl -sSL -A "Mozilla/5.0" "https://api.ashbyhq.com/posting-api/job-board/runlayer?includeCompensation=true"`
+returns all postings; pick the one whose `id` matches the `<jobId>` in the URL, then use its
+`title`, `location`, `compensationTierSummary`, and `descriptionHtml`.
 
-Parse the JSON, strip HTML from the description field with `sed 's/<[^>]*>//g'` (or in your own head),
-keep the visible text.
+Parse the JSON, strip HTML from the description field (`sed 's/<[^>]*>//g'` or in your own head), keep
+the visible text.
+
+**Verified fetch gotchas (Composio remote bash):**
+- **Send a real User-Agent.** Ashby's `api.ashbyhq.com` returns **403 to a bare Python/urllib UA** (bot
+  filtering) but 200 to `curl` / `-A "Mozilla/5.0"`. A 403 from the ATS *API* with a default UA is a
+  UA problem, not a proxy block — retry with a browser UA before concluding the host is unreachable.
+- **Don't pipe curl into a `python3 - <<HEREDOC`** — the heredoc and the piped body collide on stdin.
+  Write the response to a file first (`curl ... -o /tmp/board.json`), then parse the file.
 
 ### Step 2 — Fallback for unknown ATS / a company's own careers page
 
 1. `curl -sSL "<url>"` — directly on desktop, or via Composio remote bash on web — strip tags, check
    visible-text length. If it's a real article (hundreds+ words of role text), use it.
 2. If it's thin/SPA-shaped (lots of markup, no prose — like raw Ashby), escalate to a browser /
-   scrape-to-markdown tool. On web that's Composio's (Firecrawl-backed):
-   **browser / scrape-to-markdown tool** (Firecrawl-backed): discover it with
+   scrape-to-markdown tool. On web that's Composio's (Firecrawl-backed): discover it with
    `mcp__Composio_Docs_Drive__COMPOSIO_SEARCH_TOOLS` (use_case: "scrape a URL to clean markdown"),
    then run it via `COMPOSIO_MULTI_EXECUTE_TOOL`.
 3. If every path fails, name the exact blocked host to the user and ask them to paste the text. Do not
