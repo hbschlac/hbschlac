@@ -31,6 +31,14 @@
             "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/job-fetch/hooks/detect-job-url.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/linkedin-networking/hooks/detect-linkedin-context.py\""
+          }
+        ]
       }
     ],
     "Stop": [
@@ -96,7 +104,8 @@
   },
   "enabledPlugins": {
     "job-fetch@hbschlac": true,
-    "session-capture@hbschlac": true
+    "session-capture@hbschlac": true,
+    "linkedin-networking@hbschlac": true
   },
   "extraKnownMarketplaces": {
     "hbschlac": {
