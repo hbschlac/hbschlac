@@ -37,6 +37,24 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 - **Attach it first:** a remote session does NOT clone it automatically. Run `add_repo` before use. **Redirect gotcha:** the session access grant currently resolves the OLD name — if `add_repo hbschlac/product-networking-skills` returns "not accessible," retry with `hbschlac/career-skills`.
 - **Resume editing needs the Google Docs (Workspace) MCP**, not just Drive — see that skill's Step 2 preflight for the Drive-only fallback.
 
+### Interview prep (Dust / Sierra) — auto-load this skill
+
+Hannah's **private, active interview prep** for **Sierra** (Agent Strategist) and **Dust** (Founder's
+Office) is the `interview-prep-dust-sierra` skill. It also lives in `hbschlac/career-skills`, NOT here.
+
+**Auto-load rule (do this BEFORE responding):** if the session is about interview prep — the user
+mentions Dust, Sierra, "mock interview," "quiz me," "help me prep/study," "design an agent," an
+applied-AI concept (agents, RAG, evals, tau-bench, ADLC, MCP-vs-API), **or the branch/session name
+contains `interview-prep`** — then `add_repo hbschlac/career-skills` (redirect gotcha: retry
+`hbschlac/career-skills` if `product-networking-skills` is "not accessible"), clone it, and load
+`skills/interview-prep-dust-sierra/SKILL.md`. That skill's `references/learnings.md` is living memory —
+capture and push what she learns.
+
+> The reason `/interview-prep-dust-sierra` fails as a slash command in web is that the skill is not in
+> Hannah's claude.ai account Skills library — only `product-networking`, `personal-stylist`, and
+> `calmar-ave-designer` are. To make it a true always-on slash command, upload it via claude.ai
+> Settings → Skills (a laptop `./install-interview-skill.sh` only fixes the CLI, not web).
+
 ## What to work on (not another skill review)
 
 **High-priority (stuck work):**
