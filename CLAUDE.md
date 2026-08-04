@@ -25,6 +25,8 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
+| mbb-slides | v1.0 | McKinsey/Bain/BCG-grade decks: action titles, pyramid + MECE storyline, real charts, sourced claims. Discipline layer that routes to the `pptx` skill (editable PowerPoint) or an HTML artifact. References for storylining + layout/charts/type. Runs content-quality humanizer pass |
+| case-study | v1.0 | Outcome-led project/customer write-ups (Problem→Solution→Metric→Detail), modeled on Sierra's client-work pattern. One verifiable number each, borrowed figures hedged. Feeds mbb-slides proof slides + portfolio-dev |
 | job-fetch | v1.0 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enable in any repo via `enabledPlugins: {"job-fetch@hbschlac": true}`. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
