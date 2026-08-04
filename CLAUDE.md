@@ -25,6 +25,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
+| reddit-listener | v1.0 | Pull Reddit posts/comments past the web-sandbox 403 (reddit.com/*.json and PullPush now block cloud IPs). Uses the Arctic Shift archive API (verified 200). One-shot pulls, subreddit monitors, scheduled listeners; hands off to research-pipeline for classify/analyze. |
 | job-fetch | v1.0 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enable in any repo via `enabledPlugins: {"job-fetch@hbschlac": true}`. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
