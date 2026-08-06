@@ -22,6 +22,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-safety | v19 | Groundhog Day prevention, BLOCKING review circuit breaker, Step 0 productive work routing, branch cleanup, scheduled routine templates |
 | debug-escalation | v12.1 | Fix-churn breaker, cross-skill routing, pipeline hardening, scheduled routine failure handling |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
+| kindle-book-agent | v1.0 | Dev/ops for the Kindle book-delivery system: kindle-schlacter-me web app (search waterfall, Send-to-Kindle pipeline, `kindle:` KV schema) + kindle-connector torrent bridge (Jackett/qBittorrent/Calibre, two-bridge failover, phone triage). Carries the E999 lore + dead-end list. Attach both repos first. |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
