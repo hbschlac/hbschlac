@@ -5,13 +5,13 @@ description: >
   Activates on deploy failures, Vercel-specific bugs, serverless config issues,
   OAuth flow debugging, image storage decisions, and middleware routing problems.
   Built from 100+ real deployments across schlacter-me, interior-designer-portfolio,
-  muse-shopping, kindle-schlacter-me, and fashionista-hannah. Covers the #1 real
+  muse-shopping, kindle-schlacter-me, fashionista-hannah, and babymoon. Covers the #1 real
   failure mode: TypeScript type errors from interface changes not propagated to callers.
 ---
 
 # vercel-ship
 
-Pre-deploy validation and Vercel-specific debugging for Next.js projects. Built from patterns across 100+ real deployments and 13 documented build failures.
+Pre-deploy validation and Vercel-specific debugging for Next.js projects. Built from patterns across 100+ real deployments, 13 documented build failures, and an end-to-end agent-sandbox/MCP deployment session (see Step 11).
 
 **Not for:** general Next.js development, CSS/styling, or non-Vercel hosting.
 
@@ -234,6 +234,8 @@ Diagnosis order:
 4. Update `next.config.js` image domains
 5. Keep old storage active 30 days as fallback
 
+**Hotlinking third-party images (no upload):** for small/personal apps you may hotlink instead of hosting. Guard every hotlinked `<img>` with an onError handler that hides it (dead links never show broken tiles), and prefer hotlink-friendly hosts (Wikimedia, or the same host as an asset already loading in production). In an agent sandbox you can't ingest pasted images as files — get URLs from the user. (See Step 11.)
+
 ---
 
 ## Step 5: Subdomain routing pattern
@@ -286,6 +288,7 @@ Gotchas:
 - OG images must be absolute URLs in production
 - Twitter uses `twitter:image`, OpenGraph uses `og:image` — set both
 - iMessage caches aggressively — cache-busting param during dev
+- **Behind an auth/passcode gate:** put OG tags in the root layout (so they render on the unlock page the crawler actually reaches) and use an external absolute `og:image`, or allowlist the OG route in the middleware matcher. (See Step 11.)
 
 ---
 
@@ -398,6 +401,21 @@ Deploying successfully is not the end. These checks prevent "it's been broken fo
 | **Runtime error monitoring** | `mcp__Vercel__get_runtime_logs` in web sessions, or integrate Sentry/LogRocket | Build success ≠ runtime success |
 | **External dependency health** | GHA cron that pings external APIs every 6h (see debug-escalation) | Catch upstream outages before users report them |
 | **Uptime monitoring** | Free tier: UptimeRobot or similar. Ping production URL every 5min | Know when the site is down, not when someone tweets about it |
+
+---
+
+## Step 11: Agent-sandbox & MCP constraints (hard-won)
+
+Learned building **babymoon** (a passcode-gated Next.js app) end-to-end from a Claude Code web session. These bite specifically when deploying *from an agent sandbox via MCP*, not from a laptop.
+
+- **Sandbox egress is proxy-gated.** From the agent sandbox you often CANNOT curl the live site, third-party APIs, or arbitrary hosts — you get `403 CONNECT` / `EGRESS_BLOCKED` — even though the end user's browser reaches them fine. So don't declare a URL dead from a sandbox 403, and don't try to verify live endpoints or hotlink-test from the sandbox. Verify via a check the user runs, or via Vercel MCP runtime logs.
+- **The Vercel MCP tools can't manage environment variables**, and may lack permission for deployment protection (real: `update_project_deployment_protection` → 403). You cannot set `FLIGHT_API_KEY` or toggle SSO from tools. Guide the user through the dashboard with an exact click-path, and design any secret-dependent feature to be **env-var-gated with graceful fallback**: the server route returns `{ configured: false }` when the key is absent and the client falls back to a link-out, so the feature ships before the key exists and "lights up" once it's added. **Env-var changes only take effect on a new deployment** — redeploy after adding.
+- **Hotlinked images need an onError guard.** A small client component that hides an `<img>` on error means a dead hotlink never leaves a broken tile. And **pasted images are not available to you as files** in the sandbox — you can't commit them — so get hotlinkable URLs from the user, or from a hotlink-friendly host (Wikimedia, or the same host as an asset that already loads in production). (See also Step 4.)
+- **OG image through an auth/passcode gate.** If middleware redirects everything to an unlock page, a link-preview crawler lands on `/unlock` — so put the OG/Twitter tags in the **root layout** (they render on every page including `/unlock`) and point `og:image` at an **external absolute URL**, which sidesteps the gated middleware entirely. Alternatively allowlist the OG route in the matcher. (See also Step 6.)
+- **Satori / `next/og` `ImageResponse`** for app icons and OG cards: pure shapes + CSS gradients need no font, but any **text/emoji requires a loaded font** — offline/CI builds can't fetch an emoji CDN. `next build` pre-renders these routes, so a green build validates that the image actually renders.
+- **Committing to a repo that isn't the session's primary repo.** `add_repo`, then either the GitHub MCP `push_files` (commits via the API), or `git push` after `git checkout -B main origin/main` so you don't clobber commits already made through the API. Verify byte-exactness with `git diff origin/main` before trusting a hand-transcribed push.
+- **Subagent caution.** An image-sourcing subagent tripped a security flag for spoofing `Referer`/`User-Agent` to bypass hotlink protection — behavior nobody asked for. Don't trust a subagent's "verified" output blindly; prefer user-provided or clearly hotlink-friendly sources, and read the security note attached to subagent results.
+- **Build before every push, always** (`npm run build` locally). Cheapest way to catch both the #1 failure (TypeScript interface drift, Step 2A) and Satori render errors before a deploy round-trip.
 
 ---
 
