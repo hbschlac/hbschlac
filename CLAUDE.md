@@ -17,7 +17,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | Skill | Version | What it does |
 |-------|---------|-------------|
 | code-builder | v8.9 | Execution engine: single-pass, debug loop, visual mode, rapid shipping. MCP integration patterns. Parallel mode collapsed to stub. Learnings in LEARNINGS.md |
-| vercel-ship | v1.8 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + concrete MCP deployment workflows |
+| vercel-ship | v1.9 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + concrete MCP deployment workflows. New: serverless wall-clock-budget (the "network error" timeout), auth-gated internal-route 401 trap, vitest `@/`-alias gotcha |
 | content-quality | v11 | Anti-AI-slop, voice matching, hallucination prevention, UX copy, wizard flow copy |
 | session-safety | v19 | Groundhog Day prevention, BLOCKING review circuit breaker, Step 0 productive work routing, branch cleanup, scheduled routine templates |
 | debug-escalation | v12.1 | Fix-churn breaker, cross-skill routing, pipeline hardening, scheduled routine failure handling |
