@@ -95,6 +95,7 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 - [ ] **`tsc --noEmit` passes.** (Repeat — this is the #1 failure.)
 - [ ] **No `import` of server-only code from client components.** Check for `fs`, `path`, `crypto` imports in `"use client"` files.
 - [ ] **`output: 'standalone'` is set if using custom server.**
+- [ ] **Unit-tested `lib/` modules use RELATIVE imports, not the `@/` alias.** `tsc` and Next resolve `@/`, but Vitest (with no alias config) does not — a `lib/foo.ts` importing `@/lib/bar` passes `tsc` + `build` yet its test fails to load with "Cannot find package '@/lib/bar'". Use `./bar`. (kindle-schlacter-me: caught a new wish-list test failing exactly this way.)
 
 ### 2I. Preview deployments
 
@@ -181,6 +182,24 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 2. Free tier: 1 cron job per day max. Pro: every minute
 3. Cron invocations are `GET` requests — your handler must handle `GET`
 4. Check Vercel dashboard → Crons tab for execution history
+5. **A schedule change only takes effect once the deploy carrying the new `vercel.json` is the active production deploy.** If several deploys land near a scheduled minute, the first tick can be skipped (Vercel does not retry a missed cron) — the next tick fires normally.
+
+### "Network error" / function killed partway through a long route
+
+A route that loops over N items calling a flaky/slow upstream (e.g. Google Books, which returns intermittent 503s retried with backoff) can overrun `maxDuration`. The platform kills the function mid-request, the connection drops, and the *client's* `fetch` throws — surfacing as a generic "network error" that hides the real cause (a timeout, not a network fault).
+
+1. **Bound the work by WALL-CLOCK, not a fixed batch count.** Per-item latency is unpredictable when an upstream is slow; a fixed `BATCH=10` that's fine on a good day overruns on a bad one. Loop until `Date.now() - start > BUDGET_MS` (well under `maxDuration`), then RETURN partial progress (`{processed, remaining}`) and let the client loop the calls until done.
+2. **Raise `maxDuration`** to leave headroom past the budget for the last in-flight item's retries (Pro allows up to 300s).
+3. **Make the client resilient:** retry a dropped round a few times before giving up, and show honest partial-progress copy ("Saved N so far — try again") instead of a dead-end error.
+
+Real example (kindle-schlacter-me #95): the admin genre-backfill button died with "Network error" because Google Books 503s made a fixed 10-book batch overrun the 60s limit. Fix: 55s wall-clock budget + client retry + `maxDuration` 60→120. The same engine then runs as an hourly cron.
+
+### Server-to-server `fetch` to your OWN API route returns 401
+
+A route that calls another of your app's routes over HTTP (a cron, or a "check availability" endpoint hitting `/api/search/...`) does NOT carry the user's session cookie, so an auth-gated target returns 401 and the caller silently gets empty results.
+
+- **Call the underlying lib function directly** instead of the HTTP route (e.g. `searchOne(source, q)` rather than `fetch('/api/search/source')`). No auth wrapper, no HTTP hop, and it works from both an authed route and an unauthed cron.
+- If you must hop over HTTP, forward the incoming `Cookie` header — but direct is better. Real example (kindle-schlacter-me #99): the wish-list availability check calls `searchOne` directly; the old orphaned `/api/wishlist/check` would have 401'd on every server-to-server lane.
 
 ### ISR / SSG stale data ("it shows old content")
 

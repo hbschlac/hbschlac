@@ -3,7 +3,8 @@
 **Date:** 2026-08-09 · **Updated:** 2026-08-11
 **Harness branch:** `claude/kindle-agent-feedback-4p93uc` (this repo, `hbschlac/hbschlac`)
 
-Spans two feedback rounds plus the flagship year-in-review build.
+Spans three feedback rounds, the flagship year-in-review build, and the Wish List
+feature (add unavailable books → auto re-check → auto-deliver).
 
 ## Where the code lives
 
@@ -14,8 +15,8 @@ The profile repo (`hbschlac/hbschlac`) is not where the app's code belongs, so t
 branch carries only this handoff record.
 
 Every PR passed the repo gate before merge: `npx tsc --noEmit && npx vitest run &&
-npm run build` (test count grew **176 → 203** across both rounds). Production deploy
-after the final PR (#87) is READY.
+npm run build` (test count grew **176 → 219** across all rounds). All PRs
+(**#69–#102**) squash-merged to `main` and auto-deployed.
 
 ## Round 1 — initial feedback (all merged to `kindle-schlacter-me:main`)
 
@@ -55,6 +56,33 @@ gated phases once she locked the decisions, plus a covers follow-up.
 | 4 | Year-end "Wrapped": 1080×1920 recap image via `next/og` + Dec-20→Jan-1 banner + Web Share + per-year share picker on `/history/stats` | [#86](https://github.com/hbschlac/kindle-schlacter-me/pull/86) |
 | follow-up | Real book covers in the recap — fetched server-side into base64 data URIs with a colored-spine fallback, so a slow/blocked cover can't crash the render | [#87](https://github.com/hbschlac/kindle-schlacter-me/pull/87) |
 
+## Round 3 — post-item-10 feedback (all merged)
+
+| # | Feedback | PR |
+|---|----------|----|
+| 1 | Add a **"Family & Parenting"** genre (parenting/pregnancy/family books had no home); classifier places it after Biography/History, before Science | [#88](https://github.com/hbschlac/kindle-schlacter-me/pull/88) |
+| 3 | **Note editor** in the library book-detail modal (next to the stars) | [#89](https://github.com/hbschlac/kindle-schlacter-me/pull/89) |
+| 6 | History **ring click → reads list** (the affordance broke after the IA split) | [#90](https://github.com/hbschlac/kindle-schlacter-me/pull/90) |
+| 5,9,10,8 | **Persistent sticky nav** + mobile hamburger + **back-to-top** on long pages (every page/sub-page, iPhone + iPad) | [#91](https://github.com/hbschlac/kindle-schlacter-me/pull/91) |
+| 4 | Medium library tiles **2-up on mobile** so the status control isn't clipped ("Not started" → "Not") | [#92](https://github.com/hbschlac/kindle-schlacter-me/pull/92) |
+| 2,7 | Admin **metadata backfill** — resolve genres for existing books + Goodreads reads still showing "auto"/Untagged (shared meta store, override-safe) | [#93](https://github.com/hbschlac/kindle-schlacter-me/pull/93) |
+| modal | Book-detail modal fixes: note spacing, surfaced genre editor, editable **"started reading" date** | [#94](https://github.com/hbschlac/kindle-schlacter-me/pull/94) |
+
+## Round 4 — bug fixes + the Wish List (this stretch)
+
+Bugs and refinements from live use, then the flagship Wish List.
+
+| Area | What shipped | PR |
+|------|--------------|----|
+| bug | Admin **"Backfill" button broke ("Network error")** — Google Books 503s made a fixed batch overrun the 60s function limit; now bounded by a **wall-clock budget** (returns partial progress, client loops) | [#95](https://github.com/hbschlac/kindle-schlacter-me/pull/95) |
+| admin | **"Counting since" badge** on the active-days stat (the count was accurate but the tracking window is young, so it read as a false positive) | [#96](https://github.com/hbschlac/kindle-schlacter-me/pull/96) |
+| feature | **Sort + filter** on the `/history/reads` sub-page (longest/shortest pages, date finished, rating, title; genre + source filters). Page count joined onto reads rows | [#97](https://github.com/hbschlac/kindle-schlacter-me/pull/97) |
+| infra | **Hourly cron** runs the genre backfill server-side (no admin clicking) — `/api/cron/backfill-meta`, dedupes by bookKey across all users | [#98](https://github.com/hbschlac/kindle-schlacter-me/pull/98) |
+| **Wish List A** | Add a book when a search comes up empty; per-item status (pending/available/found-confirm/failed); one-tap **Get it** / **confirm which book** / **Search manually**; on-open + pooled "Check all" re-checks. Author-gated so it never grabs the wrong book | [#99](https://github.com/hbschlac/kindle-schlacter-me/pull/99) |
+| **Wish List B** | **Notifications** (header bell + Library banner) + a **6-hourly detection cron** (`/api/cron/wishlist-check`) so you hear about a book while away | [#100](https://github.com/hbschlac/kindle-schlacter-me/pull/100) |
+| **Wish List C** | **Autonomous auto-send**: a confident title+author match on an email account is delivered to the Kindle unattended (non-torrent, quota-respected); anything ambiguous/torrent/device stays one-tap | [#101](https://github.com/hbschlac/kindle-schlacter-me/pull/101) |
+| UI | Search page **empty state** (recent-search chips + quick-link cards, all surfaces) + **alphabetical genre dropdown** | [#102](https://github.com/hbschlac/kindle-schlacter-me/pull/102) |
+
 ## Status notes
 
 - **Per-year goal keys** migrate the old single goal on first current-year read;
@@ -72,7 +100,22 @@ gated phases once she locked the decisions, plus a covers follow-up.
   themes stay auto-detected per Hannah's decision.
 - **Download-to-device** on iPhone saves the `.epub` to Files/Books (iOS Safari
   Downloads), not into the Kindle app — intended for a non-Kindle reader.
-- There is **no standalone "kindle" skill** in this repo — the app appears only as
-  worked examples inside general skills, so no skill needed changes.
+- **Wish List** is internally `watchlist` (KV `kindle:watchlist:{email}`), DISTINCT
+  from the "Want to Read" list (internally `wishlist`, route `/future`). New routes:
+  `/api/watchlist` (CRUD), `/api/watchlist/check`, `/api/notifications`. Auto-send
+  lives in `lib/watchlistDeliver.ts` and is called only from the cron.
+- **Three crons now run** (`vercel.json`): the existing bounce-poll (07:00) + diag-
+  digest (14:00), plus **`/api/cron/backfill-meta` hourly (:22)** and
+  **`/api/cron/wishlist-check` every 6h (:42)**. All use `CRON_SECRET` bearer auth.
+- **Availability checks call `searchOne()` directly**, not the auth-gated
+  `/api/search/source` route — a server-to-server fetch has no session cookie and
+  would 401 (this also fixed the latent same bug in the old `/api/wishlist/check`).
+- Wish List UI + auto-send were verified at the code/build level; the sandbox can't
+  reach the authed live app or drive a real Kindle send, so live confirmation is on
+  Hannah's session (add a book → let the cron auto-deliver, or tap "Get it").
+- A **targeted learning** from this session's real bugs was added to the
+  **`vercel-ship`** skill (serverless wall-clock budgeting + the auth-gated-internal-
+  route trap + the vitest `@/`-alias gotcha). Still **no standalone "kindle" skill** —
+  the app remains a worked example inside general skills.
 
 `kindle-connector` (the self-hosted torrent bridge) was not touched this session.
