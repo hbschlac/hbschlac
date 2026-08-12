@@ -1,10 +1,10 @@
 # Session handoff — Kindle app feedback (Hannah + Sam)
 
-**Date:** 2026-08-09 · **Updated:** 2026-08-11
+**Date:** 2026-08-09 · **Updated:** 2026-08-12
 **Harness branch:** `claude/kindle-agent-feedback-4p93uc` (this repo, `hbschlac/hbschlac`)
 
-Spans three feedback rounds, the flagship year-in-review build, and the Wish List
-feature (add unavailable books → auto re-check → auto-deliver).
+Spans five feedback rounds, the year-in-review build, the Wish List, Book Clubs,
+and the Hobby-plan deploy recovery.
 
 ## Where the code lives
 
@@ -15,8 +15,10 @@ The profile repo (`hbschlac/hbschlac`) is not where the app's code belongs, so t
 branch carries only this handoff record.
 
 Every PR passed the repo gate before merge: `npx tsc --noEmit && npx vitest run &&
-npm run build` (test count grew **176 → 219** across all rounds). All PRs
-(**#69–#102**) squash-merged to `main` and auto-deployed.
+npm run build` (test count grew **176 → 236** across all rounds). PRs
+**#69–#114** squash-merged to `main`. (Rounds 1–4 + Book Clubs were by this + a
+sibling session; see the deploy-incident note below — production was recovered
+after the auto-deploy webhook stalled.)
 
 ## Round 1 — initial feedback (all merged to `kindle-schlacter-me:main`)
 
@@ -119,3 +121,42 @@ Bugs and refinements from live use, then the flagship Wish List.
   the app remains a worked example inside general skills.
 
 `kindle-connector` (the self-hosted torrent bridge) was not touched this session.
+
+## Round 5 — Book Clubs (a sibling session)
+
+Follow the national reading clubs (Oprah / Reese's / Read with Jenna); each new
+monthly pick auto-delivers to the library, badged with the club.
+
+| # | What | PR |
+|---|------|----|
+| 104 | Follow clubs: nav tab + `/book-clubs` page, follows store, per-club backfill | [#104](https://github.com/hbschlac/kindle-schlacter-me/pull/104) |
+| 105 | Scrape each club's current pick + show picks on the page | [#105](https://github.com/hbschlac/kindle-schlacter-me/pull/105) |
+| 106 | Auto-download a new pick to the library (torrent-inclusive, author-gated) + a monthly cron | [#106](https://github.com/hbschlac/kindle-schlacter-me/pull/106) |
+| 107 | Year-end "finished by club" count on the stats page | [#107](https://github.com/hbschlac/kindle-schlacter-me/pull/107) |
+| 108 | Wish List auto-deliver from torrent sources too (drop the non-torrent guardrail) | [#108](https://github.com/hbschlac/kindle-schlacter-me/pull/108) |
+| 109 | Club-pick badge on each library tile | [#109](https://github.com/hbschlac/kindle-schlacter-me/pull/109) |
+
+Files: `lib/bookclubs/*` (registry, follows store, refresh/scrape, deliver),
+`/api/book-clubs/*`, `/api/cron/book-club-scrape`.
+
+## Deploy incident + Hobby plan (Aug 11–12) — IMPORTANT for the next session
+
+- **The project is on the Vercel HOBBY plan** (a stale note said Pro — corrected).
+  Hobby: **max 2 cron jobs, daily-only cadence; 60s function cap** (`maxDuration>60`
+  is silently capped, not rejected). #111 consolidated 5 crons → **2**: a daily
+  dispatcher `/api/cron/daily` (runs diag-digest + poll-bounces + wishlist-check +
+  backfill-meta in one 60s function) + the monthly `/api/cron/book-club-scrape`.
+  **Do not add a 3rd cron or a sub-daily schedule** — it fails the Hobby deploy.
+- **The GitHub→Vercel auto-deploy webhook silently stopped** after a burst of ~13
+  rapid merges (#98–#110): `main` advanced but ZERO deployments were created (not
+  even failed ones), so prod sat on #97 for hours. **A remote sandbox can't fix or
+  force it** — no `VERCEL_TOKEN`, and Vercel API egress is proxy-blocked (403 on
+  `api.vercel.com`); `npx vercel` can't run. **Fix (Hannah, dashboard):** project →
+  Settings → Git → Disconnect then Connect (re-registers the webhook + redeploys
+  latest). The dashboard "Redeploy" button re-runs the OLD commit — it does NOT ship
+  latest. Recovered on Aug 12: production now serves the latest (#111+), auto-deploy
+  restored, health check clean (no runtime errors). The **Vercel MCP tools work**
+  server-side for read-only verification (`get_project` / `list_deployments` /
+  `get_runtime_logs`).
+- Docs updated so any sandbox inherits this: `kindle-schlacter-me/CONTINUE.md`
+  ("Platform + deploy reality" section) + `CHANGELOG.md` (#111/#114).

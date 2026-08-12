@@ -179,10 +179,21 @@ Run this BEFORE every deploy. Every item is a real failure that has happened.
 ### "Cron job not running"
 
 1. Cron requires `vercel.json` `crons` field AND a matching API route
-2. Free tier: 1 cron job per day max. Pro: every minute
+2. **Plan limits are a DEPLOY-BLOCKER on Hobby.** Hobby allows **2 cron jobs, daily cadence only** (Pro: many, down to per-minute). A `vercel.json` with a 3rd cron OR a sub-daily schedule (hourly / every-6h) **fails the Hobby deploy**. Consolidate into ≤2 daily crons — e.g. one `/api/cron/daily` dispatcher that calls several task handlers in-process (import each route's `GET` and call it with a synthetic `Authorization: Bearer <CRON_SECRET>` request). Separately, `maxDuration > 60` on Hobby is CAPPED to 60s, not rejected — it won't fail the build, but long work gets killed at 60s.
 3. Cron invocations are `GET` requests — your handler must handle `GET`
 4. Check Vercel dashboard → Crons tab for execution history
 5. **A schedule change only takes effect once the deploy carrying the new `vercel.json` is the active production deploy.** If several deploys land near a scheduled minute, the first tick can be skipped (Vercel does not retry a missed cron) — the next tick fires normally.
+
+### Merges land on `main` but nothing deploys (Git auto-deploy stalled)
+
+Symptom: `main` keeps advancing (PRs merge fine) but the Vercel Deployments list shows **no new deploys — not even failed ones** — so production sits on an old commit. This is the GitHub→Vercel webhook silently stopping, not a build failure. Seen after a burst of ~13 rapid merges.
+
+1. **Confirm via the Vercel MCP:** `get_project` / `list_deployments`. If `latestDeployment` is an old commit and there are zero deploys after it (no ERROR/QUEUED either), the webhook isn't firing.
+2. **The dashboard "Redeploy" button does NOT fix it** — it re-runs the OLD deployment's commit, not `main` HEAD.
+3. **Fix:** project → **Settings → Git → Disconnect, then Connect** (re-registers the webhook and redeploys latest). Or re-grant the Vercel GitHub App's repo access at github.com/settings/installations. Also check team **Billing/Usage** for a spend / deployment-limit pause.
+4. **From a remote sandbox you usually can't force it:** no `VERCEL_TOKEN`, and Vercel API egress is often proxy-blocked (403 on `api.vercel.com`), so `npx vercel --prod` can't run. The fix is the dashboard reconnect, or `vercel --prod` from a laptop checkout of `main`. (Vercel MCP tools still work for read-only verification.)
+
+Evidence: kindle-schlacter-me — `main` advanced #98→#111 with zero deploys; reconnecting Git in Settings restored auto-deploy and shipped everything in one build.
 
 ### "Network error" / function killed partway through a long route
 
