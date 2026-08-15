@@ -216,6 +216,11 @@ When multiple web sessions may be active on the same repo:
    ```
 3. **Don't edit CLAUDE.md or shared config files unless that's the primary task.** These are high-contention files.
 4. **If you see a recent branch touching the same files, ask before proceeding.** Two sessions editing the same component will create a merge conflict neither can resolve.
+5. **Rebase right before you merge, not only at branch start.** When another session is landing PRs in the same area, `git fetch origin main && git rebase origin/main` immediately before each merge. Main may have moved since you branched; a stale branch either merges as a conflict or silently reverts their work.
+6. **Force-push with the SHA pinned.** After a rebase or a post-squash-merge branch restart, push with `--force-with-lease=<branch>:<exact remote SHA>` (get the SHA from `git ls-remote origin <branch>`). A bare `--force-with-lease` trusts your local remote-tracking ref, which is stale after a fetch/rebase, so it either wrongly rejects the push or wrongly clobbers.
+7. **Reconcile ONTO the other session's approach; don't ship a rival.** If they already solved the same problem a different way, adopt their primitive and delete yours. Two solutions to one problem rot into conflicts and double maintenance.
+
+Evidence: one day saw ~13 parallel PRs rework kindle-schlacter-me's Book Clubs (registry, client, logo route) while other work was mid-flight. Rebase-before-merge + SHA-pinned leases carried ~7 clean merges through it; a route-local logo-domain table was dropped in favor of the parallel session's `club.logoDomain` field rather than shipped as a duplicate.
 
 ---
 
