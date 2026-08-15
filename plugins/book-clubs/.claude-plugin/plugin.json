@@ -1,0 +1,16 @@
+{
+  "name": "book-clubs",
+  "displayName": "Book Clubs",
+  "version": "1.0.0",
+  "description": "Book-club lookup for Claude (from kindle.schlacter.me): name or describe a club and get it plus its recent monthly picks. A bundled, keyless stdio MCP server — a 32-club catalog with typo-tolerant name/celebrity matching and Book Notification pick fetching, plus a generic scraper fallback for off-catalog clubs Claude web-searches for.",
+  "author": {
+    "name": "Hannah Schlacter"
+  },
+  "keywords": ["books", "book-club", "reading", "oprah", "reese", "jenna", "booknotification", "mcp"],
+  "mcpServers": {
+    "book-clubs": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/server.mjs"]
+    }
+  }
+}
