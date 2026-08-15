@@ -8,6 +8,11 @@
       "name": "job-fetch",
       "source": "./plugins/job-fetch",
       "description": "Fetch + ingest a job description past a proxy-blocked host (Claude Code web egress allowlist), via ATS public APIs and a remote-exec MCP (Composio) fallback. Auto-fires on job URLs via a UserPromptSubmit hook; ingest-and-acknowledge, no JD echoed back."
+    },
+    {
+      "name": "book-clubs",
+      "source": "./plugins/book-clubs",
+      "description": "Book-club lookup for Claude (from kindle.schlacter.me): name or describe a club → get it plus its recent monthly picks. A bundled, keyless stdio MCP server — 32-club catalog with typo-tolerant name/celebrity matching + Book Notification pick fetching, and a generic scraper fallback for off-catalog clubs Claude web-searches for."
     }
   ]
 }
