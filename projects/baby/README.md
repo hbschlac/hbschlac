@@ -6,6 +6,8 @@ Phase 1 (what's here now) is the planning half: decide what to buy, argue about 
 structured way, and work through nursery setup. Phase 2 is the tracker — feeds, sleep, diapers,
 growth — which needs a real database first.
 
+Requirements and schedule: [`docs/PRD.md`](docs/PRD.md).
+
 ## Running it
 
 ```bash

@@ -50,6 +50,10 @@ Both must pass. The build runs type checking too, but `typecheck` is faster for 
 
 ## Phase 2: the tracker
 
+**Read `docs/PRD.md` first.** It is the source of truth for scope,
+priorities, the schedule, and what is deliberately not being built. The notes below are the
+short version.
+
 Feeds, sleep, diapers, growth. `FeedLog` / `SleepLog` / `DiaperLog` / `GrowthLog` in `types.ts`
 are the intended model — they exist so phase 2 doesn't invent a third vocabulary.
 
