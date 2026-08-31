@@ -3,10 +3,11 @@
 **Status:** Draft
 **Owner:** Hannah
 **Users:** Two (Hannah + partner)
+**Due date (D):** Tuesday, December 8, 2026
 **Last updated:** 2026-08-31
 
-> **Anchor date:** all milestones below are relative to **D** = due date. Replace `D-N`
-> with real dates once D is set. Everything in the schedule moves with it.
+> **Anchor date:** milestones are pinned to **D** = Dec 8, 2026 — 14 weeks out as of this
+> revision. If D moves, §11 moves with it.
 
 ---
 
@@ -84,7 +85,9 @@ Explicitly not building. Each of these is a real temptation and each is a "no":
 
 ## 6. Constraints
 
-- **Weeks, not months.** Everything competes with actually getting ready for a baby.
+- **14 weeks, and the back half is worth less than the front half.** Calendar time is
+  not the binding constraint — energy is. The third trimester starts in early October.
+  Schedule the hard technical work before it, not after.
 - **Two devices, always in sync.** This is what off-the-shelf apps give you for free and
   it is the entire reason phase 2 needs a backend.
 - **Offline must work.** Not degrade gracefully — work. See §8.4.
@@ -102,9 +105,13 @@ Four routes, live and working: overview, registry, names, nursery. State persist
 | # | Requirement | Priority |
 |---|---|---|
 | P1.1 | Registry, names, and nursery data sync between both phones | Must — see §8.3, same backend |
-| P1.2 | Real prices entered on must-have registry items, so the estimate means something | Should |
+| P1.2 | Real prices entered on must-have registry items, so the estimate means something | Must — by mid-October |
 | P1.3 | Nursery checklist worked down to zero | Should — the point of the list |
 | P1.4 | Names narrowed to a shortlist of ≤5 | Should — this has a hard deadline too |
+
+**The registry has an earlier deadline than everything else in this document.** It has to
+be finished before invitations go out, and gifts need shipping time — which in practice means
+usable by **mid-October**, not by D. It is the one piece of the planning half that can't slip.
 
 No new planning features. The planning half is done being built.
 
@@ -242,30 +249,42 @@ For a two-person tool, the only honest metrics are behavioral:
 
 ## 11. Schedule
 
-Working backward from D. This assumes evenings and pieces of weekends, not focused weeks.
+**D = Tuesday, December 8, 2026.**
 
-| When | What | Gate |
+The first draft of this document assumed a few weeks total and crammed the backend into the
+last month. With 14 weeks, that's the wrong shape. The backend moves to **September**, while
+the energy for it exists, and the gate at D-14 becomes a safety net instead of a coin flip.
+
+Assumes evenings and pieces of weekends, not focused weeks.
+
+| By | What | Gate |
 |---|---|---|
-| **D-28** | Postgres provisioned, schema deployed, HTTP adapter written, phase 1 syncing between both phones | Proves the whole architecture on low-stakes data |
-| **D-21** | Feed, diaper, and sleep logging working online. Home screen answering the standing questions. | |
-| **D-14** | Offline queue and sync. Live nursing timer, visible on both phones. Installed to both home screens. | **Go/no-go — see §12** |
-| **D-10** | The 3am test, run for real: in the dark, one-handed, both phones, wifi off | Fix what it surfaces |
-| **D-7** | Freeze. Planning half archived. No new features. | |
-| **D+0** | Use it | |
-| **After** | Growth logging, rollups, export, inventory | |
+| **Oct 13** (D-56) | Postgres provisioned, schema deployed, HTTP adapter written, planning half syncing between both phones | Proves the whole architecture on low-stakes data |
+| **Oct 13** | Registry finalized — real items, real prices | Driven by shower timing and shipping lead times, not by D |
+| **Nov 3** (D-35) | Feed, diaper, and sleep logging working online. Home screen answering the standing questions. Live nursing timer, visible on both phones. | |
+| **Nov 10** (D-28) | Offline queue and sync. Installed to both home screens. | Feature complete |
+| **Nov 24** (D-14) | Two weeks of real use on live data. The 3am test run for real: in the dark, one-handed, both phones, wifi off. | **Go/no-go — see §12** |
+| **Dec 1** (D-7) | Fix-only. Planning half archived. Nursery list at zero. | Freeze |
+| **Dec 1 – Dec 8** | Nothing. Rest. | |
+| **Dec 8** | Use it | |
+| **After** | Growth logging, rollups, CSV export, pumped-milk inventory | |
 
-**D-14 is the real deadline.** The last two weeks are for using the thing and fixing what
-breaks, not for building.
+**Nov 10 is the real deadline**, not Nov 24. The two weeks between them are for using the
+thing on live data and fixing what breaks — which is where the actual bugs surface. Building
+into that window is how you arrive at D with something untested.
+
+Babies come early. Treat every date above as two weeks softer than it looks.
 
 ## 12. Risks
 
-**1. The backend doesn't land in time.** Highest-probability failure. It's the least fun
-part, it's on the critical path, and it competes with a nursery that needs finishing.
+**1. September slips and the backend lands in November.** Highest-probability failure, and
+the reason §11 front-loads it. It is the least fun part, it is on the critical path, and
+every week it slips lands it in a worse week than the one before.
 
-> *Mitigation — hard go/no-go at D-14.* If sync isn't working on both phones by then,
+> *Mitigation — hard go/no-go at Nov 24.* If sync isn't working on both phones by then,
 > stop. Ship the tracker single-device on `localStorage`, one designated phone, and treat
 > the other parent's logs as verbal handoff. Better: download Huckleberry. Do not spend
-> D-14 to D-0 debugging a sync bug.
+> the last two weeks before D debugging a sync bug.
 
 **2. It's unreliable once, and that's the end.** One lost night of data, one white screen
 at 3am, and the app is dead — trust doesn't come back. This is why offline-first and
@@ -279,7 +298,7 @@ everything ships. §2 already gives permission to walk away.
 
 ## 13. Open questions
 
-1. **What is D?** Everything in §11 anchors to it.
+1. ~~What is D?~~ **Answered: Dec 8, 2026.** §11 is pinned to it.
 2. **Whose phone is the primary?** Matters for the single-device fallback in §12.
 3. **Neon or Supabase?** Neon is less to learn if all you need is Postgres. Supabase gives
    auth and realtime you'd otherwise hand-roll — but §8.3 says the auth is a passcode, so
