@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #faf7f2;
+  --color-surface: #ffffff;
+  --color-ink: #2e2a26;
+  --color-muted: #7a716a;
+  --color-line: #e7e0d6;
+  --color-sage: #6e8b72;
+  --color-sage-soft: #e8efe8;
+  --color-clay: #b9764f;
+  --color-clay-soft: #f6e9df;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: 0.875rem;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Native controls inherit the warm palette instead of shipping system chrome. */
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 2px;
+}
