@@ -9,5 +9,12 @@
   },
   "enabledPlugins": {
     "job-fetch@hbschlac": true
+  },
+  "permissions": {
+    "allow": [
+      "mcp__Composio_Docs_Drive__COMPOSIO_REMOTE_BASH_TOOL",
+      "mcp__Composio_Docs_Drive__COMPOSIO_SEARCH_TOOLS",
+      "mcp__Composio_Docs_Drive__COMPOSIO_MULTI_EXECUTE_TOOL"
+    ]
   }
 }
