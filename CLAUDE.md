@@ -63,42 +63,56 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 8. **54 orphaned branches.** Branch cleanup commands now in session-safety. Run them.
 9. **recs.community 4 stacked PRs open 30+ days.** PRs #4-7 in dependency chain, none merged. Merge #4 first.
 
-## Repo settings.json does not load in cloud sessions
+## Connector tool permissions CANNOT be set from inside the container
 
-**A `.claude/settings.json` committed to a repo is INERT in Claude Code web/iOS
-sessions, and it fails SILENTLY.** Those sessions clone every source repo as a
-SUBDIRECTORY of the session root (`/home/user/hbschlac`, `/home/user/kindle-schlacter-me`),
-and the root itself is not a repo. Project settings load from the session root, so
-nothing in `<repo>/.claude/settings.json` is ever read. `CLAUDE.md` IS read from each
-added directory, which is what makes this so confusing: the repo clearly influences
-the session, so the settings file looks like it must be working too.
+**`permissions.allow` is a NO-OP for gateway-managed MCP connector tools (Composio,
+Gmail, Drive, Vercel...), wherever you put it** — repo `.claude/settings.json`, user
+`~/.claude/settings.json`, or an environment setup script. It fails SILENTLY: the file
+is valid, present at session start, and simply discarded with no warning.
 
-Verified 2026-09-01: PR #23 added Composio `permissions.allow` rules and
-`enabledPlugins: {"job-fetch@hbschlac": true}` to `.claude/settings.json`. In a live
-session `ListPlugins` returned EMPTY and no `job-fetch` skill existed, while
-`/root/.claude/settings.json` (user level, inside the container) carried the same
-three Composio rules and those DID apply. The repo file did nothing.
+Why: the sandbox-gateway computes the allowlist server-side and injects it as the
+CLI's `--allowed-tools` flag at launch. Measured 2026-09-01 — 86 entries, ZERO
+matching composio. Nothing writable inside the container can add to that list.
+Full bug report, with launcher logs and process argv:
+https://claude.ai/code/artifact/9268b29a-5858-4bd8-9190-79c3408e0d30
 
-Consequences, both of which were live that day:
-- **Permission rules must be set at the ACCOUNT/user level**, not committed to a repo.
-  A rule in a repo file will never suppress a prompt.
-- **A plugin enabled only in a repo file is off.** A session that needs `job-fetch`
-  will not have it and will improvise — one was caught hand-rolling a scrape of a
-  vendor's minified JS to find GraphQL endpoints, precisely the thing the skill's
-  ATS-public-API path exists to avoid.
+Do not repeat these three dead ends:
+- **PR #23 (Composio rules in `.claude/settings.json`) never did anything.** It looked
+  plausible and shipped as a fix. It is inert twice over: connector rules are
+  gateway-controlled, AND a repo settings.json is not read at all (below).
+- **Name-form mismatch is NOT the cause.** MCP servers oscillate mid-session between
+  `mcp__Composio_Docs_Drive__*` and the raw UUID `mcp__ae6e71d8-...__*`, which makes a
+  matching failure look like the obvious answer. It was tested and disproved: a
+  Calendar tool whose allowlist entry exists only in UUID form ran unprompted while
+  registered under its friendly name. The matcher resolves both. This cost hours.
+- **A benign probe command proves NOTHING.** In `auto` mode the classifier approves
+  innocuous calls on their own merits, so `echo hi` through the Composio bash tool
+  succeeds and reads as a working allow rule when there is none. It also DENIES
+  allowlisted tools ("Blocked by classifier" on `ps` and `/proc/<pid>/cmdline`, both
+  in `--allowed-tools`). Whether a Composio call prompts depends on how the
+  classifier reads THAT command, not on any config.
 
-Two more traps on top of the location problem:
-- **An allow rule is an exact tool-name match, and the MCP name is not stable.** The
-  Composio server is exposed as `mcp__Composio_Docs_Drive__*` but ALSO, after a
-  reconnect, as its raw UUID `mcp__ae6e71d8-77c8-4c40-b774-fbaa2ceaa0c1__*`. A rule
-  naming the friendly form cannot match the UUID form.
-- **Auto mode's classifier can override an allowlist in BOTH directions.** It denied
-  allowlisted `Bash` (`ps`, reading `/proc/<pid>/cmdline`) with "Blocked by
-  classifier", and it approved a Composio call under the UUID name that no rule
-  covered. So an allow rule is not a guarantee, and a prompt does not prove a rule is
-  missing. Do not conclude anything about permissions from a benign test command:
-  auto mode approves those on their own merits, which reads as a working allow rule
-  when there is none.
+What actually works: the environment's permission mode, which is blunt (it changes
+prompting for every tool). "Always run" writes into the container filesystem, which is
+ephemeral, so it does not survive into the next session. **A fresh container therefore
+never helps** — the same gateway list is injected every time.
+
+## A repo .claude/settings.json is never read in cloud sessions
+
+Separate bug, same silent shape. Cloud sessions clone each source repo as a
+SUBDIRECTORY of the session root (`/home/user/hbschlac`), and the root is not a repo,
+so project settings never load. Verified: `.claude/settings.json` sets
+`enabledPlugins: {"job-fetch@hbschlac": true}`, and in a live session `ListPlugins`
+returned EMPTY with no `job-fetch` skill.
+
+`CLAUDE.md` IS read from each added directory, which is what makes this confusing —
+the repo plainly influences the session, so the settings file looks like it works.
+
+Consequence beyond permissions: **a plugin enabled only in a repo file is off**, so a
+session that needs `job-fetch` will not have it and will improvise. One was caught
+hand-rolling a scrape of a vendor's minified JS for GraphQL endpoints, exactly what the
+skill's ATS-public-API path exists to avoid — and that command is the kind auto mode
+escalates, so the two bugs compound.
 
 ## Sandbox constraint
 
