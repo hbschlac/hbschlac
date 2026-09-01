@@ -25,7 +25,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
-| job-fetch | v1.0 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enable in any repo via `enabledPlugins: {"job-fetch@hbschlac": true}`. |
+| job-fetch | v1.0 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enabling it via a repo `.claude/settings.json` DOES NOT WORK in cloud sessions — see "Repo settings.json does not load" below. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
 ## Personal skills live in a SEPARATE repo (add_repo first)
@@ -62,6 +62,43 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 7. **Scheduled routines misconfigured.** Routines configured to "review skills" hit the circuit breaker every time. Reconfigure to: health check, PR hygiene, or dependency freshness.
 8. **54 orphaned branches.** Branch cleanup commands now in session-safety. Run them.
 9. **recs.community 4 stacked PRs open 30+ days.** PRs #4-7 in dependency chain, none merged. Merge #4 first.
+
+## Repo settings.json does not load in cloud sessions
+
+**A `.claude/settings.json` committed to a repo is INERT in Claude Code web/iOS
+sessions, and it fails SILENTLY.** Those sessions clone every source repo as a
+SUBDIRECTORY of the session root (`/home/user/hbschlac`, `/home/user/kindle-schlacter-me`),
+and the root itself is not a repo. Project settings load from the session root, so
+nothing in `<repo>/.claude/settings.json` is ever read. `CLAUDE.md` IS read from each
+added directory, which is what makes this so confusing: the repo clearly influences
+the session, so the settings file looks like it must be working too.
+
+Verified 2026-09-01: PR #23 added Composio `permissions.allow` rules and
+`enabledPlugins: {"job-fetch@hbschlac": true}` to `.claude/settings.json`. In a live
+session `ListPlugins` returned EMPTY and no `job-fetch` skill existed, while
+`/root/.claude/settings.json` (user level, inside the container) carried the same
+three Composio rules and those DID apply. The repo file did nothing.
+
+Consequences, both of which were live that day:
+- **Permission rules must be set at the ACCOUNT/user level**, not committed to a repo.
+  A rule in a repo file will never suppress a prompt.
+- **A plugin enabled only in a repo file is off.** A session that needs `job-fetch`
+  will not have it and will improvise — one was caught hand-rolling a scrape of a
+  vendor's minified JS to find GraphQL endpoints, precisely the thing the skill's
+  ATS-public-API path exists to avoid.
+
+Two more traps on top of the location problem:
+- **An allow rule is an exact tool-name match, and the MCP name is not stable.** The
+  Composio server is exposed as `mcp__Composio_Docs_Drive__*` but ALSO, after a
+  reconnect, as its raw UUID `mcp__ae6e71d8-77c8-4c40-b774-fbaa2ceaa0c1__*`. A rule
+  naming the friendly form cannot match the UUID form.
+- **Auto mode's classifier can override an allowlist in BOTH directions.** It denied
+  allowlisted `Bash` (`ps`, reading `/proc/<pid>/cmdline`) with "Blocked by
+  classifier", and it approved a Composio call under the UUID name that no rule
+  covered. So an allow rule is not a guarantee, and a prompt does not prove a rule is
+  missing. Do not conclude anything about permissions from a benign test command:
+  auto mode approves those on their own merits, which reads as a working allow rule
+  when there is none.
 
 ## Sandbox constraint
 
