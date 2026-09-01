@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__Composio_Docs_Drive__COMPOSIO_REMOTE_BASH_TOOL"
+    ]
+  },
   "extraKnownMarketplaces": {
     "hbschlac": {
       "source": {
