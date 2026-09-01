@@ -41,7 +41,6 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 
 **High-priority (stuck work):**
 - Merge or close muse-shopping #1 (draft PR, 30+ days old)
-- Disable mcp-contributor cron (8+ identical unactioned issues) or fix the anchor bug
 
 **Feature work:**
 - Build features on kindle-schlacter-me, kindle-connector, or recs.community
@@ -54,8 +53,8 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 
 ## Active known issues
 
-1. **mcp-contributor anchor bug.** refresh.sh grep expects `## Step 11.1:` but SKILL.md uses `### 11.1`. Creates false-positive issues weekly. Fix: update sources.yml anchors (requires laptop, 5 min).
-2. **mcp-contributor cron noise.** 8+ identical "11 anchor misses" issues filed, all unactioned. Disable the cron or fix the bug.
+1. **mcp-contributor anchor bug (still unfixed, no longer firing).** refresh.sh:100 greps `^## Step 11.N[: ]` but SKILL.md's appendix uses `### 11.N`, so all 11 subsection anchors miss and the job always exits non-zero. The skill is FROZEN, so this is left alone deliberately. Fix the anchors before ever restoring a schedule.
+2. **mcp-contributor cron noise: RESOLVED 2026-09-01.** It filed 10 identical issues (#4-#13, Apr 19 - Jun 21), all closed as not_planned. GitHub had auto-disabled the workflow on Jun 21 after 60 days of repo inactivity, which was an accident, not a fix: any push re-enables it. The `schedule:` trigger is now removed from `weekly-refresh.yml`; `workflow_dispatch` remains. Do not re-add a schedule while issue 1 stands.
 3. **code-builder parallel mode collapsed.** Stub-only in SKILL.md (full spec in git history). Laptop-only, never tested.
 4. **No project has monitoring configured.** Incidents are discovered reactively. Use Vercel MCP tools + WebFetch in scheduled routines for health checks.
 5. **muse-shopping #1 draft PR.** Created by vibe-improver, 50+ days in draft limbo. Close or merge.
