@@ -92,10 +92,37 @@ Do not repeat these three dead ends:
   in `--allowed-tools`). Whether a Composio call prompts depends on how the
   classifier reads THAT command, not on any config.
 
-What actually works: the environment's permission mode, which is blunt (it changes
-prompting for every tool). "Always run" writes into the container filesystem, which is
-ephemeral, so it does not survive into the next session. **A fresh container therefore
-never helps** — the same gateway list is injected every time.
+THE FIX, and the only one that is repo-independent and permanent: set
+**`allowed_tools` on the ENVIRONMENT** (Default, `env_018RLatzZ4RYNGhyZoDmXF3s`) in the
+Claude Code web environment settings. Verified in `/tmp/environment-manager.out`:
+
+    "msg":"Parsed environment from V0 input","has_allowed_tools":false
+    allowed_tools":""
+
+The field is real and is parsed at EVERY session launch. It is simply empty, which is
+why the earlier investigation read it as "env config contributes nothing" and stopped.
+It sits ABOVE the container, so it survives container recycling and applies to every
+session whatever repo is attached. Value to set (wildcards work — the gateway's own
+injected list already contains `mcp__github__*`):
+
+    mcp__Composio_Docs_Drive__*
+    mcp__ae6e71d8-77c8-4c40-b774-fbaa2ceaa0c1__*
+
+Set BOTH forms. Matching resolves either, but the server is announced under both names
+and listing both costs nothing.
+
+Verify from inside any new session with the original diagnostic — reading the live
+`--allowed-tools` value out of the claude process argv and grepping it for composio.
+It must return non-zero; it returns 0 today.
+
+**Necessary but NOT sufficient:** in `auto` mode the classifier sits ON TOP of the
+allowlist and can still escalate an individual command. It denied allowlisted `Bash`
+here ("Blocked by classifier" on `ps` and on reading process argv). So the allowlist
+ends the systemic prompting; it does not license a command that looks dangerous. Pair
+it with the plugin fix below so sessions stop generating those commands.
+
+Not fixes: a fresh container (the same gateway list is injected every time), "Always
+run" (writes to the ephemeral container filesystem), and settings.json anywhere.
 
 ## A repo .claude/settings.json is never read in cloud sessions
 
