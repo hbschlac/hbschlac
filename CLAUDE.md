@@ -64,6 +64,16 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 8. **54 orphaned branches.** Branch cleanup commands now in session-safety. Run them.
 9. **recs.community 4 stacked PRs open 30+ days.** PRs #4-7 in dependency chain, none merged. Merge #4 first.
 
+## Connectors
+
+**Vibe Prospecting (Explorium)** — connected at the account level as of 2026-09-02, so it is available to every new session without re-auth. B2B data: ~150M companies, ~800M professionals, 50+ sources. Server: `https://vibeprospecting.explorium.ai/mcp`.
+
+- **Use it for:** target-company discovery in the job search — funding events, headcount growth, hiring trends, "AI companies in SF that raised recently and are hiring PMs." This is what it is actually built for, and it feeds the `job-search` skill and the job tracker.
+- **It cannot tell you where someone went to school.** There is no education/university filter in `fetch-entities`, and the only prospect enrichments are `enrich-prospects-contacts` (email/phone) and `enrich-prospects-profiles` (work history). Education is not in the API surface at all. For alma-mater questions use the LinkedIn alumni tool instead.
+- **Coverage is weakest on stealth companies, and name matching is a trap.** Tested 2026-09-02 on Crucibl: `crucibl.ai` returns `business_id: null` (not indexed). But bare name `"Crucibl"` AND `crucibl.com` both resolve to `30593fdf7b5342a08c7828bf49121988` = **Crucibl Co., Salt Lake City, Utah, NAICS 6113 "Colleges, Universities, and Professional Schools"** — an unrelated leadership-training company. A name-only match returned confident data about the wrong company. **Always match by domain, and sanity-check `firmo_website` and `firmo_city_name` against what you expect before trusting any prospect list built on that business_id.**
+- **It is credit-metered.** `estimate-cost` and `show-pricing-plans` exist for a reason — check cost before a large `fetch-entities` or `enrich-prospects` run.
+- **If its tools are missing from a session,** the connector is connected but toggled off for that chat (`enabledInChat: false`). Fix in claude.ai connector settings; it cannot be enabled from repo config, and connectors toggled on mid-session may need a fresh session.
+
 ## Sandbox constraint
 
 Web sessions can only push to `hbschlac/hbschlac`. To change other repos, use GitHub MCP tools to create a PR. If MCP tools can't reach the repo, send a PushNotification with exact commands instead of writing laptop instructions.
