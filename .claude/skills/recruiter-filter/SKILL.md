@@ -5,9 +5,11 @@ description: >
   runs applicants through. Give it a CV plus a job posting (link or pasted text) and
   it returns a 0-100 fit score, the knockouts that would drop the application before
   scoring, what the filter and the 6-second human skim actually see, and a ranked
-  list of fixes with the points each one recovers. Activates on "score my resume
-  against this job", "will this pass the ATS", "rate my CV for this role", "what
-  should I fix before I apply", or a CV plus a job link.
+  list of fixes with the points each one recovers. Also runs a read-only Gmail scan to
+  find what actually happened to submitted applications and feed outcomes back into the
+  rubric. Activates on "score my resume against this job", "will this pass the ATS",
+  "rate my CV for this role", "what should I fix before I apply", a CV plus a job link,
+  or "did I get rejected", "check my applications for outcomes", "is the score working".
 ---
 
 # recruiter-filter
@@ -161,11 +163,40 @@ applications must not produce twenty near-identical resumes.
   Pass it the fix list; it owns resume format, rules, and publishing.
 - **Check any rewritten line** → `aislop` skill, then `content-quality`. Resume bullets
   are exactly where AI phrasing reads as filler.
-- **Log the application** → `job-tracker` skill. Record the score alongside it, and the
-  outcome when it lands (screen / silence / reject). That log is the only route this
-  rubric has to ever becoming calibrated — see below.
+- **Log the application** → `job-tracker` skill. Record the score alongside it so Step 7
+  can pair it with the outcome later. That pairing is the only route this rubric has to
+  ever becoming calibrated.
 - **Under 55, or a role worth extra** → `project` skill (build something for the team)
   and `job-search` (find better-fitting reqs at the same company).
+
+## Step 7 — Outcome scan (separate mode; run it on its own)
+
+Scoring is a guess until an outcome lands. This mode reads Gmail (**read-only**) for what
+actually happened to submitted applications and turns each one into evidence about the
+rubric. Mechanics, verified query shapes, and classification tells:
+`references/outcome-scan.md`. Read it before running — the obvious design is wrong in
+four specific ways.
+
+1. **Scope the search.** Company names do not appear in ATS sender addresses — almost
+   everything arrives from `no-reply@ashbyhq.com` whatever the employer — so match on
+   subject and body. Never run bare keyword searches like `subject:application`: her
+   mailbox holds financial and medical mail a broad query will surface.
+2. **Classify inbound messages only.** She forwards rejections onward, so her own `SENT`
+   mail sits in the same thread. And a candidate-experience survey ("Thanks for
+   interviewing with X!") is not a rejection — the easiest mistake available here.
+3. **Pair confirmation with decision** for days-to-decision, then read the layer:
+   - **Under ~72h, no human contact** → knockout or fast skim. If this skill scored the
+     application well, **the rubric was wrong** — say so, and re-examine the knockout gate.
+   - **1-4 weeks, no interview** → she made the pile and lost on rank. The fix list was
+     aimed correctly; Dimensions 2, 3 and 4 are the work.
+   - **After an interview** → not a resume problem. Do not open the CV. Route to
+     `interview`.
+   - **30+ days silent** → ghosted, or the req was never live. Feed back into Step 2.
+4. **Write the outcome back** to `job-tracker` as an appended `[rf]` line in `notes` — the
+   tracker has no field for scores or outcomes. On web the tracker secret is unreachable
+   (laptop path), so print the lines for her to paste instead.
+
+Never commit any of this to the repo. `hbschlac/hbschlac` is public.
 
 ## What this does not see — state it, don't bury it
 
@@ -173,10 +204,12 @@ The score is the most quotable thing in the output and the least trustworthy. Sa
 the run; a confident number that hides its own limits is the main way this skill could
 do harm.
 
-- **It is uncalibrated.** No outcome data sits behind the rubric. A 74 is not a 74%
-  chance of anything — it is ordinal, and re-reading the same bullets can move it several
-  points. Lead with the **band**; use the number to rank fixes against each other, never
-  as a forecast.
+- **It is uncalibrated.** No outcome data sits behind the rubric *yet*. A 74 is not a
+  74% chance of anything — it is ordinal, and re-reading the same bullets can move it
+  several points. Lead with the **band**; use the number to rank fixes against each
+  other, never as a forecast. Step 7 is the route out, and it needs roughly 15-20 scored
+  applications with landed outcomes before it means anything. Until then the honest
+  output is "not enough data yet," not a trend.
 - **Ranking is relative; this score is absolute.** No view of applicant volume or who
   else applied. The same 74 is a reject in a 400-deep pool and an interview in a 12-deep
   one. If she can see an applicant count, factor it into the band read.
