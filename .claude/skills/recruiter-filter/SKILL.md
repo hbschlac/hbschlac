@@ -51,12 +51,36 @@ gotcha: if that returns "not accessible," retry `add_repo hbschlac/career-skills
 
 Missing either one → ask for it. Never score against a remembered or assumed CV.
 
+## Step 0.5 — List the whole board before you score
+
+**Do this every time. It changed the application twice on the first day this skill ran.**
+
+Companies post several reqs and candidates fixate on the one they found. The ATS APIs in
+`job-fetch` return the full board from the same call that returns one posting — enumerate it,
+and check whether a better-fitting req is open before scoring the one she named.
+
+Two real cases from one session:
+
+- **Constellation.** She was applying to *Business Operations Generalist*. The board also had
+  *Operations Generalist* — same resume, **54 vs ~78**. A 24-point swing for free, purely from
+  reading the board.
+- **Crucibl.** *Chief of Staff — Outcomes* existed in their ssh careers TUI and was **not on
+  their Ashby board at all**. A title-for-title match she'd never have found. So also check
+  careers pages and any alternate channel, not just the ATS.
+
+Report the alternatives before the scorecard. If a better-fitting req is open, say so first —
+a 24-point gap is worth more than every fix in Step 5 combined.
+
 ## Step 1 — Rebuild the recruiter's criteria list
 
 This is the step people skip. A recruiter configures screening criteria from the JD;
 reconstruct that list before judging anything. Extract into a table:
 
-- **Title(s)** the req is filed under, and the seniority band.
+- **Title(s)** the req is filed under, and the seniority band. **Derive the function from the
+  responsibilities, never from the title.** "Business Operations Generalist" turned out to be an
+  accounting role — day-to-day bookkeeping, AP/AR, Form 990, nonprofit audit, QuickBooks. Scoring
+  it as an ops role would have been wrong by 20+ points. Read the responsibilities first, then
+  decide what job this actually is.
 - **Must-haves** — everything in Requirements / Qualifications stated without a hedge,
   plus anything repeated in the summary. Years, domain, scale, tools, credentials.
 - **Nice-to-haves** — "preferred," "bonus," "a plus."
@@ -84,6 +108,16 @@ the ones that gate.
 Distinguish **hard** gates (authorization, clearance, licensure, physical location for
 onsite roles) from **soft** ones (a "5+ years" against her 4.5, a degree preference).
 Soft gates cost points in Step 3; they do not end the run.
+
+**Check for over-qualification, not just under.** The rubric rewards seniority everywhere, so
+it will happily score a candidate high on a role that would reject her for being too expensive
+or too senior. Two hard gates run in this direction:
+
+- **Comp band.** A posted maximum below her current level is a silent knockout — she is filtered
+  before anyone reads a word. If the posting shows a range, say plainly whether she would take
+  the top of it, and treat "no" as a knockout rather than a detail.
+- **Years over the stated band.** "4-6 years" against her 7-9 is a flag, not a bonus. Note it;
+  many startups hire over-band, but it is never free.
 
 **Check whether the req is alive.** A high score on a dead posting is worse than useless.
 Tells: posted date older than ~4 weeks, the same req reposted repeatedly, a listing that
@@ -150,6 +184,18 @@ disqualifying. Do not paper over it. Fabricating experience fails the first scre
 call and is the one failure mode that costs more than not applying.
 
 Cap the list at the top 5-7. A fix list longer than the resume gets ignored.
+
+**If the application says not to use an LLM, switch to critique-only.** Constellation's form
+said: *"Please do not use LLMs in your application - we want to know what you genuinely think,
+in your own words,"* and separately that they screen for AI-drafted text. In that mode: proofread,
+flag, and point at what's missing — never hand over sentences she could paste. Her rough voice
+outperforms polished prose with those readers anyway.
+
+**Verify every superlative before it lands.** Any "largest / first / only / biggest in X" needs a
+search first, and the narrow true version beats the broad unverifiable one. Real miss: a
+"largest fundraise of its kind" claim turned out to be the *largest private-company round in
+Massachusetts history* — and in a different year than she remembered. Checkable claims that are
+slightly wrong cost more than no claim, especially to ex-consulting and ex-PE readers.
 
 **Stop optimizing before it costs voice.** Dimension 4 is the one that rewards drifting
 toward the JD's language, and 15 points is not worth a resume that reads machine-tailored.
@@ -219,6 +265,12 @@ do harm.
   say so, or ask her to describe the file.
 - **The projection is self-graded.** "74 → 87" is this skill's estimate of its own edits.
   Re-scoring after applying them proves nothing.
+- **It sees one version of the resume.** She keeps a tailored copy per application, and the
+  numbers drift between them — the same Walmart role appeared as "~400M daily customer
+  impressions," "~400M daily decisions," and "~400M daily page views"; the same fund as "$750M
+  deployed," "$750M AUM," and "managing $750M+." No single document looks wrong. Anyone comparing
+  a resume to an email might. When a claim is load-bearing, check it against the other recent
+  versions rather than trusting the copy in front of you.
 - **It only sees the resume.** LinkedIn, GitHub, the portfolio, the cover letter, and
   whether a human inside will vouch for her are all outside the frame, and any one of
   them can outweigh every point on this rubric.
