@@ -51,12 +51,47 @@ the HTML. Use the ATS's public posting API, which returns clean JSON (title, loc
 | `jobs.ashbyhq.com/<org>` or `/<org>/<jobId>` | `https://api.ashbyhq.com/posting-api/job-board/<org>?includeCompensation=true` → array of jobs; pick the one whose `id` matches `<jobId>` (or the only listing / title match) |
 | `boards.greenhouse.io/<org>/jobs/<id>`, `job-boards.greenhouse.io/<org>/jobs/<id>` | `https://boards-api.greenhouse.io/v1/boards/<org>/jobs/<id>?content=true` → `title`, `location.name`, `content` (HTML) |
 | `jobs.lever.co/<org>/<id>` | `https://api.lever.co/v0/postings/<org>/<id>` → `text`, `descriptionPlain`, `categories` |
+| `jobs.gem.com/<org>/<extId>` | GraphQL POST — see **Gem** below (no REST endpoint exists) |
 | `*.myworkdayjobs.com/...` | the site's `/wday/cxs/<tenant>/<site>/jobs` POST/GET JSON endpoint; if the tenant/site path isn't obvious, use the fallback below |
 
 Example that is known to work (verified end-to-end):
 `curl -sSL -A "Mozilla/5.0" "https://api.ashbyhq.com/posting-api/job-board/runlayer?includeCompensation=true"`
 returns all postings; pick the one whose `id` matches the `<jobId>` in the URL, then use its
 `title`, `location`, `compensationTierSummary`, and `descriptionHtml`.
+
+### Gem (`jobs.gem.com`) — GraphQL, and the two IDs are easy to get wrong
+
+Gem boards are a pure SPA: the page is ~4KB of markup with **zero** JD text, and there is no REST
+posting API. Do not scrape it. POST to the public GraphQL endpoint instead:
+
+```
+POST https://jobs.gem.com/api/public/graphql        # /api/graphql is 403, /graphql is 404
+Content-Type: application/json
+Origin: https://jobs.gem.com
+{"operationName":"ExternalJobPosting",
+ "variables":{"boardId":"<org-slug>","extId":"<last URL segment>"},
+ "query":"query ExternalJobPosting($boardId: String!, $extId: String!) { oatsExternalJobPosting(boardId: $boardId, extId: $extId) { title descriptionHtml firstPublishedTsSec locations { name city isRemote } job { locationType employmentType department { name } } jobPostSectionHtml { introHtml outroHtml } compensationHtml } }"}
+```
+
+**The two gotchas, both of which return `null` rather than an error:**
+
+- **`boardId` is the vanity slug from the URL** (`constellation-institute`) — *not* the UUID in the
+  page's `window['__GEM_TRACKING_CONTEXT__']`. That UUID looks authoritative and silently fails.
+- **`extId` is the last URL path segment verbatim** (`am9icG9zdDo0moI-...`). It base64-decodes to
+  `jobpost:<uuid>`, but the decoded UUID does **not** work. Pass the raw segment.
+
+A `null` result with no `errors` array means one of those two is wrong, not that the job is gone.
+
+**List the whole board** (feeds `recruiter-filter` Step 0.5) with the same endpoint:
+
+```
+query JobBoardList($boardId: String!) { oatsExternalJobPostings(boardId: $boardId) {
+  jobPostings { id extId title locations { name city isRemote }
+                job { department { name } locationType employmentType } } } }
+```
+
+Unlisted roles are real — Crucibl had a Chief of Staff req in its ssh careers TUI that was on no
+board at all — so check the company's own careers surface too, not just the ATS.
 
 Parse the JSON, strip HTML from the description field (`sed 's/<[^>]*>//g'` or in your own head), keep
 the visible text.
