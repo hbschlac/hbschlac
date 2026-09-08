@@ -1,8 +1,8 @@
 # Fix playbook
 
 Loaded at Step 5, when converting a score into edits. Patterns are written against
-Hannah's real material (Walmart BuyBox, Uprising VC, Accenture, Muse, Kindle ×
-Schlacter, recs.community, Haas MBA) so the before/afters are usable, not generic.
+Hannah's real material (Walmart BuyBox, Uprising VC, Accenture, Kindle × Schlacter,
+recs.community, Muse, Haas MBA) so the before/afters are usable, not generic.
 
 ## The truth rule, restated
 
@@ -28,8 +28,8 @@ For a platform/infra req:
 > after (bullet 1):  "Own the BuyBox — the ML ranking system serving ~400M daily product
 >                     page views and ~30% of marketplace volume."
 
-For a 0→1 / founding req, Muse belongs above the Walmart bullets or in the headline —
-it is her only solo-shipped-platform evidence and it is usually filed as a side project.
+For a 0→1 / founding / agent req, the lead project belongs above the Walmart bullets or
+in the headline rather than filed on page 2 — see *Which project to lead with* below.
 
 ## Pattern 2 — Vocabulary reframe (cheap, safe, moves Dimensions 1 and 4 together)
 
@@ -80,9 +80,9 @@ A must-have last touched at Uprising in 2021 scores badly. Two honest routes:
 
 1. **Find it in current work.** Often the skill is live and unlabeled — the internal
    GenAI assistant is current AI-product work whether or not it's in the job description.
-2. **Use the projects.** Muse, Kindle × Schlacter, and recs.community are *current* and
-   dated. A shipped side project is legitimate recency evidence and it is the fastest
-   truthful fix for a stale skill.
+2. **Use the projects.** Kindle × Schlacter and recs.community are *current* and dated.
+   A shipped side project is legitimate recency evidence and it is the fastest truthful
+   fix for a stale skill — provided it is one she'd still defend today.
 
 If neither works, it's a gap. Say so.
 
@@ -102,6 +102,33 @@ Actual failure modes, in order of how often they bite:
 
 Skim-safety is the other half: if page one is a wall, the human bails before the parser
 ever mattered.
+
+## Which project to lead with
+
+Do not lead with the biggest-sounding project. Lead with the one that survives the
+follow-up question. Rank by, in order: **is it running now**, **can she defend how it
+works in detail**, **does it evidence this req's load-bearing requirement**, and only
+then how impressive the description sounds.
+
+**Default lead: Kindle × Schlacter.** It is current, it actually runs, and it is a
+genuine autonomous agent — request a title, it arrives on the device, unattended, with
+cross-source fallback across three download providers. That reliability detail is the
+strongest part and the part most people leave off: handling provider failure without a
+human is the difference between a script and an agent. For applied-AI, agent, automation,
+platform, or infra reqs, this is the lead.
+
+**Muse is not the default, despite being the bigger story.** It shipped, but it never got
+users — so "264 brands, 10 retailers" is surface area, not traction, and the first
+screener question ("how many people used it?") collapses the bullet. Use Muse only where
+its *specific* content is the match — commerce, checkout, catalog integration, payments —
+and describe it as built scope, never as adoption. Never imply usage it did not have; the
+skill's truth rule applies to her own portfolio first.
+
+**recs.community** is the fit for community/social/consumer reqs. **The Claude Skills
+work** is the fit for developer-experience, docs, and AI-enablement reqs.
+
+If she wants a number on any of these, **ask her** — usage figures for these projects are
+not in her written material, and an estimated metric is a fabricated one.
 
 ## Application questions (Layer 1 — where the actual rejects live)
 

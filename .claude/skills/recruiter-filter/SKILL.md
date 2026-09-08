@@ -63,6 +63,12 @@ reconstruct that list before judging anything. Extract into a table:
 - **Hard gates** — location/onsite days, work authorization, clearance, degree, comp band.
 - **Vocabulary** — the exact nouns this company uses for the work. Copy them verbatim.
 
+Then mark which must-haves are **load-bearing**. A req's requirement list is part real
+bar, part copied-from-the-last-req padding. Load-bearing = it appears in the title, or in
+the role summary, or in the first three responsibility bullets — ideally two of those.
+Everything else is wishlist. Score all of them, but weight fixes toward the load-bearing
+ones; a perfect score against padding wins nothing.
+
 ## Step 2 — Knockout gate (pass/fail, before scoring)
 
 Check each hard gate. Any fail is reported **first and on its own** — a 92 that fails
@@ -76,6 +82,13 @@ the ones that gate.
 Distinguish **hard** gates (authorization, clearance, licensure, physical location for
 onsite roles) from **soft** ones (a "5+ years" against her 4.5, a degree preference).
 Soft gates cost points in Step 3; they do not end the run.
+
+**Check whether the req is alive.** A high score on a dead posting is worse than useless.
+Tells: posted date older than ~4 weeks, the same req reposted repeatedly, a listing that
+has been open far longer than its peers on the same board, or a company in a public
+freeze or recent layoff. The ATS APIs in `job-fetch` return posting dates — use them.
+Report req health next to the score. If it looks stale, say the highest-EV move is a
+human, not an edit.
 
 ## Step 3 — Score, 100 points
 
@@ -136,15 +149,46 @@ call and is the one failure mode that costs more than not applying.
 
 Cap the list at the top 5-7. A fix list longer than the resume gets ignored.
 
+**Stop optimizing before it costs voice.** Dimension 4 is the one that rewards drifting
+toward the JD's language, and 15 points is not worth a resume that reads machine-tailored.
+Mirror the req's nouns for the load-bearing requirements only, leave the rest in her
+words, and route every rewritten line through `aislop`. Applying this skill across twenty
+applications must not produce twenty near-identical resumes.
+
 ## Step 6 — Handoffs (only when asked)
 
 - **Apply the edits** → `product-networking` skill (separate repo; `add_repo` per Step 0).
   Pass it the fix list; it owns resume format, rules, and publishing.
 - **Check any rewritten line** → `aislop` skill, then `content-quality`. Resume bullets
   are exactly where AI phrasing reads as filler.
-- **Log the application** → `job-tracker` skill.
+- **Log the application** → `job-tracker` skill. Record the score alongside it, and the
+  outcome when it lands (screen / silence / reject). That log is the only route this
+  rubric has to ever becoming calibrated — see below.
 - **Under 55, or a role worth extra** → `project` skill (build something for the team)
   and `job-search` (find better-fitting reqs at the same company).
+
+## What this does not see — state it, don't bury it
+
+The score is the most quotable thing in the output and the least trustworthy. Say so in
+the run; a confident number that hides its own limits is the main way this skill could
+do harm.
+
+- **It is uncalibrated.** No outcome data sits behind the rubric. A 74 is not a 74%
+  chance of anything — it is ordinal, and re-reading the same bullets can move it several
+  points. Lead with the **band**; use the number to rank fixes against each other, never
+  as a forecast.
+- **Ranking is relative; this score is absolute.** No view of applicant volume or who
+  else applied. The same 74 is a reject in a 400-deep pool and an interview in a 12-deep
+  one. If she can see an applicant count, factor it into the band read.
+- **The layout is invisible.** This reads text, which is what a working parser does — so
+  the multi-column interleave, contact details locked in a header, and skills rendered as
+  an image are exactly the failures it cannot observe. Score Dimension 6 as inference and
+  say so, or ask her to describe the file.
+- **The projection is self-graded.** "74 → 87" is this skill's estimate of its own edits.
+  Re-scoring after applying them proves nothing.
+- **It only sees the resume.** LinkedIn, GitHub, the portfolio, the cover letter, and
+  whether a human inside will vouch for her are all outside the frame, and any one of
+  them can outweigh every point on this rubric.
 
 ## Anti-patterns — do not emit these as advice
 
@@ -165,8 +209,9 @@ Cap the list at the top 5-7. A fix list longer than the resume gets ignored.
 ## Output shape
 
 ```
-VERDICT   74/100 — Makes the pile. Three fixes puts it top of stack.
+VERDICT   Makes the pile (74/100, uncalibrated). Three fixes puts it top.
 KNOCKOUTS Pass (onsite SF ✓ · work auth ✓ · 5+ yrs ✓)
+REQ       Posted 9 days ago, not reposted — live.
 
 SCORE     Title & seniority    16/20
           Must-have coverage   17/25   ← weakest
@@ -178,11 +223,14 @@ SCORE     Title & seniority    16/20
 SEES      Top-third skim: "Senior PM at Walmart, ML/BuyBox, 400M daily views."
           Covers 2 of 5 must-haves. Missing: platform/API ownership, 0→1.
 
-FIX 1  (+6, must-haves · surface)  Muse is on page 2 as a side project; it is
-       the only 0→1 platform evidence you have. Move it into the top third.
-       before: "Muse — personal project, shopping platform"
-       after:  "Muse (muse.shopping) — built and shipped a 0→1 agentic
-                commerce platform solo: 264 brands, 10 retailers, one checkout."
+FIX 1  (+6, must-haves · surface)  Kindle x Schlacter sits on page 2 as a side
+       project; it is your strongest current evidence of a shipped autonomous
+       agent. Move it into the top third.
+       before: "Kindle x Schlacter — side project, ebook automation"
+       after:  "Kindle x Schlacter (kindle.schlacter.me) — built and shipped an
+                autonomous delivery agent for ebooks and audiobooks: request a
+                title, it arrives on the device. Runs unattended, with
+                cross-source fallback across three providers."
 FIX 2  (+4, vocabulary · reframe)  ...
 FIX 3  (+3, parse · surface)  ...
 
@@ -190,5 +238,7 @@ PROJECTED  74 → 87
 GAPS       No B2B SaaS experience (survivable — 1 of 9 "preferred" bullets).
 ```
 
-Adapt the shape to the case; keep the order: verdict → knockouts → score → what it
-sees → ranked fixes → projected → gaps.
+Adapt the shape to the case; keep the order: verdict → knockouts → req health → score
+→ what it sees → ranked fixes → projected → gaps. Close any run that leans on the number
+with the one-line caveat: the rubric is uncalibrated and ranks fixes, it does not predict
+callbacks.
