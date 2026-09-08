@@ -45,6 +45,11 @@ Layer 3. Every fix this skill emits must serve one of those. Detail and sources:
 a Composio remote-exec fallback for the web sandbox's 403 egress block). Note the ATS
 from the host — it changes the Layer-1 advice. If given pasted text, use it as-is.
 
+`job-fetch` is a plugin, enabled per repo, so it may be absent in a given session. If it is,
+the fetch still works the same way — hit the ATS's public posting API rather than scraping the
+page, and route the request outside the sandbox through any remote-exec MCP when the host is
+proxy-blocked. Ask for pasted text only once both have failed.
+
 **CV.** Pasted or uploaded text wins. If none is supplied, pull the base resume:
 `add_repo hbschlac/product-networking-skills` → read `references/resume.md`. Redirect
 gotcha: if that returns "not accessible," retry `add_repo hbschlac/career-skills`.
@@ -242,7 +247,7 @@ four specific ways.
    tracker has no field for scores or outcomes. On web the tracker secret is unreachable
    (laptop path), so print the lines for her to paste instead.
 
-Never commit any of this to the repo. `hbschlac/hbschlac` is public.
+Never commit any of this — scores, tracker contents, email text — to a repo. Several of hers are public, and none of them are the right home for job-application data.
 
 ## What this does not see — state it, don't bury it
 
