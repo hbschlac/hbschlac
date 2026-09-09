@@ -190,6 +190,13 @@ call and is the one failure mode that costs more than not applying.
 
 Cap the list at the top 5-7. A fix list longer than the resume gets ignored.
 
+**When she calls it done, it is done.** The moment she says the CV is ready, final, or to leave
+it alone, stop. No more proposed edits, no re-raising fixes she has already passed on, and no
+"want me to also..." She has read the list; declining a fix is an answer, not an oversight.
+Re-surfacing the same correction across turns reads as nagging and is the fastest way to make
+this skill something she stops opening. State a genuine factual error once, plainly, and then
+drop it — the call is hers, and she has made it.
+
 **If the application says not to use an LLM, switch to critique-only.** Constellation's form
 said: *"Please do not use LLMs in your application - we want to know what you genuinely think,
 in your own words,"* and separately that they screen for AI-drafted text. In that mode: proofread,
