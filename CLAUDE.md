@@ -29,6 +29,36 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | recruiter-filter | v1.3 | Screens a CV against a specific job the way the hiring stack actually does: knockout gate, 100-point rubric across 6 dimensions, what the AI review cites + what the 6-second human skim retains, and fixes ranked by points recovered. Grounded in real Ashby/Greenhouse/Workday behavior (refs in `references/`), not the auto-reject myth. Routes to job-fetch for the JD, product-networking to apply edits. Discloses its own blindspots every run (uncalibrated score, no view of the applicant pool or the layout, self-graded projection). Step 7 closes the loop with a read-only Gmail outcome scan (ATS mail patterns verified against the real mailbox) that dates each rejection and says which screening layer failed. Step 0.5 (list the whole board first) and the over-qualification/comp-band gate came from four live runs. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
+## Bullet Bench — the resume builder (`resume-builder/`)
+
+**Dashboard:** https://claude.ai/artifact/RWLv53mteWtb4dmZ1qJSnf (private artifact)
+
+Every bullet Hannah has ever written — **994 unique**, mined 2026-09-14 from 256 real resumes
+across 346 CV docs (2021→Sept 2026) — browsable, badged, and selectable against a specific JD.
+Solves selection, not writing: Walmart alone has 290 variants, Uprising 281.
+
+**Read `resume-builder/RUNBOOK.md` before acting on any of these triggers:**
+- *"apply the pending resume build"* → copy base doc, apply the queued swaps, verify, update tracker
+- *"publish the queued resume link"* → share doc, PR the 307 redirect, confirm deploy
+- a job posting URL → `job-fetch` → write the parsed JD into the bench's `db`
+
+**Hard dependencies:** `recruiter-filter` (the 100-point scorecard, used verbatim), `aislop`
+(kill lists encoded in `scripts/enrich.py` and mirrored in the page), `job-fetch`, `voice`.
+
+**The Composio rule is narrowed, on evidence.** `resume-subskill.md` bans Composio `GOOGLEDOCS_*`
+for CV editing because *whole-doc imports* destroy native formatting. `GOOGLEDOCS_REPLACE_ALL_TEXT`
+is the same `replaceAllText` batchUpdate the sanctioned path uses and never touches structure —
+**proven 2026-09-14**: copy + 3 swaps (bullet, tagline, italic descriptor) vs. the untouched
+original gave **0 paragraphStyle / 0 bullet / 0 runStyle diffs** across 35 paragraphs, identical
+margins and fonts, italic scope unchanged. Still banned: any whole-doc or markdown import, any
+provider. This is what makes Docs editing work from her **phone** — it does not depend on her Mac.
+
+**Two gotchas:** `match_case` defaults to `false` (always pass `true`); `REPLACE_ALL_TEXT` replaces
+*every* occurrence, so verify each `find_text` is unique in the plaintext readback first.
+
+**Never transfer the bank by gzip+base64 through the conversation** — one mistyped character
+silently corrupts all 994 bullets (this happened). Use the Drive handoff in RUNBOOK.md.
+
 ## Personal skills live in a SEPARATE repo (add_repo first)
 
 Hannah's personal **resume, outreach, and networking** skill is NOT in this repo and NOT in `.claude/skills/` here — don't search for it locally. It lives in **`hbschlac/product-networking-skills`** (old name `career-skills`, which still redirects).
