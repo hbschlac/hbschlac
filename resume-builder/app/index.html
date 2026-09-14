@@ -240,8 +240,12 @@ const S = {
   profile: B.profiles[0].id, jd: null, reqs: [], picked: {},
   sections: B.sectionOrder.slice(), tagline: B.profiles[0].tagline,
   skills: B.profiles[0].skills, filters:{q:"",cur:false,num:false,clean:false,match:false},
-  open: {walmart:true}, lastBuild: null
+  open: {walmart:true}, lastBuild: null,
+  // Marketing and Management are two separate BS degrees; Entrepreneurship is the
+  // concentration. Resume drops it for space, formal applications keep it.
+  formalDegree: false
 };
+const roleOf = e => (S.formalDegree && e.roleFormal) ? e.roleFormal : e.role;
 const prof = () => B.profiles.find(p => p.id === S.profile);
 
 /* ---------- capabilities (all optional; page works without them) ---------- */
@@ -254,7 +258,8 @@ async function persist(){
   if(!DB) return;
   try{ await DB.doc("state/current").set({
     profile:S.profile, picked:S.picked, sections:S.sections, tagline:S.tagline,
-    skills:S.skills, jd:S.jd, reqs:S.reqs, savedAt:new Date().toISOString() }); }catch(e){}
+    skills:S.skills, jd:S.jd, reqs:S.reqs, formalDegree:S.formalDegree,
+    savedAt:new Date().toISOString() }); }catch(e){}
 }
 async function restore(){
   try{
@@ -262,7 +267,8 @@ async function restore(){
     const v = d && (d.data || d);
     if(v && v.picked && Object.keys(v.picked).length){
       Object.assign(S,{profile:v.profile||S.profile,picked:v.picked,sections:v.sections||S.sections,
-        tagline:v.tagline||S.tagline,skills:v.skills||S.skills,jd:v.jd||null,reqs:v.reqs||[]});
+        tagline:v.tagline||S.tagline,skills:v.skills||S.skills,jd:v.jd||null,reqs:v.reqs||[],
+        formalDegree:!!v.formalDegree});
       syncHeader(); renderAll();
     }
   }catch(e){}
@@ -454,9 +460,18 @@ function renderResume(){
       const ids = S.picked[e.id]||[]; if(!ids.length) continue; any=true;
       const ex = document.createElement("div"); ex.className="exp";
       ex.innerHTML = `<div class="exp-title"><b>${esc(e.org)}</b>
-        ${e.role?`<span class="role">${esc(e.role)}</span>`:""}
+        ${roleOf(e)?`<span class="role">${esc(roleOf(e))}</span>`:""}
         <span class="dates">${esc(e.dates)}</span></div>
         ${e.descriptor?`<div class="desc">${esc(e.descriptor)}</div>`:""}`;
+      if(e.roleFormal){
+        const t = document.createElement("button");
+        t.className = "tog"; t.style.marginBottom = "6px";
+        t.setAttribute("aria-pressed", String(S.formalDegree));
+        t.textContent = S.formalDegree ? "Formal form — concentration shown" : "Resume form — concentration dropped for space";
+        t.title = "Marketing and Management are two separate BS degrees; Entrepreneurship is the concentration. Keep it for formal applications, drop it on the resume.";
+        t.onclick = () => { S.formalDegree = !S.formalDegree; renderAll(); persist(); };
+        ex.querySelector(".exp-title").insertAdjacentElement("afterend", t);
+      }
       const pl = document.createElement("div"); pl.className="picked";
       ids.forEach((id,i)=>{ const b=byId[id]; if(b) pl.appendChild(pickedRow(b,e,i)); });
       ex.appendChild(pl); sc.appendChild(ex);
@@ -564,7 +579,7 @@ function asText(){
     if(!exps.length) continue;
     L.push(sec.toUpperCase(), "");
     for(const e of exps){
-      L.push([e.org,e.role,e.loc].filter(Boolean).join(" | ") + (e.dates?`\t${e.dates}`:""));
+      L.push([e.org,roleOf(e),e.loc].filter(Boolean).join(" | ") + (e.dates?`\t${e.dates}`:""));
       if(e.descriptor) L.push(e.descriptor);
       for(const id of S.picked[e.id]) if(byId[id]) L.push("  ● " + byId[id].text);
       L.push("");

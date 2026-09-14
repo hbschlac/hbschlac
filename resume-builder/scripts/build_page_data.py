@@ -30,8 +30,12 @@ EXPERIENCES = [
  {"id":"edu_berkeley","org":"University of California, Berkeley, Haas School of Business","role":"Master of Business Administration",
   "loc":"Berkeley, CA","dates":"May 2024","section":"EDUCATION, SKILLS, & INTERESTS","order":8,
   "descriptor":"Merit Scholarship, Beyond Yourself Fellowship"},
+ # Marketing and Management are TWO separate BS degrees; Entrepreneurship is the concentration.
+ # Resume form drops Entrepreneurship for space; formal applications keep it. See resume.md rule 9.
  {"id":"edu_illinois","org":"University of Illinois at Urbana-Champaign, Gies College of Business",
-  "role":"Bachelor of Science in Marketing and Management","loc":"Champaign, IL","dates":"May 2017",
+  "role":"Bachelor of Science in Marketing and Management",
+  "roleFormal":"Bachelor of Science in Marketing and Management with a concentration in Entrepreneurship",
+  "loc":"Champaign, IL","dates":"May 2017",
   "section":"EDUCATION, SKILLS, & INTERESTS","order":9,
   "descriptor":"Graduated High Honors, Gies Scholars, Merit Scholarship"},
  {"id":"community","org":"Community Impact","role":"","loc":"","dates":"","section":"EDUCATION, SKILLS, & INTERESTS","order":10,
