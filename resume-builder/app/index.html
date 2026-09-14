@@ -1,0 +1,799 @@
+<title>Bullet Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+:root{
+  --paper:#F2F4F6; --surface:#FFFFFF; --sunk:#E8ECF0; --line:#D5DCE3; --line-soft:#E4E9ee;
+  --ink:#131A24; --ink-2:#3D4753; --ink-3:#6B7684;
+  --accent:#1F5C8B; --accent-soft:#E2ECF5; --accent-line:#A9C6DD;
+  --good:#2D6A4F; --good-soft:#E1F0E8;
+  --warn:#9A6414; --warn-soft:#F7EDDC;
+  --bad:#9E2B25; --bad-soft:#F7E3E1;
+  --shadow:0 1px 2px rgba(19,26,36,.06),0 4px 12px rgba(19,26,36,.05);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0F141B; --surface:#171E27; --sunk:#111821; --line:#2A3542; --line-soft:#222C38;
+  --ink:#E7EDF4; --ink-2:#B3BECB; --ink-3:#8492A2;
+  --accent:#6FA8D6; --accent-soft:#172E42; --accent-line:#2E5677;
+  --good:#6FBF96; --good-soft:#15291F;
+  --warn:#D9A957; --warn-soft:#2C2314;
+  --bad:#E08A82; --bad-soft:#2E1917;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --paper:#0F141B; --surface:#171E27; --sunk:#111821; --line:#2A3542; --line-soft:#222C38;
+  --ink:#E7EDF4; --ink-2:#B3BECB; --ink-3:#8492A2;
+  --accent:#6FA8D6; --accent-soft:#172E42; --accent-line:#2E5677;
+  --good:#6FBF96; --good-soft:#15291F;
+  --warn:#D9A957; --warn-soft:#2C2314;
+  --bad:#E08A82; --bad-soft:#2E1917;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ---------- header ---------- */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--surface);
+  border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;gap:1px;margin-right:2px}
+.brand b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.brand span{font-size:10.5px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.02em}
+.hspacer{flex:1 1 auto}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--line);
+  border-radius:999px;background:var(--sunk);font-size:12px;color:var(--ink-2);white-space:nowrap}
+.chip b{font-weight:600;color:var(--ink)}
+select.chip{background:var(--sunk);border-radius:999px;padding:5px 8px;max-width:210px}
+.btn{padding:7px 13px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
+  font-size:12.5px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--accent-line)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.scorebox{display:flex;align-items:baseline;gap:5px;font-family:var(--mono)}
+.scorebox b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.scorebox span{font-size:10.5px;color:var(--ink-3)}
+
+/* ---------- layout ---------- */
+main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+  gap:1px;background:var(--line);min-height:0}
+.pane{background:var(--paper);display:flex;flex-direction:column;min-height:0;min-width:0}
+.pane-head{padding:11px 16px 9px;border-bottom:1px solid var(--line-soft);background:var(--surface);
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pane-head h2{margin:0;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.pane-body{overflow-y:auto;padding:12px 16px 40px;flex:1 1 auto}
+.tabbar{display:none}
+
+/* ---------- filters ---------- */
+.filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.filters input[type=search]{flex:1 1 150px;min-width:120px;padding:6px 10px;border:1px solid var(--line);
+  border-radius:7px;background:var(--paper);color:var(--ink);font:inherit;font-size:12.5px}
+.tog{padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:11.5px;color:var(--ink-2)}
+.tog[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);font-weight:600}
+
+/* ---------- bank ---------- */
+.grp{margin-bottom:16px}
+.grp-head{width:100%;display:flex;align-items:center;gap:9px;padding:7px 9px;border:0;border-radius:7px;
+  background:var(--sunk);text-align:left}
+.grp-head:hover{background:var(--accent-soft)}
+.grp-head .org{font-weight:600;font-size:13px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp-head .ct{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.grp-head .caret{color:var(--ink-3);font-size:10px;width:10px}
+.blist{display:flex;flex-direction:column;gap:5px;margin-top:5px}
+
+.bullet{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:7px;background:var(--surface);
+  padding:9px 11px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border-color .12s,background .12s}
+.bullet:hover{border-color:var(--accent-line);border-left-color:var(--accent)}
+.bullet.on{border-left-color:var(--accent);background:var(--accent-soft)}
+.bullet.hasslop{border-left-color:var(--warn)}
+.bullet.hasblock{border-left-color:var(--bad)}
+.btext{font-family:var(--serif);font-size:14.5px;line-height:1.45;color:var(--ink)}
+.bmeta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;padding:2px 6px;border-radius:4px;
+  background:var(--sunk);color:var(--ink-3);border:1px solid var(--line-soft);white-space:nowrap}
+.tag.match{background:var(--good-soft);color:var(--good);border-color:transparent;font-weight:600}
+.tag.slop{background:var(--warn-soft);color:var(--warn);border-color:transparent;font-weight:600}
+.tag.block{background:var(--bad-soft);color:var(--bad);border-color:transparent;font-weight:600}
+.tag.cur{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:600}
+.tag.nonum{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+
+/* ---------- resume ---------- */
+.sec{margin-bottom:14px;border:1px solid var(--line);border-radius:9px;background:var(--surface);overflow:hidden}
+.sec-head{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--sunk);border-bottom:1px solid var(--line-soft)}
+.sec-head h3{margin:0;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);flex:1 1 auto}
+.mini{border:1px solid var(--line);background:var(--surface);border-radius:5px;width:22px;height:22px;
+  display:grid;place-items:center;font-size:11px;color:var(--ink-3);padding:0}
+.mini:hover{border-color:var(--accent-line);color:var(--accent)}
+.exp{padding:9px 11px;border-bottom:1px solid var(--line-soft)}
+.exp:last-child{border-bottom:0}
+.exp-title{display:flex;gap:7px;align-items:baseline;flex-wrap:wrap}
+.exp-title b{font-size:13px;font-weight:600}
+.exp-title .role{font-size:11.5px;color:var(--ink-2)}
+.exp-title .dates{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-left:auto}
+.desc{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--ink-2);margin:3px 0 7px}
+.picked{display:flex;flex-direction:column;gap:4px}
+.pb{display:flex;gap:7px;align-items:flex-start;padding:6px 8px;border:1px solid var(--line-soft);
+  border-radius:6px;background:var(--paper);cursor:grab}
+.pb.drag{opacity:.4}
+.pb.over{border-color:var(--accent);border-style:dashed}
+.pb .h{color:var(--ink-3);font-size:11px;line-height:1.6;user-select:none}
+.pb .t{flex:1 1 auto;font-family:var(--serif);font-size:13.5px;line-height:1.42}
+.pb .x{border:0;background:transparent;color:var(--ink-3);font-size:14px;padding:0 2px;line-height:1}
+.pb .x:hover{color:var(--bad)}
+.empty{font-size:12px;color:var(--ink-3);font-style:italic;padding:5px 2px}
+
+/* ---------- checks ---------- */
+.checks{border-top:1px solid var(--line);background:var(--surface);padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  max-height:34vh;overflow-y:auto}
+.meter{height:5px;border-radius:3px;background:var(--sunk);overflow:hidden;margin:7px 0 9px}
+.meter i{display:block;height:100%;background:var(--good);transition:width .25s,background .25s}
+.meter i.over{background:var(--bad)} .meter i.under{background:var(--warn)}
+.issue{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;align-items:flex-start}
+.issue:last-child{border-bottom:0}
+.issue .dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:none}
+.issue .dot.bad{background:var(--bad)} .issue .dot.warn{background:var(--warn)}
+.issue b{font-weight:600} .issue .why{color:var(--ink-3);font-size:11.5px}
+.ok{color:var(--good);font-size:12.5px;font-weight:500;display:flex;gap:7px;align-items:center}
+
+/* ---------- modal ---------- */
+dialog{border:1px solid var(--line);border-radius:12px;padding:0;background:var(--surface);color:var(--ink);
+  max-width:760px;width:calc(100% - 32px);box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(19,26,36,.55)}
+.mhead{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.mhead h3{margin:0;font-size:15px;font-weight:700}
+.mbody{padding:16px 18px;max-height:64vh;overflow-y:auto}
+.mfoot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+textarea{width:100%;min-height:190px;padding:11px;border:1px solid var(--line);border-radius:8px;
+  background:var(--paper);color:var(--ink);font:inherit;font-size:13px;resize:vertical}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.field input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);font:inherit}
+pre.out{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;line-height:1.55;background:var(--paper);
+  border:1px solid var(--line);border-radius:8px;padding:12px;margin:0;overflow-x:auto}
+.note{font-size:12px;color:var(--ink-3);margin:9px 0 0;line-height:1.5}
+.swap{border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:8px;background:var(--paper)}
+.swap .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.swap .from{font-family:var(--serif);font-size:12.5px;color:var(--ink-3);text-decoration:line-through;margin:2px 0 5px}
+.swap .to{font-family:var(--serif);font-size:13px;color:var(--ink)}
+
+@media (max-width:860px){
+  main{grid-template-columns:1fr}
+  .pane{display:none} .pane.show{display:flex}
+  .tabbar{display:flex;gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+  .tabbar button{flex:1;padding:9px;border:0;background:var(--surface);font-size:12px;font-weight:600;color:var(--ink-3)}
+  .tabbar button[aria-selected="true"]{color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+  .checks{max-height:40vh}
+  header{padding:8px 12px;gap:8px}
+}
+</style>
+
+<header>
+  <div class="brand"><b>Bullet Bench</b><span id="bankct">—</span></div>
+  <button class="chip" id="jdBtn">📋 <b id="jdLabel">Add a job description</b></button>
+  <select class="chip" id="profSel" aria-label="Base profile"></select>
+  <div class="hspacer"></div>
+  <div class="scorebox" title="Live: must-have coverage + vocabulary alignment (40 of 100). Full 100 runs on Final check.">
+    <b id="scoreN">—</b><span id="scoreD">/40 live</span>
+  </div>
+  <button class="btn" id="checkBtn">Final check</button>
+  <button class="btn" id="buildBtn">Approve &amp; build</button>
+  <button class="btn" id="pubBtn">Publish link</button>
+  <button class="btn primary" id="dlBtn">Download</button>
+</header>
+
+<div class="tabbar" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="bank">Bank</button>
+  <button role="tab" aria-selected="false" data-tab="resume">Resume</button>
+</div>
+
+<main>
+  <section class="pane show" id="pane-bank">
+    <div class="pane-head">
+      <h2>Bullet bank</h2>
+      <div class="filters">
+        <input type="search" id="q" placeholder="Search 994 bullets…" aria-label="Search bullets">
+        <button class="tog" id="fCur" aria-pressed="false">Current only</button>
+        <button class="tog" id="fNum" aria-pressed="false">Has number</button>
+        <button class="tog" id="fClean" aria-pressed="false">Slop-free</button>
+        <button class="tog" id="fMatch" aria-pressed="false">JD match</button>
+      </div>
+    </div>
+    <div class="pane-body" id="bank"></div>
+  </section>
+
+  <section class="pane" id="pane-resume">
+    <div class="pane-head">
+      <h2>Resume</h2>
+      <span class="chip" id="lineChip">— lines</span>
+      <div class="hspacer"></div>
+      <button class="btn" id="autoBtn">Auto-fill from profile</button>
+    </div>
+    <div class="pane-body" id="resume"></div>
+    <div class="checks" id="checks"></div>
+  </section>
+</main>
+
+<dialog id="dlg">
+  <div class="mhead"><h3 id="dlgTitle">—</h3><div class="hspacer"></div>
+    <button class="mini" id="dlgX" aria-label="Close">✕</button></div>
+  <div class="mbody" id="dlgBody"></div>
+  <div class="mfoot" id="dlgFoot"></div>
+</dialog>
+
+<script src="data.js"></script>
+<script>
+(function(){
+"use strict";
+const B = window.BANK, $ = s => document.querySelector(s);
+const EXP = Object.fromEntries(B.experiences.map(e => [e.id, e]));
+const byId = Object.fromEntries(B.bullets.map(b => [b.id, b]));
+
+const S = {
+  profile: B.profiles[0].id, jd: null, reqs: [], picked: {},
+  sections: B.sectionOrder.slice(), tagline: B.profiles[0].tagline,
+  skills: B.profiles[0].skills, filters:{q:"",cur:false,num:false,clean:false,match:false},
+  open: {walmart:true}, lastBuild: null,
+  // Marketing and Management are two separate BS degrees; Entrepreneurship is the
+  // concentration. Resume drops it for space, formal applications keep it.
+  formalDegree: false
+};
+const roleOf = e => (S.formalDegree && e.roleFormal) ? e.roleFormal : e.role;
+const prof = () => B.profiles.find(p => p.id === S.profile);
+
+/* ---------- capabilities (all optional; page works without them) ---------- */
+let SAMPLE=null, DB=null, DL=null;
+(async()=>{ try{ SAMPLE = await window.claude?.use?.("sample"); }catch(e){} })();
+(async()=>{ try{ DB = await window.claude?.use?.("db"); if(DB) restore(); }catch(e){} })();
+(async()=>{ try{ DL = await window.claude?.use?.("downloads"); }catch(e){} })();
+
+async function persist(){
+  if(!DB) return;
+  try{ await DB.doc("state/current").set({
+    profile:S.profile, picked:S.picked, sections:S.sections, tagline:S.tagline,
+    skills:S.skills, jd:S.jd, reqs:S.reqs, formalDegree:S.formalDegree,
+    savedAt:new Date().toISOString() }); }catch(e){}
+}
+async function restore(){
+  try{
+    const d = await DB.doc("state/current").get();
+    const v = d && (d.data || d);
+    if(v && v.picked && Object.keys(v.picked).length){
+      Object.assign(S,{profile:v.profile||S.profile,picked:v.picked,sections:v.sections||S.sections,
+        tagline:v.tagline||S.tagline,skills:v.skills||S.skills,jd:v.jd||null,reqs:v.reqs||[],
+        formalDegree:!!v.formalDegree});
+      syncHeader(); renderAll();
+    }
+  }catch(e){}
+}
+
+/* ---------- default selection so the page opens working, not empty ---------- */
+const QUOTA = {walmart:4,uprising:2,siemens:1,accenture:1,muse:1,aiprojects:1,coherent:1,
+               edu_berkeley:0,edu_illinois:0,community:0,misc:0};
+function autofill(){
+  const p = prof(); S.picked = {};
+  for(const e of B.experiences){
+    const n = QUOTA[e.id] ?? 0; if(!n) continue;
+    const pool = B.bullets.filter(b => b.experienceId===e.id && b.section==="bullet"
+      && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email"));
+    const score = b => (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
+      + b.archetypes.filter(a => p.archetypes.includes(a)).length*30 + Math.min(b.useCount,12)
+      + matchCount(b)*45;
+    const seen = new Set();
+    S.picked[e.id] = pool.slice().sort((a,b)=>score(b)-score(a))
+      .filter(b => { const v=b.verb.toLowerCase(); if(seen.has(v)) return false; seen.add(v); return true; })
+      .slice(0,n).map(b=>b.id);
+  }
+  S.tagline = p.tagline; S.skills = p.skills;
+}
+
+/* ---------- JD matching ---------- */
+function matchedReqs(b){
+  if(!S.reqs.length) return [];
+  const t = b.text.toLowerCase();
+  return S.reqs.filter(r => (r.keywords||[]).some(k => k && t.includes(String(k).toLowerCase())));
+}
+const matchCount = b => matchedReqs(b).length;
+
+/* ---------- format linter (resume-subskill.md) + aislop ---------- */
+function lint(){
+  const issues = [];
+  const rows = orderedPicks();
+  const verbs = {};
+  for(const {b,e} of rows){
+    const v = (b.verb||"").toLowerCase();
+    if(v){ (verbs[v] = verbs[v]||[]).push({b,e}); }
+    if(/—/.test(b.text)) issues.push({lvl:"bad",t:"Em dash inside a bullet",w:"Rule: use a semicolon. Em dash is only for the date line.",ref:b.text});
+    if(/\.\s*$/.test(b.text)) issues.push({lvl:"bad",t:"Bullet ends with a period",w:"No periods at the end of bullets.",ref:b.text});
+    if(/\s[+/]\s/.test(b.text)) issues.push({lvl:"bad",t:"“+” or “/” used as shorthand",w:"Reads informal. Use “and”.",ref:b.text});
+    if(b.estLines>2) issues.push({lvl:"bad",t:"Bullet runs over 2 lines",w:`~${b.chars} chars. Tighten until it fits 2 lines.`,ref:b.text});
+    if(!b.hasMetric) issues.push({lvl:"warn",t:"No number in this bullet",w:"Every bullet needs a measurable outcome or a proxy.",ref:b.text});
+    for(const f of b.flags){
+      if(f==="walmart-present") issues.push({lvl:"bad",t:"Present tense on Walmart",w:"The role ended in 2026 — use past tense.",ref:b.text});
+      if(f==="berkeley-email") issues.push({lvl:"bad",t:"Berkeley email present",w:"Always hbschlac@gmail.com.",ref:b.text});
+      if(f==="gmv-headline") issues.push({lvl:"warn",t:"GMV is leading the bullet",w:"The $400M+ charter is the stronger claim; GMV is supporting evidence.",ref:b.text});
+    }
+    for(const s of b.slop) issues.push({lvl:"warn",t:`aislop — ${s.category.replace(/-/g," ")}`,w:`“${s.hits[0]}”`,ref:b.text});
+  }
+  for(const [v,list] of Object.entries(verbs))
+    if(list.length>1) issues.push({lvl:"bad",t:`Repeated opening verb “${cap(v)}”`,
+      w:`Used ${list.length}× — ${list.map(x=>EXP[x.e].org.split(" ")[0]).join(", ")}. Every bullet must open differently.`});
+  const L = lineCount();
+  if(L>56) issues.push({lvl:"bad",t:`Over one page (~${L} lines)`,w:"Cut order: Accenture b2 → Education co-founded → longest BuyBox bullet → Uprising."});
+  else if(L<52) issues.push({lvl:"warn",t:`Under one page (~${L} lines)`,w:"Room left. Add back the Education co-founded bullet first."});
+  if(S.tagline.length>118) issues.push({lvl:"bad",t:"Tagline will wrap past one line",w:`${S.tagline.length} chars. Keep it on one line in the Doc.`});
+  return issues;
+}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+function orderedPicks(){
+  const out=[];
+  for(const sec of S.sections)
+    for(const e of B.experiences.filter(x=>x.section===sec).sort((a,b)=>a.order-b.order))
+      for(const id of (S.picked[e.id]||[])) if(byId[id]) out.push({b:byId[id],e:e.id});
+  return out;
+}
+function lineCount(){
+  let n = 6; // header block: name, contact, tagline, rule, spacing
+  for(const sec of S.sections){
+    const exps = B.experiences.filter(x=>x.section===sec && (S.picked[x.id]||[]).length);
+    if(!exps.length) continue;
+    n += 1;
+    for(const e of exps){
+      n += e.descriptor ? 2 : 1;
+      for(const id of S.picked[e.id]) n += (byId[id]?.estLines || 2);
+    }
+  }
+  return n + 2; // skills + interests
+}
+
+/* ---------- live score: rubric dims 2 (25) + 4 (15) ---------- */
+function liveScore(){
+  if(!S.reqs.length) return null;
+  const rows = orderedPicks(), text = rows.map(r=>r.b.text.toLowerCase()).join(" ");
+  const must = S.reqs.filter(r=>r.mustHave!==false);
+  let cov = 0;
+  for(const r of must){
+    const ks = (r.keywords||[]).map(k=>String(k).toLowerCase());
+    const hit = ks.some(k=>k && text.includes(k));
+    cov += hit ? 1 : 0;
+  }
+  const d2 = must.length ? (cov/must.length)*25 : 0;
+  const allk = [...new Set(S.reqs.flatMap(r=>(r.keywords||[]).map(k=>String(k).toLowerCase())))];
+  const present = allk.filter(k=>k && text.includes(k)).length;
+  const d4 = allk.length ? (present/allk.length)*15 : 0;
+  return Math.round(d2+d4);
+}
+
+/* ---------- render ---------- */
+function renderBank(){
+  const f = S.filters, host = $("#bank"); host.innerHTML = "";
+  let shown = 0;
+  for(const e of B.experiences){
+    let list = B.bullets.filter(b=>b.experienceId===e.id && b.section==="bullet");
+    if(f.q){ const q=f.q.toLowerCase(); list = list.filter(b=>b.text.toLowerCase().includes(q)); }
+    if(f.cur) list = list.filter(b=>b.current);
+    if(f.num) list = list.filter(b=>b.hasMetric);
+    if(f.clean) list = list.filter(b=>!b.slop.length);
+    if(f.match) list = list.filter(b=>matchCount(b)>0);
+    if(!list.length) continue;
+    list.sort((a,b)=> matchCount(b)-matchCount(a) || (b.current-a.current) || b.useCount-a.useCount);
+    shown += list.length;
+
+    const grp = document.createElement("div"); grp.className="grp";
+    const isOpen = S.open[e.id] ?? false;
+    const head = document.createElement("button");
+    head.className="grp-head"; head.setAttribute("aria-expanded", String(isOpen));
+    head.innerHTML = `<span class="caret">${isOpen?"▾":"▸"}</span>
+      <span class="org">${esc(e.org)}</span>
+      <span class="ct">${(S.picked[e.id]||[]).length} of ${list.length}</span>`;
+    head.onclick = ()=>{ S.open[e.id]=!isOpen; renderBank(); };
+    grp.appendChild(head);
+
+    if(isOpen){
+      const wrap = document.createElement("div"); wrap.className="blist";
+      for(const b of list) wrap.appendChild(bulletCard(b,e));
+      grp.appendChild(wrap);
+    }
+    host.appendChild(grp);
+  }
+  $("#bankct").textContent = `${shown} of ${B.bullets.filter(b=>b.section==="bullet").length} bullets`;
+  if(!shown) host.innerHTML = `<p class="empty">No bullets match these filters.</p>`;
+}
+
+function bulletCard(b,e){
+  const on = (S.picked[e.id]||[]).includes(b.id);
+  const blocking = b.flags.some(f=>f==="walmart-present"||f==="berkeley-email");
+  const el = document.createElement("div");
+  el.className = "bullet" + (on?" on":"") + (blocking?" hasblock":(b.slop.length?" hasslop":""));
+  el.tabIndex = 0; el.setAttribute("role","button"); el.setAttribute("aria-pressed",String(on));
+  const m = matchedReqs(b);
+  const tags = [];
+  if(on) tags.push(`<span class="tag cur">selected</span>`);
+  for(const r of m.slice(0,2)) tags.push(`<span class="tag match">covers: ${esc(r.label)}</span>`);
+  if(b.current) tags.push(`<span class="tag cur">in rotation</span>`);
+  for(const a of b.archetypes.slice(0,2)) tags.push(`<span class="tag">${esc(a)}</span>`);
+  if(!b.hasMetric) tags.push(`<span class="tag nonum">no number</span>`);
+  for(const s of b.slop.slice(0,2)) tags.push(`<span class="tag slop">${esc(s.category.replace(/-/g," "))}</span>`);
+  for(const fl of b.flags) tags.push(`<span class="tag ${fl==="gmv-headline"?"slop":"block"}">${esc(fl.replace(/-/g," "))}</span>`);
+  tags.push(`<span class="tag">${b.estLines} ln</span>`);
+  tags.push(`<span class="tag">used ${b.useCount}×</span>`);
+  if(b.source) tags.push(`<span class="tag">${esc(b.source)}</span>`);
+  el.innerHTML = `<div class="btext">${esc(b.text)}</div><div class="bmeta">${tags.join("")}</div>`;
+  const toggle = ()=>{
+    const arr = S.picked[e.id] = S.picked[e.id]||[];
+    const i = arr.indexOf(b.id);
+    if(i>=0) arr.splice(i,1); else arr.push(b.id);
+    renderAll(); persist();
+  };
+  el.onclick = toggle;
+  el.onkeydown = ev => { if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); toggle(); } };
+  return el;
+}
+
+function renderResume(){
+  const host = $("#resume"); host.innerHTML = "";
+  host.appendChild(headerBlock());
+  S.sections.forEach((sec,si)=>{
+    const exps = B.experiences.filter(x=>x.section===sec).sort((a,b)=>a.order-b.order);
+    const sc = document.createElement("div"); sc.className="sec";
+    const sh = document.createElement("div"); sh.className="sec-head";
+    sh.innerHTML = `<h3>${esc(sec)}</h3>`;
+    const up = document.createElement("button"); up.className="mini"; up.textContent="↑";
+    up.title="Move section up"; up.setAttribute("aria-label",`Move ${sec} up`);
+    up.disabled = si===0;
+    up.onclick = ()=>{ const a=S.sections; [a[si-1],a[si]]=[a[si],a[si-1]]; renderAll(); persist(); };
+    const dn = document.createElement("button"); dn.className="mini"; dn.textContent="↓";
+    dn.title="Move section down"; dn.setAttribute("aria-label",`Move ${sec} down`);
+    dn.disabled = si===S.sections.length-1;
+    dn.onclick = ()=>{ const a=S.sections; [a[si+1],a[si]]=[a[si],a[si+1]]; renderAll(); persist(); };
+    sh.append(up,dn); sc.appendChild(sh);
+
+    let any=false;
+    for(const e of exps){
+      const ids = S.picked[e.id]||[]; if(!ids.length) continue; any=true;
+      const ex = document.createElement("div"); ex.className="exp";
+      ex.innerHTML = `<div class="exp-title"><b>${esc(e.org)}</b>
+        ${roleOf(e)?`<span class="role">${esc(roleOf(e))}</span>`:""}
+        <span class="dates">${esc(e.dates)}</span></div>
+        ${e.descriptor?`<div class="desc">${esc(e.descriptor)}</div>`:""}`;
+      if(e.roleFormal){
+        const t = document.createElement("button");
+        t.className = "tog"; t.style.marginBottom = "6px";
+        t.setAttribute("aria-pressed", String(S.formalDegree));
+        t.textContent = S.formalDegree ? "Formal form — concentration shown" : "Resume form — concentration dropped for space";
+        t.title = "Marketing and Management are two separate BS degrees; Entrepreneurship is the concentration. Keep it for formal applications, drop it on the resume.";
+        t.onclick = () => { S.formalDegree = !S.formalDegree; renderAll(); persist(); };
+        ex.querySelector(".exp-title").insertAdjacentElement("afterend", t);
+      }
+      const pl = document.createElement("div"); pl.className="picked";
+      ids.forEach((id,i)=>{ const b=byId[id]; if(b) pl.appendChild(pickedRow(b,e,i)); });
+      ex.appendChild(pl); sc.appendChild(ex);
+    }
+    if(!any) sc.insertAdjacentHTML("beforeend",`<div class="exp"><p class="empty">Nothing selected for this section yet — click bullets in the bank.</p></div>`);
+    host.appendChild(sc);
+  });
+  host.appendChild(skillsBlock());
+  $("#lineChip").textContent = `~${lineCount()} lines`;
+}
+
+function headerBlock(){
+  const d = document.createElement("div"); d.className="sec";
+  d.innerHTML = `<div class="sec-head"><h3>Header</h3></div>
+    <div class="exp"><div class="exp-title"><b>${esc(B.header.name)}</b></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--ink-3);margin:2px 0 7px">${esc(B.header.contact)}</div></div>`;
+  const wrap = document.createElement("div"); wrap.className="exp"; wrap.style.borderTop="1px solid var(--line-soft)";
+  const lab = document.createElement("div"); lab.className="lbl";
+  lab.style.cssText="font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px";
+  lab.textContent = `Tagline — ${S.tagline.length} chars${S.tagline.length>118?" (will wrap)":""}`;
+  const ta = document.createElement("textarea");
+  ta.id="taglineInput"; ta.style.minHeight="52px"; ta.style.fontFamily="var(--serif)"; ta.value=S.tagline;
+  ta.oninput = ()=>{ S.tagline=ta.value; lab.textContent=`Tagline — ${ta.value.length} chars${ta.value.length>118?" (will wrap)":""}`;
+    renderChecks(); persist(); };
+  wrap.append(lab,ta); d.appendChild(wrap);
+  return d;
+}
+function skillsBlock(){
+  const d = document.createElement("div"); d.className="sec";
+  d.innerHTML = `<div class="sec-head"><h3>Skills &amp; interests</h3></div>`;
+  const w = document.createElement("div"); w.className="exp";
+  const ta = document.createElement("textarea"); ta.id="skillsInput";
+  ta.style.minHeight="60px"; ta.value=S.skills;
+  ta.oninput = ()=>{ S.skills=ta.value; persist(); };
+  w.innerHTML = `<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px">Skills — AI first, always</div>`;
+  w.appendChild(ta);
+  w.insertAdjacentHTML("beforeend",`<div class="desc" style="margin-top:8px">${esc(B.header.interests)}</div>`);
+  d.appendChild(w); return d;
+}
+
+function pickedRow(b,e,i){
+  const r = document.createElement("div"); r.className="pb"; r.draggable=true;
+  r.innerHTML = `<span class="h" aria-hidden="true">⠿</span><span class="t">${esc(b.text)}</span>`;
+  const x = document.createElement("button"); x.className="x"; x.textContent="✕";
+  x.setAttribute("aria-label","Remove bullet");
+  x.onclick = ev => { ev.stopPropagation(); S.picked[e.id].splice(i,1); renderAll(); persist(); };
+  r.appendChild(x);
+  r.ondragstart = ev => { ev.dataTransfer.setData("text/plain", JSON.stringify({e:e.id,i}));
+    ev.dataTransfer.effectAllowed="move"; r.classList.add("drag"); };
+  r.ondragend = ()=> r.classList.remove("drag");
+  r.ondragover = ev => { ev.preventDefault(); r.classList.add("over"); };
+  r.ondragleave = ()=> r.classList.remove("over");
+  r.ondrop = ev => {
+    ev.preventDefault(); r.classList.remove("over");
+    let d; try{ d = JSON.parse(ev.dataTransfer.getData("text/plain")); }catch(_){ return; }
+    if(d.e!==e.id) return;
+    const arr = S.picked[e.id], [m] = arr.splice(d.i,1); arr.splice(i,0,m);
+    renderAll(); persist();
+  };
+  return r;
+}
+
+function renderChecks(){
+  const host = $("#checks"), issues = lint(), L = lineCount();
+  const pct = Math.min(100, Math.round(L/56*100));
+  const cls = L>56 ? "over" : (L<52 ? "under" : "");
+  const bad = issues.filter(i=>i.lvl==="bad"), warn = issues.filter(i=>i.lvl==="warn");
+  host.innerHTML = `<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+      <h2 style="margin:0;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)">Checks</h2>
+      <span class="tag ${bad.length?'block':'match'}">${bad.length} blocking</span>
+      <span class="tag ${warn.length?'slop':''}">${warn.length} to review</span>
+      <span class="tag">~${L} lines · 1 page is 52–56</span>
+    </div>
+    <div class="meter"><i class="${cls}" style="width:${pct}%"></i></div>`;
+  if(!issues.length){ host.insertAdjacentHTML("beforeend",`<div class="ok">✓ Clean — every rule passes.</div>`); return; }
+  const seen = new Set();
+  for(const it of [...bad,...warn]){
+    const k = it.t+(it.ref||"");
+    if(seen.has(k)) continue; seen.add(k);
+    host.insertAdjacentHTML("beforeend",
+      `<div class="issue"><span class="dot ${it.lvl}"></span><div>
+        <b>${esc(it.t)}</b> <span class="why">${esc(it.w)}</span>
+        ${it.ref?`<div class="why" style="font-family:var(--serif);margin-top:2px">“${esc(it.ref.slice(0,105))}${it.ref.length>105?"…":""}”</div>`:""}
+      </div></div>`);
+  }
+}
+
+function renderAll(){ renderBank(); renderResume(); renderChecks(); syncScore(); }
+function syncScore(){
+  const s = liveScore();
+  $("#scoreN").textContent = s===null ? "—" : s;
+  $("#scoreD").textContent = s===null ? "add a JD" : "/40 live";
+}
+function syncHeader(){
+  $("#profSel").value = S.profile;
+  $("#jdLabel").textContent = S.jd ? `${S.jd.company||"JD"} — ${S.reqs.length} requirements` : "Add a job description";
+}
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- plain-text resume (download + swap list) ---------- */
+function asText(){
+  const L=[B.header.name, B.header.contact, "", S.tagline, "", "".padEnd(60,"_"), ""];
+  for(const sec of S.sections){
+    const exps = B.experiences.filter(x=>x.section===sec && (S.picked[x.id]||[]).length);
+    if(!exps.length) continue;
+    L.push(sec.toUpperCase(), "");
+    for(const e of exps){
+      L.push([e.org,roleOf(e),e.loc].filter(Boolean).join(" | ") + (e.dates?`\t${e.dates}`:""));
+      if(e.descriptor) L.push(e.descriptor);
+      for(const id of S.picked[e.id]) if(byId[id]) L.push("  ● " + byId[id].text);
+      L.push("");
+    }
+  }
+  L.push("Skills: "+S.skills, "Interests: "+B.header.interests);
+  return L.join("\n");
+}
+
+/* ---------- dialog helper ---------- */
+const dlg=$("#dlg");
+function openDlg(title, bodyHTML, footNodes){
+  $("#dlgTitle").textContent = title;
+  $("#dlgBody").innerHTML = bodyHTML;
+  const f=$("#dlgFoot"); f.innerHTML="";
+  (footNodes||[]).forEach(n=>f.appendChild(n));
+  if(!dlg.open) dlg.showModal();
+}
+function mkBtn(label, cls, fn){ const b=document.createElement("button"); b.className="btn"+(cls?" "+cls:""); b.textContent=label; b.onclick=fn; return b; }
+$("#dlgX").onclick = ()=>dlg.close();
+
+/* ---------- JD ingest ---------- */
+$("#jdBtn").onclick = ()=>{
+  openDlg("Job description", `
+    <div class="field"><label for="jdCo">Company</label><input id="jdCo" value="${esc(S.jd?.company||"")}" placeholder="Google"></div>
+    <div class="field"><label for="jdRole">Role</label><input id="jdRole" value="${esc(S.jd?.role||"")}" placeholder="Consumer Shopping PM"></div>
+    <div class="field"><label for="jdText">Paste the posting</label>
+      <textarea id="jdText" placeholder="Paste the full job description here…">${esc(S.jd?.text||"")}</textarea></div>
+    <p class="note"><b>Have a link instead?</b> A published page can't fetch URLs — its network is blocked.
+    Ask Claude in any session (phone included) to pull the posting with <code>job-fetch</code>; it writes the
+    parsed JD straight into this bench.</p>`,
+    [mkBtn("Cancel","",()=>dlg.close()), mkBtn("Analyze","primary",runJD)]);
+};
+async function runJD(){
+  const co=$("#jdCo").value.trim(), role=$("#jdRole").value.trim(), text=$("#jdText").value.trim();
+  if(!text){ alert("Paste the job description first."); return; }
+  S.jd = {company:co, role:role, text:text};
+  if(!SAMPLE){
+    S.reqs = []; syncHeader(); renderAll(); persist(); dlg.close();
+    alert("Saved the JD. Claude isn't available in this view, so requirement matching is off — the bank and the format checks still work.");
+    return;
+  }
+  openDlg("Reading the posting", `<p class="note">Pulling out the must-haves, the load-bearing vocabulary, and the closest base profile…</p><pre class="out" id="jdOut">Thinking…</pre>`, []);
+  try{
+    const data = await SAMPLE.json(
+      `You are reading a job posting to help tailor a resume. Reply with ONLY JSON:
+{"themes":["..."],"requirements":[{"label":"short name","keywords":["exact","nouns","from","the","posting"],"mustHave":true}],
+ "profile":"one of: ai-native|ecomm-marketplace|enterprise-b2b|platform-ml|ops-generalist|consumer-growth",
+ "profileWhy":"one sentence","seniority":"...","knockouts":["..."]}
+Rules: 8-14 requirements. keywords must be words that literally appear in the posting, lowercase, 1-3 words each.
+Prefer the posting's own load-bearing nouns over generic PM vocabulary.
+
+POSTING (${co} — ${role}):
+${text.slice(0,14000)}`, {modelTier:"default"});
+    S.reqs = (data.requirements||[]).filter(r=>r && r.label);
+    S.jd.themes = data.themes||[]; S.jd.knockouts = data.knockouts||[]; S.jd.profileWhy = data.profileWhy||"";
+    const rec = (data.profile||"").trim();
+    if(B.profiles.some(p=>p.id===rec)){ S.profile = rec; autofill(); }
+    syncHeader(); renderAll(); persist();
+    openDlg("What this posting asks for", `
+      <p class="note" style="margin-top:0"><b>Recommended base:</b> ${esc(prof().name)} — ${esc(S.jd.profileWhy)}<br>
+      Copies from <b>${esc(prof().baseName)}</b>. Bullets have been auto-filled; adjust freely.</p>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin:12px 0">
+        ${S.reqs.map(r=>`<span class="tag ${(B.bullets.some(b=>matchedReqs(b).includes(r)))?"match":"slop"}">${esc(r.label)}</span>`).join("")}
+      </div>
+      ${S.jd.knockouts?.length?`<p class="note"><b>Knockouts to check:</b> ${esc(S.jd.knockouts.join("; "))}</p>`:""}`,
+      [mkBtn("Done","primary",()=>dlg.close())]);
+  }catch(e){
+    $("#dlgBody").innerHTML = `<p class="note">Couldn't analyze the posting (${esc(e.code||"error")}). The JD is saved and everything else still works — try Analyze again in a moment.</p>`;
+    $("#dlgFoot").innerHTML=""; $("#dlgFoot").appendChild(mkBtn("Close","primary",()=>dlg.close()));
+    syncHeader(); renderAll(); persist();
+  }
+}
+
+/* ---------- final check ---------- */
+$("#checkBtn").onclick = async ()=>{
+  if(!SAMPLE){ alert("Claude isn't available in this view, so the scorecard can't run. The format and slop checks in the right pane still apply."); return; }
+  openDlg("Final check", `<pre class="out" id="fcOut">Running the recruiter-filter rubric, an aislop pass, and a spelling and formatting audit…</pre>`,
+    [mkBtn("Close","",()=>dlg.close())]);
+  const out = $("#fcOut");
+  try{
+    await SAMPLE(`You are the AI screening layer for an Ashby/Greenhouse recruiter, plus a copy editor.
+
+Score this resume 0-100 on exactly these six dimensions and show the per-dimension breakdown:
+1 Title & seniority match (20) 2 Must-have coverage (25) 3 Evidence & impact (20)
+4 Vocabulary alignment (15) 5 Recency & trajectory (10) 6 Parse & skim safety (10)
+Bands: 85-100 top of stack; 70-84 makes the pile; 55-69 buried; under 55 will not surface.
+
+Then, in this order and with these headings:
+KNOCKOUTS — anything that drops this before scoring, or "none found".
+WHAT THE AI REVIEW CITES — per must-have, the exact resume line it would cite, or "no evidence found".
+WHAT THE 6-SECOND SKIM RETAINS — read only the tagline and first two bullets; say what a recruiter walks away knowing.
+AISLOP — flag template phrasing, jargon without grounding, a missing "so what", or claims about third parties
+that aren't defensible. Format each as LINE / SLOP TYPE / WHY / REWRITE. Skip categories already clean.
+SPELLING & FORMATTING — typos, inconsistent tense, inconsistent symbols, repeated verbs.
+FIXES RANKED BY POINTS RECOVERED — each with the exact before → after line and the points it recovers.
+Close with: "62 → 84 if you do the top three" using the real numbers.
+
+Say plainly at the end that this score is uncalibrated — a model of the screen, not the screen itself.
+
+JOB (${S.jd?.company||"unspecified"} — ${S.jd?.role||""}):
+${(S.jd?.text||"No job description provided — score against a generic senior PM req and say so.").slice(0,9000)}
+
+RESUME:
+${asText()}`, {modelTier:"complex", onText:({text})=>{ out.textContent = text; }});
+  }catch(e){
+    out.textContent = (e.text? e.text+"\n\n":"") + `— interrupted (${e.code||"error"}). Nothing was changed.`;
+  }
+};
+
+/* ---------- approve & build ---------- */
+$("#buildBtn").onclick = ()=>{
+  const p = prof(), rows = orderedPicks();
+  const swaps = [
+    {label:"Tagline", to:S.tagline},
+    ...rows.map((r,i)=>({label:`${EXP[r.e].org} — bullet ${i+1}`, to:r.b.text})),
+    {label:"Skills line", to:S.skills},
+  ];
+  const issues = lint(), blocking = issues.filter(i=>i.lvl==="bad").length;
+  openDlg("Approve & build", `
+    ${blocking?`<p class="note" style="color:var(--bad)"><b>${blocking} blocking issue${blocking>1?"s":""}</b> still open in Checks. You can build anyway, but they'll ship into the Doc.</p>`:`<p class="note" style="color:var(--good)">✓ No blocking issues.</p>`}
+    <p class="note">Claude copies <b>${esc(p.baseName)}</b>, renames it
+    <b>${esc((S.jd?.company||"Company").replace(/\s+/g,""))}_CVResume-Hannah Schlacter</b>, then applies these
+    ${swaps.length} replacements one at a time with <code>match_case: true</code> — native formatting is preserved.</p>
+    ${swaps.map(s=>`<div class="swap"><div class="lbl">${esc(s.label)}</div><div class="to">${esc(s.to)}</div></div>`).join("")}`,
+    [mkBtn("Close","",()=>dlg.close()), mkBtn("Queue for Claude","primary", async ()=>{
+      const build = {company:S.jd?.company||"", role:S.jd?.role||"", profile:p.id, baseDoc:p.baseDoc,
+        baseName:p.baseName, tagline:S.tagline, skills:S.skills, sections:S.sections,
+        bullets:rows.map(r=>({experienceId:r.e, org:EXP[r.e].org, text:r.b.text, id:r.b.id})),
+        resumeText:asText(), blocking, queuedAt:new Date().toISOString(), status:"pending"};
+      S.lastBuild = build;
+      if(DB){
+        try{
+          await DB.doc("builds/pending").set(build);
+          openDlg("Queued", `<p class="note">Saved to this bench. In any Claude session — phone included — say
+            <b>“apply the pending resume build”</b>. Claude reads it from here, copies the base doc, applies every
+            swap, reads the doc back to verify, and reports any replacement that changed 0 or more than 1 occurrence.</p>`,
+            [mkBtn("Done","primary",()=>dlg.close())]);
+        }catch(err){
+          openDlg("Couldn't save", `<p class="note">Storage wasn't available, so nothing was queued. Copy the resume text instead:</p><pre class="out">${esc(asText())}</pre>`,
+            [mkBtn("Close","primary",()=>dlg.close())]);
+        }
+      } else {
+        openDlg("Storage unavailable", `<p class="note">This view can't save a build, so here is the full resume to hand to Claude directly:</p><pre class="out">${esc(asText())}</pre>`,
+          [mkBtn("Close","primary",()=>dlg.close())]);
+      }
+    })]);
+};
+
+/* ---------- publish link ---------- */
+const slugify = s => String(s||"").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+$("#pubBtn").onclick = ()=>{
+  const co = slugify(S.jd?.company), role = slugify(S.jd?.role);
+  const slug = ["resume",co,role].filter(Boolean).join("-") || "resume-untitled";
+  const reserved = slug === "resume";
+  openDlg("Publish link", `
+    <div class="field"><label for="slugIn">schlacter.me slug</label>
+      <input id="slugIn" value="${esc(slug)}"></div>
+    <p class="note" id="slugNote"></p>
+    <p class="note">On publish, Claude will:<br>
+      1. Set the Doc to <b>Anyone with the link → Viewer</b> and verify it reads
+         <code>{"role":"reader","type":"anyone"}</code> — without this every click hits a request-access screen.<br>
+      2. Open a PR on <b>hannah-portfolio</b> adding a <b>307</b> redirect in <code>next.config.ts</code> to the Doc's
+         <code>/preview</code> view — not <code>/edit</code>, so there's no editor chrome and the real layout survives.<br>
+      3. Confirm the Vercel deploy on <b>schlacter-me</b> is READY.</p>
+    <p class="note"><b>307, never 308.</b> A permanent redirect is cached hard by every browser that already
+      followed it, so repointing the slug later would silently fail for exactly the people who clicked it.</p>`,
+    [mkBtn("Close","",()=>dlg.close()), mkBtn("Queue link","primary", async ()=>{
+      const v = slugify($("#slugIn").value);
+      if(v==="resume"){ $("#slugNote").innerHTML = `<b style="color:var(--bad)">/resume is reserved for your general CV</b> — it's already out in outreach and must not be repointed. Pick another slug.`; return; }
+      if(DB){ try{ await DB.doc("slugs/"+v).set({slug:v, company:S.jd?.company||"", role:S.jd?.role||"",
+        baseName:prof().baseName, queuedAt:new Date().toISOString(), status:"pending"}); }catch(e){} }
+      openDlg("Link queued", `<p class="note">Ask Claude to <b>“publish the queued resume link”</b>. It'll land at:</p>
+        <pre class="out">schlacter.me/${esc(v)}</pre>
+        <p class="note">The sandbox proxy blocks schlacter.me, so Claude can confirm the deploy is READY but the final
+        click-test is yours — open it in a private window.</p>`,
+        [mkBtn("Done","primary",()=>dlg.close())]);
+    })]);
+  const note=$("#slugNote"), inp=$("#slugIn");
+  const upd = ()=>{ const v=slugify(inp.value);
+    note.innerHTML = v==="resume"
+      ? `<b style="color:var(--bad)">/resume is reserved</b> for your general CV — pick another.`
+      : `Will resolve to <code>schlacter.me/${esc(v)}</code>`; };
+  inp.oninput = upd; upd();
+  if(reserved) note.innerHTML = `<b style="color:var(--bad)">/resume is reserved</b> — add a company or role.`;
+};
+
+/* ---------- download ---------- */
+$("#dlBtn").onclick = async ()=>{
+  const name = `resume-${slugify(S.jd?.company)||"draft"}.txt`;
+  const text = asText();
+  if(DL){
+    try{ await DL.save({filename:name, data:text}); return; }catch(e){}
+  }
+  openDlg("Resume text", `<p class="note">Saving a file isn't available in this view — here's the full resume to copy.</p><pre class="out">${esc(text)}</pre>`,
+    [mkBtn("Copy","primary", async()=>{ try{ await navigator.clipboard.writeText(text); }catch(e){} dlg.close(); })]);
+};
+
+/* ---------- wiring ---------- */
+$("#profSel").innerHTML = B.profiles.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+$("#profSel").onchange = e => { S.profile=e.target.value; autofill(); renderAll(); persist(); };
+$("#autoBtn").onclick = ()=>{ autofill(); renderAll(); persist(); };
+$("#q").oninput = e => { S.filters.q=e.target.value; renderBank(); };
+for(const [id,key] of [["#fCur","cur"],["#fNum","num"],["#fClean","clean"],["#fMatch","match"]]){
+  $(id).onclick = ()=>{ S.filters[key]=!S.filters[key]; $(id).setAttribute("aria-pressed",String(S.filters[key])); renderBank(); };
+}
+document.querySelectorAll(".tabbar button").forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll(".tabbar button").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+    $("#pane-bank").classList.toggle("show", t.dataset.tab==="bank");
+    $("#pane-resume").classList.toggle("show", t.dataset.tab==="resume");
+  };
+});
+
+autofill(); syncHeader(); renderAll();
+})();
+</script>
