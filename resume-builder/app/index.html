@@ -88,25 +88,6 @@ main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,
 .grp-head .ct{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .grp-head .caret{color:var(--ink-3);font-size:10px;width:10px}
 .blist{display:flex;flex-direction:column;gap:5px;margin-top:5px}
-.story{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:7px;
-  background:var(--surface);overflow:hidden}
-.story.on{border-left-color:var(--accent);background:var(--accent-soft)}
-.story-main{display:block;width:100%;text-align:left;border:0;background:none;cursor:pointer;
-  padding:9px 11px;display:flex;flex-direction:column;gap:6px;font:inherit;color:inherit}
-.story-main:hover{background:var(--accent-soft)}
-.story-title{font-weight:600;font-size:12.5px;line-height:1.35;display:flex;gap:7px;align-items:baseline}
-.story-title .dot{color:var(--ink-3);font-size:11px;flex:0 0 auto}
-.story.on .story-title .dot{color:var(--accent)}
-.story-pick{font-family:var(--serif);font-size:14px;line-height:1.45;color:var(--ink-2)}
-.story.on .story-pick{color:var(--ink)}
-.story-foot{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.vbar{width:100%;border:0;border-top:1px solid var(--line);background:none;cursor:pointer;
-  font-family:var(--mono);font-size:10px;letter-spacing:.03em;color:var(--ink-3);
-  padding:5px 11px;text-align:left}
-.vbar:hover{color:var(--accent);background:var(--accent-soft)}
-.vlist{display:flex;flex-direction:column;gap:4px;padding:6px 8px 8px;border-top:1px solid var(--line);
-  background:var(--paper)}
-.vgist{padding:0 11px 8px;font-size:11.5px;line-height:1.5;color:var(--ink-3)}
 
 .bullet{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:7px;background:var(--surface);
   padding:9px 11px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border-color .12s,background .12s}
@@ -123,6 +104,36 @@ main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,
 .tag.block{background:var(--bad-soft);color:var(--bad);border-color:transparent;font-weight:600}
 .tag.cur{background:var(--accent-soft);color:var(--accent);border-color:transparent;font-weight:600}
 .tag.nonum{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+
+/* ---------- stories ---------- */
+.modes{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.modes button{border:0;background:var(--surface);padding:4px 10px;font-size:11.5px;color:var(--ink-2)}
+.modes button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+.baseline{border:1px solid var(--accent-line);background:var(--surface);border-radius:9px;padding:12px 14px;margin-bottom:16px}
+.baseline h3{margin:0 0 2px;font-size:13px;font-weight:700}
+.baseline p.sub{margin:0 0 9px;font-size:12px;color:var(--ink-3)}
+.bl-row{display:flex;gap:9px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--line-soft);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+.bl-row:hover .bl-t{color:var(--accent)}
+.bl-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);width:14px;flex:none;padding-top:2px}
+.bl-t{flex:1 1 auto;font-family:var(--serif);font-size:14px;line-height:1.4}
+.bl-s{flex:none;font-family:var(--mono);font-size:9.5px;padding:2px 6px;border-radius:4px;margin-top:2px}
+.bl-s.on{background:var(--good-soft);color:var(--good)} .bl-s.off{background:var(--sunk);color:var(--ink-3)}
+.story{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px;margin-top:6px}
+.story.on{border-left-color:var(--good)}
+.story.core{border-left-color:var(--accent)}
+.story.core.on{border-left-color:var(--good)}
+.st-top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.st-title{font-weight:600;font-size:13.5px;flex:1 1 220px}
+.st-take{font-family:var(--serif);font-size:14px;line-height:1.45;color:var(--ink-2);margin:3px 0 7px}
+.st-proof{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.proof{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.drift{font-size:11.5px;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:5px 8px;margin:4px 0 7px;line-height:1.45}
+.st-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.linkbtn{border:0;background:none;padding:2px 0;font-size:12px;color:var(--accent);font-weight:500}
+.linkbtn:hover{text-decoration:underline}
+.st-vars{display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.st-vars .bullet{padding:7px 9px}
+.st-vars .btext{font-size:13.5px}
 
 /* ---------- resume ---------- */
 .sec{margin-bottom:14px;border:1px solid var(--line);border-radius:9px;background:var(--surface);overflow:hidden}
@@ -216,9 +227,13 @@ pre.out{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;line-heigh
 <main>
   <section class="pane show" id="pane-bank">
     <div class="pane-head">
-      <h2>Bullet bank</h2>
+      <h2>Story bank</h2>
+      <div class="modes" role="group" aria-label="Bank view">
+        <button id="mStories" aria-pressed="true">Stories</button>
+        <button id="mAll" aria-pressed="false">Every phrasing</button>
+      </div>
       <div class="filters">
-        <input type="search" id="q" placeholder="Search every wording…" aria-label="Search bullets">
+        <input type="search" id="q" placeholder="Search phrasings…" aria-label="Search phrasings">
         <button class="tog" id="fCur" aria-pressed="false">Current only</button>
         <button class="tog" id="fNum" aria-pressed="false">Has number</button>
         <button class="tog" id="fClean" aria-pressed="false">Slop-free</button>
@@ -255,20 +270,12 @@ pre.out{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;line-heigh
 const B = window.BANK, $ = s => document.querySelector(s);
 const EXP = Object.fromEntries(B.experiences.map(e => [e.id, e]));
 const byId = Object.fromEntries(B.bullets.map(b => [b.id, b]));
-/* The bank is browsed by STORY, not by wording. 994 strings are ~60 real accomplishments;
-   showing all 994 was the thing that made this unusable. A story is the unit of selection,
-   the wording underneath is the interchangeable part. */
-const STORY = Object.fromEntries((B.stories||[]).map(s => [s.id, s]));
-const VARIANTS = {};
-for(const b of B.bullets){ (VARIANTS[b.storyId] = VARIANTS[b.storyId] || []).push(b); }
-const storiesOf = eid => (B.stories||[]).filter(s => s.experienceId === eid
-  && (VARIANTS[s.id]||[]).some(b => b.section === "bullet"));
 
 const S = {
   profile: B.profiles[0].id, jd: null, reqs: [], picked: {},
   sections: B.sectionOrder.slice(), tagline: B.profiles[0].tagline,
   skills: B.profiles[0].skills, filters:{q:"",cur:false,num:false,clean:false,match:false},
-  open: {walmart:true}, openStory: {}, lastBuild: null,
+  open: {walmart:true}, lastBuild: null, mode: "stories", openStory: {}, showAll: {},
   // Marketing and Management are two separate BS degrees; Entrepreneurship is the
   // concentration. Resume drops it for space, formal applications keep it.
   formalDegree: false
@@ -302,66 +309,75 @@ async function restore(){
   }catch(e){}
 }
 
+/* ---------- stories: each role tells a few stories; bullets are phrasings of them ---------- */
+const STORIES = B.stories || [];
+const STORY = Object.fromEntries(STORIES.map(s=>[s.id,s]));
+const BASE = B.baseline || [];
+const CORE = new Set(BASE.map(x=>x.storyId));
+const storiesOf = eid => STORIES.filter(s=>s.experienceId===eid);
+const phrasings = sid => B.bullets.filter(b=>b.section==="bullet" && b.storyId===sid);
+const pickedStory = sid => { const s=STORY[sid]; return s ? (S.picked[s.experienceId]||[]).find(id=>byId[id]?.storyId===sid) : undefined; };
+function phraseScore(b){
+  const p = prof();
+  return (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
+    + b.archetypes.filter(a => p.archetypes.includes(a)).length*30 + Math.min(b.useCount,12)
+    + matchCount(b)*45 - (/—/.test(b.text)?30:0)
+    // A bullet over 2 lines breaks the format rule, so it must never be the default
+    // pick. She can still choose it deliberately from the phrasings list.
+    - (b.estLines>2?150:0)
+    - (b.flags.some(f=>f==="walmart-present"||f==="berkeley-email")?500:0);
+}
+const bestOf = sid => phrasings(sid).sort((a,b)=>phraseScore(b)-phraseScore(a))[0];
+function useStory(sid, bid){
+  const s = STORY[sid], arr = S.picked[s.experienceId] = S.picked[s.experienceId]||[];
+  const cur = arr.findIndex(id=>byId[id]?.storyId===sid);
+  const id = bid || bestOf(sid)?.id; if(!id) return;
+  if(cur>=0) arr[cur]=id; else arr.push(id);
+}
+function dropStory(sid){
+  const s = STORY[sid], arr = S.picked[s.experienceId]||[];
+  S.picked[s.experienceId] = arr.filter(id=>byId[id]?.storyId!==sid);
+}
+
 /* ---------- default selection so the page opens working, not empty ---------- */
 const QUOTA = {walmart:4,uprising:2,siemens:1,accenture:1,muse:1,aiprojects:1,coherent:1,
                edu_berkeley:0,edu_illinois:0,community:0,misc:0};
-/* Score a single wording. Used both to rank stories (via their best wording) and to pick
-   which wording of a chosen story goes on the page. */
-function scoreBullet(b, p){
-  return (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
-    + b.archetypes.filter(a => p.archetypes.includes(a)).length*30
-    + Math.min(b.useCount,12) + matchCount(b)*45
-    // A bullet over 2 lines breaks the format rule, so never let one be the default pick.
-    // She can still choose it deliberately from the wordings list.
-    - (b.estLines > 2 ? 120 : 0);
-}
-const usable = b => b.section==="bullet"
-  && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email");
-/* Best wording of a story for the current profile + JD. This is what "pick the story" means. */
-function bestVariant(sid, p){
-  const pool = (VARIANTS[sid]||[]).filter(usable);
-  if(!pool.length) return null;
-  return pool.reduce((a,b)=> scoreBullet(b,p) > scoreBullet(a,p) ? b : a);
-}
 function autofill(){
   const p = prof(); S.picked = {};
-  // Opening verbs must be unique across the WHOLE page, not just within one job.
+  // One bullet per story, strongest stories first. Opening verbs must be unique across the
+  // WHOLE page, not just within one role -- the rule is about the resume, not the section.
   const verbs = new Set();
-  const pool = {};
+  const ranked = {};
   for(const e of B.experiences){
-    // One wording per story, and never two tellings of the same accomplishment.
-    pool[e.id] = storiesOf(e.id).map(st => bestVariant(st.id, p)).filter(Boolean)
-      .sort((a,b)=> scoreBullet(b,p)-scoreBullet(a,p));
+    ranked[e.id] = storiesOf(e.id)
+      .map(s => ({s, best: phrasings(s.id).slice().sort((a,b)=>phraseScore(b)-phraseScore(a))}))
+      .filter(x => x.best.length)
+      .sort((a,b)=> phraseScore(b.best[0]) - phraseScore(a.best[0]));
     S.picked[e.id] = [];
   }
   const take = (eid, n) => {
-    for(const b of pool[eid]){
+    for(const {s,best} of ranked[eid]){
       if(S.picked[eid].length >= n) break;
-      const v = (b.verb||"").toLowerCase();
-      if(v && verbs.has(v)) continue;
-      if(S.picked[eid].includes(b.id)) continue;
-      verbs.add(v); S.picked[eid].push(b.id);
+      if(pickedStory(s.id)) continue;
+      const pick = best.find(b => !verbs.has((b.verb||"").toLowerCase()));
+      if(pick){ verbs.add((pick.verb||"").toLowerCase()); S.picked[eid].push(pick.id); }
     }
   };
   for(const e of B.experiences) take(e.id, QUOTA[e.id] ?? 0);
-  // Fill the rest of the page rather than handing her a half-empty one. 52-56 lines is the
-  // documented one-page window; stop the moment another bullet would push past it.
+  // Then fill the rest of the page rather than handing her a half-empty one. 52-56 lines is
+  // the documented one-page window; stop the moment another bullet would push past it.
   for(let guard=0; guard<12 && lineCount() < 52; guard++){
     const before = JSON.stringify(S.picked);
     for(const e of B.experiences){
       if(!(QUOTA[e.id] ?? 0)) continue;
       if(lineCount() >= 52) break;
-      const n = S.picked[e.id].length + 1;
-      take(e.id, n);
+      take(e.id, S.picked[e.id].length + 1);
       if(lineCount() > 56){ S.picked[e.id].pop(); break; }
     }
     if(JSON.stringify(S.picked) === before) break;   // nothing left to add
   }
   S.tagline = p.tagline; S.skills = p.skills;
 }
-/* Which story (if any) is currently on the page for this experience. */
-const pickedStory = (eid, sid) => (S.picked[eid]||[]).some(id => byId[id]?.storyId === sid);
-const pickedVariantOf = (eid, sid) => (S.picked[eid]||[]).find(id => byId[id]?.storyId === sid);
 
 /* ---------- JD matching ---------- */
 function matchedReqs(b){
@@ -391,12 +407,11 @@ function lint(){
     }
     for(const s of b.slop) issues.push({lvl:"warn",t:`aislop — ${s.category.replace(/-/g," ")}`,w:`“${s.hits[0]}”`,ref:b.text});
   }
-  const told = {};
-  for(const {b,e} of rows){ (told[b.storyId] = told[b.storyId]||[]).push(e); }
-  for(const [sid,list] of Object.entries(told))
-    if(list.length>1) issues.push({lvl:"bad",t:"Same story told twice",
-      w:`"${STORY[sid]?.title||sid}" is on the page ${list.length}× in different words. `
-        +"Keep the strongest wording and cut the rest."});
+  const bySt = {};
+  for(const {b} of rows) if(b.storyId) (bySt[b.storyId]=bySt[b.storyId]||[]).push(b);
+  for(const [sid,list] of Object.entries(bySt))
+    if(list.length>1) issues.push({lvl:"bad",t:`Same story told twice: “${STORY[sid]?.title||sid}”`,
+      w:`${list.length} bullets are phrasings of one story. Keep one and use the space for another story.`});
   for(const [v,list] of Object.entries(verbs))
     if(list.length>1) issues.push({lvl:"bad",t:`Repeated opening verb “${cap(v)}”`,
       w:`Used ${list.length}× — ${list.map(x=>EXP[x.e].org.split(" ")[0]).join(", ")}. Every bullet must open differently.`});
@@ -447,115 +462,141 @@ function liveScore(){
 }
 
 /* ---------- render ---------- */
-function renderBank(){
-  const f = S.filters, host = $("#bank"); host.innerHTML = "";
-  const p = prof();
-  let shownStories = 0, shownVariants = 0;
-  const matchesFilters = b => {
-    if(b.section!=="bullet") return false;
-    if(f.q && !b.text.toLowerCase().includes(f.q.toLowerCase())) return false;
-    if(f.cur && !b.current) return false;
-    if(f.num && !b.hasMetric) return false;
-    if(f.clean && b.slop.length) return false;
-    if(f.match && !matchCount(b)) return false;
-    return true;
-  };
+const filtered = list => { const f=S.filters; let l=list;
+  if(f.q){ const q=f.q.toLowerCase(); l = l.filter(b=>b.text.toLowerCase().includes(q)); }
+  if(f.cur) l = l.filter(b=>b.current);
+  if(f.num) l = l.filter(b=>b.hasMetric);
+  if(f.clean) l = l.filter(b=>!b.slop.length);
+  if(f.match) l = l.filter(b=>matchCount(b)>0);
+  return l; };
+const anyFilter = () => { const f=S.filters; return !!(f.q||f.cur||f.num||f.clean||f.match); };
+const totalPhr = B.bullets.filter(b=>b.section==="bullet").length;
+// Named stories only -- the per-experience "-other" buckets are a holding pen, not a story.
+const namedStories = STORIES.filter(s=>!s.id.endsWith("-other")
+  && B.bullets.some(b=>b.storyId===s.id && b.section==="bullet")).length;
 
+function renderStories(){
+  const host = $("#bank"); host.innerHTML = "";
+  // 1. The baseline story
+  const bl = document.createElement("div"); bl.className="baseline";
+  const covered = BASE.filter(x=>pickedStory(x.storyId)).length;
+  bl.innerHTML = `<h3>The baseline story</h3>
+    <p class="sub">The ${BASE.length} things every version of your resume should say. The ${totalPhr} bullets below are
+    ${totalPhr} ways of wording ${namedStories} things that actually happened.
+    <b>${covered} of ${BASE.length}</b> are on this resume.</p>`;
+  BASE.forEach((x,i)=>{
+    const on = !!pickedStory(x.storyId), s = STORY[x.storyId];
+    const r = document.createElement("button"); r.className="bl-row";
+    r.innerHTML = `<span class="bl-n">${i+1}</span><span class="bl-t">${esc(x.line)}</span>
+      <span class="bl-s ${on?"on":"off"}">${on?"✓ on resume":"not used"}</span>`;
+    r.title = "Jump to this story";
+    r.onclick = ()=>{ S.open[s.experienceId]=true; S.openStory[s.id]=true; renderBank();
+      document.getElementById("st-"+s.id)?.scrollIntoView({behavior:"smooth",block:"center"}); };
+    bl.appendChild(r);
+  });
+  host.appendChild(bl);
+
+  // 2. Stories per role
+  let shownStories = 0;
   for(const e of B.experiences){
-    // A story survives the filters if any of its wordings does.
-    const sts = storiesOf(e.id)
-      .map(st => ({st, vars:(VARIANTS[st.id]||[]).filter(matchesFilters)}))
-      .filter(x => x.vars.length);
+    const sts = storiesOf(e.id).map(s=>({s, list:filtered(phrasings(s.id))})).filter(x=>x.list.length);
     if(!sts.length) continue;
-    for(const x of sts){
-      x.vars.sort((a,b)=> matchCount(b)-matchCount(a) || (b.current-a.current)
-        || (a.slop.length-b.slop.length) || b.useCount-a.useCount);
-      x.best = x.vars[0];
-    }
-    sts.sort((a,b)=> (pickedStory(e.id,b.st.id)-pickedStory(e.id,a.st.id))
-      || matchCount(b.best)-matchCount(a.best) || b.st.useCount-a.st.useCount);
     shownStories += sts.length;
-    shownVariants += sts.reduce((n,x)=>n+x.vars.length,0);
-
     const grp = document.createElement("div"); grp.className="grp";
-    const isOpen = S.open[e.id] ?? false;
-    const nPicked = (S.picked[e.id]||[]).length;
+    const isOpen = anyFilter() ? true : (S.open[e.id] ?? false);
+    const onCount = sts.filter(x=>pickedStory(x.s.id)).length;
+    const nPhr = sts.reduce((a,x)=>a+x.list.length,0);
     const head = document.createElement("button");
     head.className="grp-head"; head.setAttribute("aria-expanded", String(isOpen));
     head.innerHTML = `<span class="caret">${isOpen?"▾":"▸"}</span>
       <span class="org">${esc(e.org)}</span>
-      <span class="ct">${nPicked} of ${sts.length} stories</span>`;
+      <span class="ct">${sts.length} ${sts.length===1?"story":"stories"} · ${onCount} used · ${nPhr} phrasings</span>`;
+    head.onclick = ()=>{ S.open[e.id]=!isOpen; renderBank(); };
+    grp.appendChild(head);
+    if(isOpen) for(const {s,list} of sts) grp.appendChild(storyCard(s,list,e));
+    host.appendChild(grp);
+  }
+  $("#bankct").textContent = `${BASE.length} core stories · ${namedStories} total · ${totalPhr} phrasings`;
+  if(!shownStories) host.insertAdjacentHTML("beforeend",`<p class="empty">No phrasings match these filters.</p>`);
+}
+
+function storyCard(s,list,e){
+  const onId = pickedStory(s.id), core = CORE.has(s.id);
+  const el = document.createElement("div");
+  el.className = "story" + (onId?" on":"") + (core?" core":""); el.id = "st-"+s.id;
+  const best = list.slice().sort((a,b)=>phraseScore(b)-phraseScore(a));
+  const open = !!S.openStory[s.id] || (anyFilter() && !!S.filters.q);
+  el.innerHTML = `<div class="st-top"><span class="st-title">${esc(s.title)}</span>
+      ${core?`<span class="tag cur">core</span>`:""}
+      ${onId?`<span class="tag match">on resume</span>`:""}</div>
+    <div class="st-take">${esc(s.takeaway)}</div>
+    ${s.proof.length?`<div class="st-proof">${s.proof.map(p=>`<span class="proof">${esc(p)}</span>`).join("")}</div>`:""}
+    ${s.drift?`<div class="drift"><b>Numbers or names drift across versions.</b> ${esc(s.drift)}</div>`:""}`;
+  const act = document.createElement("div"); act.className="st-act";
+  if(onId){
+    act.append(mkBtn("Remove from resume","",()=>{ dropStory(s.id); renderAll(); persist(); }));
+  } else {
+    act.append(mkBtn("Use best phrasing","primary",()=>{ useStory(s.id, best[0]?.id); renderAll(); persist(); }));
+  }
+  const tg = document.createElement("button"); tg.className="linkbtn";
+  tg.textContent = open ? "Hide phrasings" : `See ${list.length} phrasing${list.length>1?"s":""}`;
+  tg.setAttribute("aria-expanded", String(open));
+  tg.onclick = ()=>{ S.openStory[s.id]=!open; renderBank(); };
+  act.append(tg);
+  el.appendChild(act);
+  if(open){
+    const wrap = document.createElement("div"); wrap.className="st-vars";
+    const lim = S.showAll[s.id] ? best.length : Math.min(best.length, 5);
+    best.slice(0,lim).forEach(b=>wrap.appendChild(bulletCard(b,e,true)));
+    if(best.length>lim){
+      const more = document.createElement("button"); more.className="linkbtn";
+      more.textContent = `Show all ${best.length}`;
+      more.onclick = ()=>{ S.showAll[s.id]=true; renderBank(); };
+      wrap.appendChild(more);
+    }
+    wrap.insertAdjacentHTML("afterbegin",`<p class="note" style="margin:0 0 3px">Ranked best first. Click one to use it for this story. It replaces the current one.</p>`);
+    el.appendChild(wrap);
+  }
+  return el;
+}
+
+function renderBank(){
+  if(S.mode==="stories") return renderStories();
+  const f = S.filters, host = $("#bank"); host.innerHTML = "";
+  let shown = 0;
+  for(const e of B.experiences){
+    let list = B.bullets.filter(b=>b.experienceId===e.id && b.section==="bullet");
+    if(f.q){ const q=f.q.toLowerCase(); list = list.filter(b=>b.text.toLowerCase().includes(q)); }
+    if(f.cur) list = list.filter(b=>b.current);
+    if(f.num) list = list.filter(b=>b.hasMetric);
+    if(f.clean) list = list.filter(b=>!b.slop.length);
+    if(f.match) list = list.filter(b=>matchCount(b)>0);
+    if(!list.length) continue;
+    list.sort((a,b)=> matchCount(b)-matchCount(a) || (b.current-a.current) || b.useCount-a.useCount);
+    shown += list.length;
+
+    const grp = document.createElement("div"); grp.className="grp";
+    const isOpen = S.open[e.id] ?? false;
+    const head = document.createElement("button");
+    head.className="grp-head"; head.setAttribute("aria-expanded", String(isOpen));
+    head.innerHTML = `<span class="caret">${isOpen?"▾":"▸"}</span>
+      <span class="org">${esc(e.org)}</span>
+      <span class="ct">${(S.picked[e.id]||[]).length} of ${list.length}</span>`;
     head.onclick = ()=>{ S.open[e.id]=!isOpen; renderBank(); };
     grp.appendChild(head);
 
     if(isOpen){
       const wrap = document.createElement("div"); wrap.className="blist";
-      for(const x of sts) wrap.appendChild(storyCard(x.st, x.vars, x.best, e, p));
+      for(const b of list) wrap.appendChild(bulletCard(b,e));
       grp.appendChild(wrap);
     }
     host.appendChild(grp);
   }
-  const totalStories = (B.stories||[]).length;
-  $("#bankct").textContent = `${shownStories} of ${totalStories} stories · ${shownVariants} wordings`;
-  if(!shownStories) host.innerHTML = `<p class="empty">Nothing matches these filters.</p>`;
+  $("#bankct").textContent = `${shown} of ${totalPhr} phrasings`;
+  if(!shown) host.innerHTML = `<p class="empty">No bullets match these filters.</p>`;
 }
 
-/* One real accomplishment. Collapsed it shows the wording that fits this JD best; expanded it
-   shows every wording she has ever used for it. Selecting is per STORY -- picking a second
-   wording of the same story swaps it rather than adding a duplicate. */
-function storyCard(st, vars, best, e, p){
-  const on = pickedStory(e.id, st.id);
-  const shownId = pickedVariantOf(e.id, st.id) || best.id;
-  const shown = byId[shownId] || best;
-  const expanded = !!S.openStory[st.id];
-
-  const el = document.createElement("div");
-  el.className = "story" + (on?" on":"");
-
-  const main = document.createElement("button");
-  main.className = "story-main";
-  main.setAttribute("aria-pressed", String(on));
-  const m = matchedReqs(shown);
-  const tags = [];
-  for(const r of m.slice(0,2)) tags.push(`<span class="tag match">covers: ${esc(r.label)}</span>`);
-  if(st.current) tags.push(`<span class="tag cur">${st.current} in rotation</span>`);
-  for(const mt of (st.metrics||[]).slice(0,3)) tags.push(`<span class="tag">${esc(mt)}</span>`);
-  for(const a of (st.archetypes||[]).slice(0,2)) tags.push(`<span class="tag">${esc(a)}</span>`);
-  if(!shown.hasMetric) tags.push(`<span class="tag nonum">no number</span>`);
-  for(const sl of shown.slop.slice(0,1)) tags.push(`<span class="tag slop">${esc(sl.category.replace(/-/g," "))}</span>`);
-  for(const fl of shown.flags) tags.push(`<span class="tag ${fl==="gmv-headline"?"slop":"block"}">${esc(fl.replace(/-/g," "))}</span>`);
-  main.innerHTML = `<div class="story-title"><span class="dot">${on?"●":"○"}</span><span>${esc(st.title)}</span></div>
-    <div class="story-pick">${esc(shown.text)}</div>
-    <div class="story-foot">${tags.join("")}</div>`;
-  const toggle = ()=>{
-    const arr = S.picked[e.id] = S.picked[e.id]||[];
-    const cur = pickedVariantOf(e.id, st.id);
-    if(cur) arr.splice(arr.indexOf(cur),1); else arr.push(shownId);
-    renderAll(); persist();
-  };
-  main.onclick = toggle;
-  el.appendChild(main);
-
-  const bar = document.createElement("button");
-  bar.className = "vbar";
-  bar.setAttribute("aria-expanded", String(expanded));
-  const clean = vars.filter(v=>!v.slop.length).length;
-  bar.textContent = `${expanded?"▾":"▸"} ${vars.length} wording${vars.length===1?"":"s"}`
-    + `  ·  ${clean} slop-free  ·  used ${st.useCount}×`;
-  bar.onclick = ()=>{ S.openStory[st.id]=!expanded; renderBank(); };
-  el.appendChild(bar);
-
-  if(expanded){
-    if(st.gist){ const g=document.createElement("div"); g.className="vgist"; g.textContent=st.gist; el.appendChild(g); }
-    const vl = document.createElement("div"); vl.className="vlist";
-    for(const b of vars) vl.appendChild(bulletCard(b,e,st));
-    el.appendChild(vl);
-  }
-  return el;
-}
-
-/* One wording. Clicking it selects this story WITH this wording -- swapping, never stacking. */
-function bulletCard(b,e,st){
+function bulletCard(b,e,inStory){
   const on = (S.picked[e.id]||[]).includes(b.id);
   const blocking = b.flags.some(f=>f==="walmart-present"||f==="berkeley-email");
   const el = document.createElement("div");
@@ -563,23 +604,23 @@ function bulletCard(b,e,st){
   el.tabIndex = 0; el.setAttribute("role","button"); el.setAttribute("aria-pressed",String(on));
   const m = matchedReqs(b);
   const tags = [];
-  if(on) tags.push(`<span class="tag cur">on the page</span>`);
+  if(on) tags.push(`<span class="tag cur">selected</span>`);
   for(const r of m.slice(0,2)) tags.push(`<span class="tag match">covers: ${esc(r.label)}</span>`);
   if(b.current) tags.push(`<span class="tag cur">in rotation</span>`);
+  for(const a of b.archetypes.slice(0,2)) tags.push(`<span class="tag">${esc(a)}</span>`);
   if(!b.hasMetric) tags.push(`<span class="tag nonum">no number</span>`);
-  for(const sl of b.slop.slice(0,2)) tags.push(`<span class="tag slop">${esc(sl.category.replace(/-/g," "))}</span>`);
+  for(const s of b.slop.slice(0,2)) tags.push(`<span class="tag slop">${esc(s.category.replace(/-/g," "))}</span>`);
   for(const fl of b.flags) tags.push(`<span class="tag ${fl==="gmv-headline"?"slop":"block"}">${esc(fl.replace(/-/g," "))}</span>`);
   tags.push(`<span class="tag">${b.estLines} ln</span>`);
   tags.push(`<span class="tag">used ${b.useCount}×</span>`);
   if(b.source) tags.push(`<span class="tag">${esc(b.source)}</span>`);
+  if(!inStory && b.storyId && STORY[b.storyId]) tags.unshift(`<span class="tag cur">${esc(STORY[b.storyId].title)}</span>`);
   el.innerHTML = `<div class="btext">${esc(b.text)}</div><div class="bmeta">${tags.join("")}</div>`;
   const toggle = ()=>{
+    if(inStory && b.storyId){ if(on) dropStory(b.storyId); else useStory(b.storyId, b.id); renderAll(); persist(); return; }
     const arr = S.picked[e.id] = S.picked[e.id]||[];
-    const sid = st ? st.id : b.storyId;
-    const cur = pickedVariantOf(e.id, sid);
-    if(cur === b.id){ arr.splice(arr.indexOf(cur),1); }          // clicking the live one removes it
-    else if(cur){ arr[arr.indexOf(cur)] = b.id; }                 // swap the wording in place
-    else { arr.push(b.id); }
+    const i = arr.indexOf(b.id);
+    if(i>=0) arr.splice(i,1); else arr.push(b.id);
     renderAll(); persist();
   };
   el.onclick = toggle;
@@ -748,7 +789,7 @@ function openDlg(title, bodyHTML, footNodes){
   (footNodes||[]).forEach(n=>f.appendChild(n));
   if(!dlg.open) dlg.showModal();
 }
-/* Hannah, 2026-09-15: these three are settled, so reporting them every run is pure noise.
+/* Hannah, 2026-09-15: these three are settled, so reporting them on every run is pure noise.
    Still live on purpose: security clearance (not the same thing as work authorization),
    licensure, a comp band below her level, years over the stated band, and req health. */
 function preClearedRule(){
@@ -761,49 +802,49 @@ function preClearedRule(){
     + " band, and a stale or reposted req.";
 }
 
-/* "What's in here" — she asked what the takeaways were, so the page answers it directly
-   instead of making her count. */
+/* "What's in here" — the archive's own takeaways, so she does not have to count. */
 function takeaways(){
-  // Count the same universe the bank shows: achievement bullets, not coursework lines.
-  const nBul = sid => (VARIANTS[sid]||[]).filter(b=>b.section==="bullet").length;
-  const sts = (B.stories||[]).filter(s=>!s.id.endsWith("-other") && nBul(s.id));
+  const nPhr = sid => phrasings(sid).length;
+  const named = STORIES.filter(s=>!s.id.endsWith("-other") && nPhr(s.id));
+  const clean = s => B.bullets.filter(b=>b.storyId===s.id && b.section==="bullet" && !b.slop.length).length;
   const rows = B.experiences.map(e=>{
-    const mine = (B.stories||[]).filter(s=>s.experienceId===e.id && nBul(s.id));
-    const named = mine.filter(s=>!s.id.endsWith("-other"));
-    const v = mine.reduce((n,s)=>n+nBul(s.id),0);
-    return {e, named:named.length, v, other:nBul(e.id+"-other")};
+    const mine = STORIES.filter(s=>s.experienceId===e.id && nPhr(s.id));
+    return {e, named: mine.filter(s=>!s.id.endsWith("-other")).length,
+            v: mine.reduce((n,s)=>n+nPhr(s.id),0), other: nPhr(e.id+"-other")};
   }).filter(r=>r.v);
-  const contaminated = sts.filter(s=>s.clean/s.variants < 0.5)
-    .sort((a,b)=>(a.clean/a.variants)-(b.clean/b.variants));
-  const stale = sts.filter(s=>!s.current && s.variants>=5).sort((a,b)=>b.variants-a.variants);
-  const nonum = sts.filter(s=>s.withMetric===0);
-  const totV = rows.reduce((n,r)=>n+r.v,0);
-  const esc2 = x=>esc(String(x));
+  const contaminated = named.filter(s=>clean(s)/nPhr(s.id) < 0.5)
+    .sort((a,b)=> clean(a)/nPhr(a.id) - clean(b)/nPhr(b.id));
+  const stale   = named.filter(s=>!s.current && nPhr(s.id)>=5).sort((a,b)=>nPhr(b.id)-nPhr(a.id));
+  const nonum   = named.filter(s=>!s.withMetric);
+  const drifty  = named.filter(s=>s.drift);
+  const totV    = rows.reduce((n,r)=>n+r.v,0);
   openDlg("What's actually in the bank", `
-    <p class="note"><b>${totV} wordings. ${sts.length} things that actually happened.</b>
-    They are all unique <i>strings</i> — they are not unique <i>stories</i>. Every wording of one
-    accomplishment now sits under that accomplishment, so the choice is which story to tell,
-    not which of 290 sentences to read.</p>
+    <p class="note" style="margin-top:0"><b>${totV} phrasings. ${named.length} things that actually
+    happened.</b> They are all unique <i>strings</i> — they are not unique <i>stories</i>. Every
+    wording of one accomplishment sits under that accomplishment, so the choice is which story to
+    tell, not which of 290 sentences to read.</p>
     <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:12px">
       <tr style="text-align:left;color:var(--ink-3)">
         <th style="padding:4px 6px">Experience</th><th style="padding:4px 6px">Stories</th>
-        <th style="padding:4px 6px">Wordings</th><th style="padding:4px 6px">No story yet</th></tr>
+        <th style="padding:4px 6px">Phrasings</th><th style="padding:4px 6px">No story yet</th></tr>
       ${rows.map(r=>`<tr style="border-top:1px solid var(--line)">
-        <td style="padding:4px 6px">${esc2(r.e.org)}</td>
+        <td style="padding:4px 6px">${esc(r.e.org)}</td>
         <td style="padding:4px 6px;font-family:var(--mono)">${r.named}</td>
         <td style="padding:4px 6px;font-family:var(--mono);color:var(--ink-3)">${r.v}</td>
         <td style="padding:4px 6px;font-family:var(--mono);color:var(--ink-3)">${r.other||"—"}</td></tr>`).join("")}
     </table>
-    ${contaminated.length?`<p class="note"><b>Stories where most wordings carry slop</b> — pick carefully
-      or rewrite:<br>${contaminated.slice(0,5).map(s=>
-      `${esc2(s.title)} <span style="font-family:var(--mono);color:var(--warn)">${s.clean}/${s.variants} clean</span>`).join("<br>")}</p>`:""}
+    ${drifty.length?`<p class="note"><b>${drifty.length} stories where your own CVs disagree</b> about
+      the numbers or the name. Each one shows the conflict on its card — settle them once.</p>`:""}
+    ${contaminated.length?`<p class="note"><b>Stories where most phrasings carry slop</b> — pick
+      carefully or rewrite:<br>${contaminated.slice(0,5).map(s=>
+      `${esc(s.title)} <span style="font-family:var(--mono);color:var(--warn)">${clean(s)}/${nPhr(s.id)} clean</span>`).join("<br>")}</p>`:""}
     ${stale.length?`<p class="note"><b>Real stories you have stopped telling</b> — nothing from these
-      is in current rotation:<br>${stale.slice(0,5).map(s=>esc2(s.title)).join("<br>")}</p>`:""}
-    ${nonum.length?`<p class="note"><b>No number in any wording</b> — these need a metric or a proxy
-      before they go on a page:<br>${nonum.slice(0,5).map(s=>esc2(s.title)).join("<br>")}</p>`:""}
-    <p class="note">The <i>No story yet</i> column is wordings that matched no story. If a number there
-    grows, the story table in <code>scripts/stories.py</code> needs a new entry — ask Claude to add it.</p>`,
-    []);
+      is in current rotation:<br>${stale.slice(0,5).map(s=>esc(s.title)).join("<br>")}</p>`:""}
+    ${nonum.length?`<p class="note"><b>No number in any phrasing</b> — these need a metric or a proxy
+      before they go on a page:<br>${nonum.slice(0,5).map(s=>esc(s.title)).join("<br>")}</p>`:""}
+    <p class="note">The <i>No story yet</i> column is phrasings that matched no story. When a number
+    there grows, the table in <code>scripts/stories.py</code> needs a new entry — ask Claude to add
+    one rather than loosening the threshold.</p>`, []);
 }
 
 function mkBtn(label, cls, fn){ const b=document.createElement("button"); b.className="btn"+(cls?" "+cls:""); b.textContent=label; b.onclick=fn; return b; }
@@ -991,6 +1032,9 @@ $("#dlBtn").onclick = async ()=>{
 /* ---------- wiring ---------- */
 $("#profSel").innerHTML = B.profiles.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
 $("#profSel").onchange = e => { S.profile=e.target.value; autofill(); renderAll(); persist(); };
+for(const [id,m] of [["#mStories","stories"],["#mAll","all"]])
+  $(id).onclick = ()=>{ S.mode=m; $("#mStories").setAttribute("aria-pressed",String(m==="stories"));
+    $("#mAll").setAttribute("aria-pressed",String(m==="all")); renderBank(); };
 $("#autoBtn").onclick = ()=>{ autofill(); renderAll(); persist(); };
 $("#q").oninput = e => { S.filters.q=e.target.value; renderBank(); };
 $("#takeBtn").onclick = takeaways;

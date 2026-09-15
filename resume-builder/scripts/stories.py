@@ -415,3 +415,113 @@ def catalog():
             "anchors": [],
         }
     return out
+
+
+# --------------------------------------------------------------------------
+# Editorial layer. `proof` is the metric set this story is entitled to claim;
+# `drift` records where her own CVs disagree with each other about that story --
+# real findings from reading the archive, not lint. Merged 2026-09-15 from the
+# parallel build that was live on the artifact, remapped onto the ids above and
+# split where that build had merged two different claims into one story.
+# Anything not listed falls back to metrics derived from the bullets themselves.
+# --------------------------------------------------------------------------
+EDITORIAL = {
+ "wm-charter": {
+   "proof": ["~400M daily page views", "~30% of marketplace", "$400M+ charter"],
+   "drift": "The charter is $400M+ in some versions, a ~$400M GMV mandate in others, and "
+            "~$400M validated impact in others. Lead with the charter, not GMV."},
+ "wm-experiments": {
+   "proof": ["greater than $137M GMV banked", "~$107M Popularity Signal", "+0.66% ATC"],
+   "drift": "Data Refresh is $30M in some versions and $33M in others. Also seen: +7% YoY ATC, "
+            "+0.87% with $58M, and +1.51% 3P conversion. Settle one set."},
+ "wm-secondary": {
+   "proof": ["~45M daily impressions", "+0.46% multi-offer add-to-cart", "4 teams"],
+   "drift": "Some versions drop the tilde (45M vs ~45M) or call it a search surface."},
+ "wm-agent": {
+   "proof": ["200+ person org", "10+ upstream systems", "3x"],
+   "drift": "The tool is called BuyBox Engineer, Team Engineer and AI Engineer in different "
+            "versions. Users are a 200+ org in some and a 15-person team in others; systems are "
+            "10+ in some and 15+ in others. Pick one. The 15-person version also trips the "
+            "aislop honesty rule by claiming daily usage."},
+ "wm-opsystem": {
+   "proof": ["30+ initiatives/qtr", "20 stakeholders", "2x"],
+   "drift": "Scope varies a lot: 30 vs 50+ teams, 30 vs 100 initiatives, 20 vs 5+ orgs, 2x vs "
+            "80%. The 50/100 versions are the outliers."},
+ "wm-deps": {
+   "proof": ["10+ upstream systems", "~80% less investigation time"],
+   "drift": "Some versions tell this as SQL analysis and others as architecting API and signal "
+            "contracts. Those are different claims about what she did -- pick the one the JD "
+            "is asking for and do not blend them."},
+ "wm-trust":        {"proof": ["+0.28% relevance"]},
+ "wm-availability": {"proof": ["~8% fewer out-of-stock recommendations"]},
+ "wm-runops":       {"proof": ["Search to PDP", "on-call with engineering"]},
+
+ "up-chiefofstaff": {"proof": ["2x capital deployed over 3 yrs", "5 functions"]},
+ "up-kpi":          {"proof": ["30 startups", "90% adoption", "50% less collection time"]},
+ "up-prorata":      {"proof": ["~95% adoption", "$100M+ in 2 months", "5 customer segments"]},
+ "up-fundraises": {
+   "proof": ["7 fundraises", "$400M+ raised"],
+   "drift": "Several versions are truncated to \"$400\" with no M, and one says $475M+. Some say "
+            "$200M closed, others $100M+ from 50+ investors."},
+ "up-execops": {
+   "proof": ["80% shorter reporting cycle", "50-page quarterly report"],
+   "drift": "The 30%, 75% and 80% figures all describe similar workflow wins. Pick one."},
+ "up-dashboard":    {"proof": ["3x organizational capacity", "CFO and 3 managing partners"]},
+ "up-governance":   {"proof": ["2x engagement"]},
+ "up-investorops":  {"proof": ["500+ investors", "$200M closed"]},
+ "up-founders":     {"proof": ["30 portfolio companies"]},
+ "up-research":     {"proof": ["80% efficiency"]},
+
+ "si-gtm":      {"proof": ["15+ interviews", "5x adoption plan"]},
+ "si-roadmap":  {"proof": ["~6x lifetime customer value", "15+ stakeholder interviews"]},
+ "si-research": {"proof": ["value-chain analysis", "industry expert interviews"]},
+ "si-xfn":      {"proof": ["10-person cross-functional team"],
+                 "drift": "Almost every wording of this one opens with \"Partnered with\", which is "
+                          "on the aislop corporate-filler kill list. 2 of 31 are clean."},
+ "si-pricing":  {"proof": ["SaaS costing and pricing models"]},
+
+ "ac-assets":     {"proof": ["50+ stakeholders", "5+ teams"]},
+ "ac-cmo":        {"proof": ["6 weeks to 2 days"]},
+ "ac-staffing":   {"proof": ["15 user interviews", "100-person org"]},
+ "ac-allocation": {"proof": ["2x productivity"]},
+ "ac-labeling":   {"proof": ["human-in-the-loop image labeling"]},
+
+ "mu-solo":            {"proof": ["120 API endpoints", "43 tests", "20+ deploys"]},
+ "mu-platform":        {"proof": ["264 brands", "10 retailers", "Stripe single-cart"]},
+ "mu-launch":          {"proof": ["13K+ products", "live at app.muse.shopping"]},
+ "mu-personalization": {"proof": ["100+ attributes", "Gmail receipt parsing"]},
+
+ "ai-volume": {"proof": ["20+ tools", "500+ build hours", "12+ repos"]},
+ "ai-range":  {"proof": ["consumer, enterprise and automation"]},
+ "ai-kindle": {"proof": ["Kindle and Libby APIs bridged"]},
+ "ai-stack":  {"proof": ["Claude Code, Codex, Vercel, Docker"]},
+
+ "ch-prototype": {"proof": ["Plaid across institutions"]},
+ "ch-pmf":       {"proof": ["100+ community"]},
+ "co-founded":   {"proof": ["20+ campuses", "$30K in 2 weeks"]},
+ "co-congress":  {"proof": ["testified before Congress"]},
+ "eb-ldor":      {"proof": ["100+ discovery users", "500+ wholesalers evaluated"]},
+ "ei-nutrition": {"proof": ["50+ user interviews"]},
+ "mi-interior":  {"proof": ["role-based permissions", "50+ API routes"]},
+ "mi-events":    {"proof": ["175+ events", "2,400+ professionals"]},
+ "mi-feedback":  {"proof": ["1,096 labeled items"]},
+}
+
+# The cross-resume baseline: the things EVERY version of her resume should say, whatever the
+# JD. Distinct from the per-role story lists -- those answer "which 5-10 stories for this job",
+# this answers "what must never be missing". Ported from the parallel build, remapped.
+BASELINE = [
+ ("wm-charter",      "Owned the ML ranking system that picks the Buy Box winner on Walmart.com: "
+                     "~400M daily views, $400M+ charter"),
+ ("wm-experiments",  "Ran the ranking experiments that banked >$137M in GMV"),
+ ("wm-secondary",    "Launched the Secondary Buy Box 0→1 for shoppers: ~45M daily impressions, "
+                     "+0.46% add-to-cart"),
+ ("wm-agent",        "Built BuyBox Engineer, a GenAI agent nobody asked for, adopted across a "
+                     "200+ person org"),
+ ("wm-opsystem",     "Ran the operating system for 30+ cross-functional initiatives a quarter"),
+ ("up-chiefofstaff", "First Chief of Staff at Uprising: built the firm's operating system and "
+                     "investor tools ($100M+ in 2 months, 7 fundraises)"),
+ ("si-gtm",          "Defined 0→1 GTM and a 6x LTV case for Siemens' new EV-charging SaaS"),
+ ("mu-solo",         "Ships AI products solo: Muse (13K+ products, 264 brands) and 20+ tools "
+                     "built with Claude Code"),
+]

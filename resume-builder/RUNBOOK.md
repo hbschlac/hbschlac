@@ -37,13 +37,25 @@ right — they are unique strings, not unique stories.
 per experience and assigns every wording to one by weighted anchor matching. Walmart lands at
 **9 stories**, Uprising at **10** — her 5-10, from her own data.
 
-- The dashboard browses **stories**. Each card shows the wording that best fits the current JD;
-  the rest sit behind `▸ N wordings`.
+It also carries two editorial layers, both emitted into `app/data.js` so the page and the repo
+cannot drift apart:
+
+- **`EDITORIAL`** — the `proof` metrics a story is entitled to claim, and `drift`: where her own
+  CVs disagree with each other. Nine stories carry a drift note and the page shows it on the card.
+  The BuyBox agent is called three different things across her CVs; Data Refresh is $30M in some
+  and $33M in others; one Uprising fundraise line reads "$400" with no M.
+- **`BASELINE`** — the **8 things every version of the resume should say**, across roles. This is
+  the second reading of her ask (5-10 *total*, not per job) and the page leads with it: a numbered
+  list showing which are on the current resume and which are missing.
+
+- The dashboard browses **stories**, in two modes — *Stories* and *Every phrasing*. Each story
+  card shows a takeaway, its proof metrics, any drift note, and the phrasings behind
+  `See N phrasings` (top 5, then *Show all*).
 - Selection is **per story**. Clicking a different wording *swaps* it; you cannot put two
   tellings of the same launch on one page. The linter still catches it if stale saved state has one.
 - **`What's in here`** in the filter row answers the takeaways question directly: stories per
-  experience, which stories are mostly slop, which real stories she has stopped telling, which
-  have no number in any wording.
+  experience, how many have conflicting numbers across CVs, which stories are mostly slop, which
+  real stories she has stopped telling, which have no number in any wording.
 
 **Adding a story.** If a wording matches nothing it lands in `<experience>-other` and shows up in
 the *No story yet* column. When that grows, add an entry to `STORIES` in `scripts/stories.py` —

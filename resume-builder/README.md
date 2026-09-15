@@ -20,7 +20,7 @@ re-deriving choices already made.
 | `data/bullets.json` | Enriched: verb, metrics, skills, archetypes, slop flags, recency |
 | `scripts/mine_cvs.py` | Drive archive → `bullets.tsv` (runs in the Composio workbench) |
 | `scripts/enrich.py` | `bullets.tsv` → `bullets.json`. **The rules live here**, not in the payload |
-| `scripts/stories.py` | The ~55 real accomplishments, hand-named. **Every wording maps to one** |
+| `scripts/stories.py` | The ~55 real accomplishments, hand-named. **Every wording maps to one**, plus the proof metrics, the cross-CV drift notes, and the 8-line baseline |
 | `scripts/build_page_data.py` | `bullets.json` + experience metadata → `app/data.js` |
 | `app/` | The dashboard |
 | `RUNBOOK.md` | What Claude does on "apply the pending build" / "publish the queued link" |
@@ -47,7 +47,7 @@ interchangeable part.
 | Community | 4 | 43 |
 | Muse | 4 | 34 |
 | AI projects | 4 | 28 |
-| Misc | 6 | 20 |
+| Side builds & recognition | 6 | 20 |
 | Illinois | 3 | 16 |
 | Coherent Finance | 2 | 3 |
 

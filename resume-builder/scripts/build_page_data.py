@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Emit app/data.js — the bank the dashboard ships with, plus experience metadata.
 Canonical experience values come from the Sept 14 2026 CV (her current format)."""
-import json, pathlib
+import json, pathlib, sys
 from collections import Counter
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import stories as story_table  # noqa: E402  (needs sys.path above)
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 B = json.loads((ROOT/"data"/"bullets.json").read_text(encoding="utf-8"))
 
@@ -41,7 +44,7 @@ EXPERIENCES = [
   "descriptor":"Graduated High Honors, Gies Scholars, Merit Scholarship"},
  {"id":"community","org":"Community Impact","role":"","loc":"","dates":"","section":"EDUCATION, SKILLS, & INTERESTS","order":10,
   "descriptor":"National student advocacy; Congressional testimony; featured in CNN, Fox, Forbes"},
- {"id":"misc","org":"Unfiled","role":"","loc":"","dates":"","section":"EDUCATION, SKILLS, & INTERESTS","order":11,"descriptor":""},
+ {"id":"misc","org":"Side builds & recognition","role":"","loc":"","dates":"","section":"EDUCATION, SKILLS, & INTERESTS","order":11,"descriptor":""},
 ]
 
 # Base prototypes. Taglines are Hannah's real ones from resume.md + her live CVs.
@@ -103,11 +106,20 @@ def build_stories(bullets, catalog):
         # one she has actually reached for most often, then the fullest telling.
         best = max(vs, key=lambda b: (b["current"], not b["slop"], b["useCount"], b["chars"]))
         mc = Counter(m for b in vs for m in b["metrics"])
+        ed = story_table.EDITORIAL.get(sid, {})
         out.append({
             "id": sid,
             "experienceId": meta.get("experienceId", vs[0]["experienceId"]),
             "title": meta.get("title", "Everything else"),
             "gist": meta.get("gist", ""),
+            # The page reads `takeaway`; it is the same one-liner as `gist`.
+            "takeaway": meta.get("gist", ""),
+            # Metrics this story is entitled to claim. Hand-written where the archive needed a
+            # judgement call, derived from the bullets otherwise so it cannot go stale.
+            "proof": ed.get("proof") or [m for m, _ in mc.most_common(3)],
+            # Where her own CVs disagree with each other about this story.
+            "drift": ed.get("drift", ""),
+            "count": len(vs),
             "variants": len(vs),
             "current": sum(1 for b in vs if b["current"]),
             "clean": sum(1 for b in vs if not b["slop"]),
@@ -125,15 +137,20 @@ def build_stories(bullets, catalog):
     return out
 
 STORIES = build_stories(B["bullets"], B["stories"])
+_have = {s["id"] for s in STORIES}
+BASELINE = [{"storyId": sid, "line": line} for sid, line in story_table.BASELINE if sid in _have]
+_dropped = [sid for sid, _ in story_table.BASELINE if sid not in _have]
+if _dropped:
+    print(f"   WARNING baseline references missing stories: {_dropped}")
 
 out = {"bullets":B["bullets"],"anomalies":B["anomalies"],"experiences":EXPERIENCES,
        "profiles":PROFILES,"header":HEADER,"sectionOrder":SECTION_ORDER,
-       "stories":STORIES,"preCleared":PRE_CLEARED}
+       "stories":STORIES,"baseline":BASELINE,"preCleared":PRE_CLEARED}
 js = "window.BANK=" + json.dumps(out, ensure_ascii=False, separators=(",",":")) + ";"
 (ROOT/"app").mkdir(exist_ok=True)
 (ROOT/"app"/"data.js").write_text(js, encoding="utf-8")
 print(f"wrote app/data.js  {len(js):,} bytes  "
-      f"bullets={len(B['bullets'])}  stories={len(STORIES)}")
+      f"bullets={len(B['bullets'])}  stories={len(STORIES)}  baseline={len(BASELINE)}")
 for e in EXPERIENCES:
     n = [s for s in STORIES if s["experienceId"] == e["id"]]
     if n:
