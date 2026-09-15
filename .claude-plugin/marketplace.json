@@ -10,6 +10,11 @@
       "description": "Fetch + ingest a job description past a proxy-blocked host (Claude Code web egress allowlist), via ATS public APIs and a remote-exec MCP (Composio) fallback. Auto-fires on job URLs via a UserPromptSubmit hook; ingest-and-acknowledge, no JD echoed back."
     },
     {
+      "name": "session-capture",
+      "source": "./plugins/session-capture",
+      "description": "Durable session memory. Logs every user message to disk outside the context window (survives compaction) and pushes it to the PRIVATE skills repo via git plumbing (survives the ephemeral container), then injects the evidence-ledger pointer at SessionStart so retrieval does not depend on remembering a trigger phrase. Fails closed: never pushes to a public repo, never blocks a prompt. NOT YET ENABLED — see the plugin README test plan."
+    },
+    {
       "name": "book-clubs",
       "source": "./plugins/book-clubs",
       "description": "Book-club lookup for Claude (from kindle.schlacter.me): name or describe a club → get it plus its recent monthly picks. A bundled, keyless stdio MCP server — 32-club catalog with typo-tolerant name/celebrity matching + Book Notification pick fetching, and a generic scraper fallback for off-catalog clubs Claude web-searches for."

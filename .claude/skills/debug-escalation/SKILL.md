@@ -31,6 +31,19 @@ Triggers when ANY of these are true:
 - User says "this keeps breaking" / "we've been going in circles" / "nothing works"
 - Git log shows 3+ consecutive "fix:" commits to the same file
 
+**Prose-churn triggers (resume bullets, outreach copy, application answers):**
+- The same bullet or paragraph has been rewritten 3+ times and is still being flagged
+- Hannah flags the same line twice ("this is still slop", "this is still outstanding")
+- She reports content as *missing* that is actually on the page under a different word
+- A rewrite round produces no new evidence — only synonyms
+
+> Prose churn has the same root cause as code churn: **rewriting instead of finding out.**
+> A bullet that will not settle is usually missing a fact, not a better verb. Stop rewriting.
+> Go read the repo, the dashboard, or the evidence ledger — or ask her one direct question —
+> and write the bullet once from what you learn. On 2026-09-15 a single Walmart bullet went
+> through 15 versions; what finally fixed it was reading the source, not the 15th rewrite.
+> If she can't find her own content on the page, you have used your noun instead of hers.
+
 **Production incident triggers:**
 - "It's broken in prod" / "users are reporting X" / "this was working yesterday"
 - External dependency returning errors (503, 403, timeouts) that the app doesn't handle

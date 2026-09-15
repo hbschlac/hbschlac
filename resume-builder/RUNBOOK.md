@@ -24,6 +24,36 @@ depends on her Mac.
 
 ---
 
+## Step 0 — Before you write a single bullet (BLOCKING)
+
+The 2026-09-15 Anthropic CV took **3h08m of working time and 127 doc edits** for nine bullets.
+Roughly **14 of Hannah's 46 messages were facts Claude did not have**, each arriving *after* a
+bullet had been written, scored, exported and reviewed. One Walmart bullet went through
+**15 distinct versions**. That is a sequencing failure, not a writing failure.
+
+**1 — Read the evidence ledger.** It holds every fact Hannah has stated, tagged by the JD
+dimension it answers, with provenance and hedges. It lives in the **private** skills repo, not
+here — this repo is public, and the ledger records what she deliberately kept *off* her CV:
+
+> `hbschlac/career-skills` → `skills/product-networking/references/evidence.md` (**private repo — run `add_repo` first**; if `product-networking-skills` 404s, retry as `career-skills`)
+
+**2 — Parse the JD into its requirement list**, then grep the ledger by tag for each one. What you
+find is evidence you already have. **Never ask a question the ledger already answers**, and never
+declare a gap unfixable before grepping it — "the IT/Security gap is unfixable without fabricating"
+was wrong and cost five points.
+
+**3 — Batch every remaining gap into ONE message.** Not one question per turn. The session that
+motivated this file asked them serially across four hours.
+
+**4 — Append her answers to the ledger in the same turn**, before writing the bullet. Not at the
+end of the session: sessions run out of context, and that one did, at 19:37.
+
+**5 — Keep her nouns.** When she supplies a fact in her own words, the bullet keeps her noun. She
+said *dashboard*; Claude wrote *"planning tool"*; twenty minutes later she reported the content as
+missing from the page. It was there, under a synonym. **If the author can't spot it, a reader won't.**
+
+---
+
 ## "Apply the pending resume build"
 
 **1 — Read the queued build.**
@@ -48,12 +78,22 @@ GOOGLEDOCS_GET_DOCUMENT_PLAINTEXT  document_id:<new id>
 each `find_text` in the plaintext first; if it appears more than once, lengthen it until it is
 unique. (Verified: `" | "` occurs 21× in a real CV — a short string silently changes 21 places.)
 
-**5 — Apply one swap per call.**
+**5 — Draft in plaintext first, then apply the whole round in one batch.**
+
+Do **not** iterate against the live Doc. Every wording change against the Doc costs an edit, a PDF
+export and a review round-trip; 127 such edits is what three hours looks like. Instead write the
+full proposed set to a scratch `.txt`, settle the wording there where a rewrite is free, and only
+then push the round.
+
+`COMPOSIO_MULTI_EXECUTE_TOOL` takes an **array** — send the round as one call:
 ```
-GOOGLEDOCS_REPLACE_ALL_TEXT
-  document_id:<new id>  find_text:<exact>  replace_text:<new>  match_case:true
+COMPOSIO_MULTI_EXECUTE_TOOL  tools:[
+  {tool_slug:"GOOGLEDOCS_REPLACE_ALL_TEXT", arguments:{document_id:<id>, find_text:<exact>,
+                                                        replace_text:<new>, match_case:true}},
+  ... one entry per swap in this round ...
+]
 ```
-**`match_case` defaults to `false`** — always pass `true` explicitly.
+**`match_case` defaults to `false`** — always pass `true` explicitly, on every entry.
 
 **6 — Structural edits, if a bullet must be removed entirely.**
 Blanking a bullet with `replace_text:""` leaves an orphan `●`. Delete the *paragraph*:
@@ -67,8 +107,22 @@ trailing newline — if the segment ends at N, use `endIndex: N-1`.
 **7 — Verify.** Read the doc back and report every replacement that changed **0** occurrences
 (find text was wrong) or **more than 1** (was not unique). Do not report success without this.
 
-**8 — Page fit.** Count non-blank lines; 52–56 ≈ one page. Say plainly that this is a proxy —
-no API confirms page count — and ask her to eyeball it before sending.
+**8 — Page fit — measure it, don't estimate it and don't outsource it to her.**
+
+Export to a **file path** and run [`scripts/linefit.py`](scripts/linefit.py):
+```
+curl -sSL "https://docs.google.com/document/d/<DOC_ID>/export?format=pdf" -o /tmp/cv.pdf
+python3 scripts/linefit.py /tmp/cv.pdf --over 2     # exit 1 if any bullet wraps past 2 lines
+```
+It decodes the exported PDF's glyph positions and reports the true line count per paragraph plus
+the page count. Exit code 1 means over one page or an over-long bullet, so it gates a send.
+
+- **Never export the PDF into the conversation.** The 2026-09-15 session ran 27 exports through the
+  Drive MCP tool and *all 27 blew the token limit* — that is what exhausted the context window.
+- **Character count is a bad proxy.** The cap was guessed at ~224 for most of that session; measured
+  against the shipped CV, a **236-char bullet still fits two lines**. Proportional fonts don't care
+  about character counts.
+- Hannah reported "siemens bullet is 3 lines in doc" because nothing else was checking. This checks.
 
 **9 — Tracker.** Update the row in [Job Search Tracker 2026](https://docs.google.com/spreadsheets/d/18Eyec7GlbuYUELhPMxIN9zRgcOjnlTd31y4O6kY929w/edit):
 status → `CV drafted` (col C), doc link (col F), angle summary (col H).

@@ -21,9 +21,29 @@ re-deriving choices already made.
 | `scripts/mine_cvs.py` | Drive archive → `bullets.tsv` (runs in the Composio workbench) |
 | `scripts/enrich.py` | `bullets.tsv` → `bullets.json`. **The rules live here**, not in the payload |
 | `scripts/build_page_data.py` | `bullets.json` + experience metadata → `app/data.js` |
+| `scripts/linefit.py` | Exported PDF → true line count per bullet + page count. **Measures, doesn't estimate** |
+| *(evidence ledger)* | **Read before writing any bullet.** Lives in the private skills repo — see below |
 | `app/` | The dashboard |
 | `RUNBOOK.md` | What Claude does on "apply the pending build" / "publish the queued link" |
 | `PORTING.md` | Moving the bench to Vercel if she ever wants to own the hosting |
+
+## Selection was only half the problem
+
+The bank solves **selection** — 994 bullets she has already written, browsable and badged.
+It does not solve **evidence**: the things she knows that were never on a CV in the first place.
+
+The 2026-09-15 Anthropic build took **3h08m of working time and 127 doc edits** for nine bullets,
+because roughly **14 of her 46 messages were facts Claude did not have** — her Uprising security
+framework, the xfn pillar she owned, the dashboard engineering leadership ran on. Each arrived
+after a bullet was already written and scored, so each triggered a full rewrite cycle. One bullet
+reached **15 versions**. None of those facts were saved anywhere.
+
+The **evidence ledger** is that missing half. Read it before writing; append to it whenever she
+states something new. `RUNBOOK.md` Step 0 makes this blocking.
+
+It lives in `hbschlac/career-skills` → `skills/product-networking/references/evidence.md` (**private repo — run `add_repo` first**; if `product-networking-skills` 404s, retry as `career-skills`) — **not in this repo, which is public.** The ledger records
+what she deliberately kept off her CV and why, which is exactly the material that should not be
+searchable on her GitHub profile.
 
 ## The bank
 
