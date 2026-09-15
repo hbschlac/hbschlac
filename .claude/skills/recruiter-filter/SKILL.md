@@ -91,7 +91,8 @@ reconstruct that list before judging anything. Extract into a table:
 - **Nice-to-haves** — "preferred," "bonus," "a plus."
 - **Outcomes** — what the role is measured on ("own the roadmap for X," "grow Y").
   These matter more than the skills list; they are what evidence gets matched against.
-- **Hard gates** — location/onsite days, work authorization, clearance, degree, comp band.
+- **Hard gates** — clearance, licensure, degree, comp band. (Location, work authorization
+  and non-competes are pre-cleared — see Step 2. Do not collect them.)
 - **Vocabulary** — the exact nouns this company uses for the work. Copy them verbatim.
 
 Then mark which must-haves are **load-bearing**. A req's requirement list is part real
@@ -113,6 +114,23 @@ the ones that gate.
 Distinguish **hard** gates (authorization, clearance, licensure, physical location for
 onsite roles) from **soft** ones (a "5+ years" against her 4.5, a degree preference).
 Soft gates cost points in Step 3; they do not end the run.
+
+**Three gates are pre-cleared — never report them.** Hannah settled these on 2026-09-15, so
+raising them is noise on every single run. Drop them silently; do not render them as
+"pre-cleared ✓" either. The facts live in `hannah-profile.md` → *Standing clearances*.
+
+| Pre-cleared — never report | Still a real knockout |
+|---|---|
+| work authorization / visa sponsorship (she is authorized, will never need sponsorship) | **security clearance** — a different thing from authorization, and she does not have one |
+| location, onsite days, hybrid, or relocation of any kind | **licensure or certification** |
+| non-compete, confidentiality, or conflicting-agreement obligations | **comp band** below her level — a silent knockout |
+| | **years over the stated band** |
+| | **req health** (stale or reposted) |
+
+Two notes on the boundary, so narrowing it later is a one-line edit rather than archaeology:
+"assume I am fine with location" is taken at face value and therefore covers **international
+relocation too** — a role requiring a move to London would not be flagged. And **clearance is
+not authorization**: a posting requiring TS/SCI is still a hard fail.
 
 **Check for over-qualification, not just under.** The rubric rewards seniority everywhere, so
 it will happily score a candidate high on a role that would reject her for being too expensive

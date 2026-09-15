@@ -2,6 +2,7 @@
 """Emit app/data.js — the bank the dashboard ships with, plus experience metadata.
 Canonical experience values come from the Sept 14 2026 CV (her current format)."""
 import json, pathlib
+from collections import Counter
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 B = json.loads((ROOT/"data"/"bullets.json").read_text(encoding="utf-8"))
 
@@ -77,9 +78,63 @@ HEADER = {"name":"Hannah Schlacter",
 
 SECTION_ORDER = ["EXPERIENCE","AI PROJECTS & VENTURES","EDUCATION, SKILLS, & INTERESTS"]
 
+# Knockout categories Hannah has settled once and for all (2026-09-15). Reporting them on
+# every run is noise, so both the JD-analysis prompt and Final Check drop them silently.
+# NOTE the boundary, taken at her word: "assume i am fine with location" covers relocation
+# anywhere, international included. Narrow this line if that ever stops being true.
+# Deliberately still live: security clearance (NOT the same as work authorization),
+# licensure, comp band below her level, years over the stated band, and req health.
+PRE_CLEARED = [
+ "location, onsite, hybrid, in-office days, or relocation of any kind",
+ "non-compete, confidentiality, or conflicting-agreement obligations",
+ "work authorization or visa sponsorship (she is authorized and will never need sponsorship)",
+]
+
+
+def build_stories(bullets, catalog):
+    """Roll each story up from its variants. The page browses THIS, not the 994 strings."""
+    by = {}
+    for b in bullets:
+        by.setdefault(b["storyId"], []).append(b)
+    out = []
+    for sid, vs in by.items():
+        meta = catalog.get(sid, {})
+        # The variant to show collapsed: current rotation first, then slop-free, then the
+        # one she has actually reached for most often, then the fullest telling.
+        best = max(vs, key=lambda b: (b["current"], not b["slop"], b["useCount"], b["chars"]))
+        mc = Counter(m for b in vs for m in b["metrics"])
+        out.append({
+            "id": sid,
+            "experienceId": meta.get("experienceId", vs[0]["experienceId"]),
+            "title": meta.get("title", "Everything else"),
+            "gist": meta.get("gist", ""),
+            "variants": len(vs),
+            "current": sum(1 for b in vs if b["current"]),
+            "clean": sum(1 for b in vs if not b["slop"]),
+            "withMetric": sum(1 for b in vs if b["hasMetric"]),
+            "useCount": sum(b["useCount"] for b in vs),
+            "lastUsed": max(b["lastUsed"] for b in vs),
+            "defaultVariant": best["id"],
+            "metrics": [m for m, _ in mc.most_common(6)],
+            "skills": sorted({k for b in vs for k in b["skills"]}),
+            "archetypes": sorted({a for b in vs for a in b["archetypes"]}),
+        })
+    order = {e["id"]: e["order"] for e in EXPERIENCES}
+    out.sort(key=lambda s: (order.get(s["experienceId"], 99),
+                            s["id"].endswith("-other"), -s["useCount"], -s["variants"]))
+    return out
+
+STORIES = build_stories(B["bullets"], B["stories"])
+
 out = {"bullets":B["bullets"],"anomalies":B["anomalies"],"experiences":EXPERIENCES,
-       "profiles":PROFILES,"header":HEADER,"sectionOrder":SECTION_ORDER}
+       "profiles":PROFILES,"header":HEADER,"sectionOrder":SECTION_ORDER,
+       "stories":STORIES,"preCleared":PRE_CLEARED}
 js = "window.BANK=" + json.dumps(out, ensure_ascii=False, separators=(",",":")) + ";"
 (ROOT/"app").mkdir(exist_ok=True)
 (ROOT/"app"/"data.js").write_text(js, encoding="utf-8")
-print(f"wrote app/data.js  {len(js):,} bytes  bullets={len(B['bullets'])}")
+print(f"wrote app/data.js  {len(js):,} bytes  "
+      f"bullets={len(B['bullets'])}  stories={len(STORIES)}")
+for e in EXPERIENCES:
+    n = [s for s in STORIES if s["experienceId"] == e["id"]]
+    if n:
+        print(f"   {e['id']:14s} {sum(x['variants'] for x in n):4d} variants -> {len(n)} stories")

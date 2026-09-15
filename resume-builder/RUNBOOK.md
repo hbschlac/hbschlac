@@ -24,6 +24,40 @@ depends on her Mac.
 
 ---
 
+## The story layer — what the bank actually is
+
+**994 wordings. ~55 things that actually happened.**
+
+The mine deduped by normalised *string*, so every rewording of one launch survived as its own
+row. That is why Walmart read as 290 bullets. Hannah, 2026-09-15: *"are these all unique? what
+are the overall takeaways? the baseline story should really only be like 5-10 max."* She was
+right — they are unique strings, not unique stories.
+
+`scripts/stories.py` is the fix and the source of truth. It hand-names each real accomplishment
+per experience and assigns every wording to one by weighted anchor matching. Walmart lands at
+**9 stories**, Uprising at **10** — her 5-10, from her own data.
+
+- The dashboard browses **stories**. Each card shows the wording that best fits the current JD;
+  the rest sit behind `▸ N wordings`.
+- Selection is **per story**. Clicking a different wording *swaps* it; you cannot put two
+  tellings of the same launch on one page. The linter still catches it if stale saved state has one.
+- **`What's in here`** in the filter row answers the takeaways question directly: stories per
+  experience, which stories are mostly slop, which real stories she has stopped telling, which
+  have no number in any wording.
+
+**Adding a story.** If a wording matches nothing it lands in `<experience>-other` and shows up in
+the *No story yet* column. When that grows, add an entry to `STORIES` in `scripts/stories.py` —
+**do not lower `MIN_SCORE`**, which just forces wrong assignments. Then rerun:
+
+```
+python3 scripts/enrich.py          # prints per-experience story counts + unfiled %
+python3 scripts/build_page_data.py
+```
+
+Current unfiled: **24 of 994 (2.4%)**.
+
+---
+
 ## "Apply the pending resume build"
 
 **1 — Read the queued build.**

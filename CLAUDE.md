@@ -33,9 +33,18 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 
 **Dashboard:** https://claude.ai/artifact/RWLv53mteWtb4dmZ1qJSnf (private artifact)
 
-Every bullet Hannah has ever written — **994 unique**, mined 2026-09-14 from 256 real resumes
+Every bullet Hannah has ever written — **994 wordings**, mined 2026-09-14 from 256 real resumes
 across 346 CV docs (2021→Sept 2026) — browsable, badged, and selectable against a specific JD.
-Solves selection, not writing: Walmart alone has 290 variants, Uprising 281.
+Solves selection, not writing.
+
+**Browse it by story, not by bullet.** The 994 are unique *strings*, not unique stories — the
+mine deduped by normalised text, so Walmart read as 290 bullets when it is really **9 things
+that happened** (the BuyBox charter, Secondary Buy Box, BuyBox Engineer, the upstream map, the
+flagship experiments, the 30-initiatives operating system, the trust call, the live-system
+ops, the availability integration). `resume-builder/scripts/stories.py` holds that table,
+hand-named and editable; every wording maps to one by weighted anchor match. Uprising lands at
+10 stories, 2.4% of wordings are still unfiled. **Add a story rather than lowering `MIN_SCORE`.**
+Selection is per story, so two tellings of the same launch can never both land on a page.
 
 **Read `resume-builder/RUNBOOK.md` before acting on any of these triggers:**
 - *"apply the pending resume build"* → copy base doc, apply the queued swaps, verify, update tracker

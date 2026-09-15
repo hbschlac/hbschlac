@@ -17,8 +17,12 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import stories as story_table  # noqa: E402  (needs sys.path above)
 
 ROOT = Path(__file__).resolve().parent.parent
 TSV = ROOT / "data" / "bullets.tsv"
@@ -183,9 +187,14 @@ def main() -> int:
                piece.split()[0].lower() in ("owned", "shipped", "drove", "delivered"):
                 flags.append("gmv-headline")             # warning: charter leads, GMV supports
 
+            story_id, story_score = story_table.assign(piece, bucket)
             rec = {
                 "id": f"{bucket}-{hashlib.md5(key.encode()).hexdigest()[:8]}",
                 "experienceId": bucket,
+                # Which of the ~5-10 real accomplishments this is a telling of. The bank is
+                # browsed by story; the variants underneath are interchangeable wordings.
+                "storyId": story_id,
+                "storyScore": story_score,
                 "section": section,
                 "text": piece,
                 "verb": piece.split()[0].strip(",;:") if piece.split() else "",
@@ -207,7 +216,8 @@ def main() -> int:
             records.append(rec)
 
     records.sort(key=lambda r: (r["experienceId"], -r["useCount"], -r["chars"]))
-    OUT.write_text(json.dumps({"bullets": records, "anomalies": anomalies},
+    OUT.write_text(json.dumps({"bullets": records, "anomalies": anomalies,
+                               "stories": story_table.catalog()},
                               ensure_ascii=False, indent=1), encoding="utf-8")
 
     print(f"bullets: {len(records)}")
@@ -220,6 +230,16 @@ def main() -> int:
         s["category"] for r in records for s in r["slop"]).most_common()))
     print("blocking flags :", dict(Counter(
         f for r in records for f in r["flags"]).most_common()))
+    unfiled = [r for r in records if r["storyId"].endswith("-other")]
+    per_exp = Counter(r["experienceId"] for r in records)
+    print(f"stories        : {sum(len(v) for v in story_table.STORIES.values())} named")
+    for exp, n in per_exp.most_common():
+        named = len(story_table.STORIES.get(exp, []))
+        o = sum(1 for r in unfiled if r["experienceId"] == exp)
+        print(f"   {exp:14s} {n:4d} variants -> {named:2d} stories"
+              + (f"   ({o} unfiled)" if o else ""))
+    print(f"unfiled        : {len(unfiled)} ({100*len(unfiled)/max(len(records),1):.1f}%)"
+          "  <- if this grows, add a story, don't lower MIN_SCORE")
     print(f"anomalies      : {len(anomalies)}")
     for a in anomalies[:5]:
         print(f"   [{a['type']}] {a.get('source','')}: {a.get('text','')[:110]}")

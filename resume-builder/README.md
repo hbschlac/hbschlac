@@ -20,31 +20,43 @@ re-deriving choices already made.
 | `data/bullets.json` | Enriched: verb, metrics, skills, archetypes, slop flags, recency |
 | `scripts/mine_cvs.py` | Drive archive → `bullets.tsv` (runs in the Composio workbench) |
 | `scripts/enrich.py` | `bullets.tsv` → `bullets.json`. **The rules live here**, not in the payload |
+| `scripts/stories.py` | The ~55 real accomplishments, hand-named. **Every wording maps to one** |
 | `scripts/build_page_data.py` | `bullets.json` + experience metadata → `app/data.js` |
 | `app/` | The dashboard |
 | `RUNBOOK.md` | What Claude does on "apply the pending build" / "publish the queued link" |
 | `PORTING.md` | Moving the bench to Vercel if she ever wants to own the hosting |
 
-## The bank
+## The bank: 994 wordings, ~55 stories
 
 Mined 2026-09-14 from **346 CV docs found, 331 fetched (2021+), 256 actual resumes** →
 **994 unique bullets** after dedupe and splitting merged lines.
 
-| Experience | Variants |
-|---|---|
-| Walmart | 290 |
-| Uprising | 281 |
-| Siemens | 132 |
-| Accenture | 81 |
-| Berkeley | 66 |
-| Community | 43 |
-| Muse | 34 |
-| AI projects | 28 |
-| Illinois | 16 |
-| Coherent Finance | 3 |
+They are unique *strings*. They are **not** unique stories — the mine deduped by normalised
+text, so every rewording of the same launch survived as its own row. That is why Walmart first
+read as 290 bullets to sort through. `scripts/stories.py` names the real accomplishments and
+maps every wording onto one, so the bank is browsed by **story** and the wording is the
+interchangeable part.
 
-152 are in current rotation (used Aug 2026+). 839 carry a number. 858 are slop-free.
-One bullet appears in **101 different CVs**.
+| Experience | Stories | Wordings |
+|---|---|---|
+| Walmart | 9 | 290 |
+| Uprising | 10 | 281 |
+| Siemens | 5 | 132 |
+| Accenture | 6 | 81 |
+| Berkeley | 3 | 66 |
+| Community | 4 | 43 |
+| Muse | 4 | 34 |
+| AI projects | 4 | 28 |
+| Misc | 6 | 20 |
+| Illinois | 3 | 16 |
+| Coherent Finance | 2 | 3 |
+
+**24 wordings (2.4%) match no story yet** and sit in a per-experience `-other` bucket, visible in
+the dashboard's *What's in here* panel. When that number grows, add a story to `stories.py` —
+never lower `MIN_SCORE`.
+
+152 wordings are in current rotation (used Aug 2026+). 839 carry a number. 858 are slop-free.
+One wording appears in **101 different CVs**.
 
 ## Rules it enforces
 
@@ -53,7 +65,8 @@ slop rules from `career-skills/skills/aislop/SKILL.md`; the 100-point scorecard 
 `.claude/skills/recruiter-filter/SKILL.md`. The dashboard and `enrich.py` read the same tables so
 they cannot drift.
 
-Blocking: repeated opening verb · em dash inside a bullet · trailing period · `+`/`/` shorthand ·
+Blocking: **the same story told twice in different words** · repeated opening verb · em dash
+inside a bullet · trailing period · `+`/`/` shorthand ·
 bullet over 2 lines · tagline wrapping · present tense on Walmart (the role ended 2026) ·
 any contact that isn't `hbschlac@gmail.com`.
 

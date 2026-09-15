@@ -88,6 +88,25 @@ main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,
 .grp-head .ct{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .grp-head .caret{color:var(--ink-3);font-size:10px;width:10px}
 .blist{display:flex;flex-direction:column;gap:5px;margin-top:5px}
+.story{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:7px;
+  background:var(--surface);overflow:hidden}
+.story.on{border-left-color:var(--accent);background:var(--accent-soft)}
+.story-main{display:block;width:100%;text-align:left;border:0;background:none;cursor:pointer;
+  padding:9px 11px;display:flex;flex-direction:column;gap:6px;font:inherit;color:inherit}
+.story-main:hover{background:var(--accent-soft)}
+.story-title{font-weight:600;font-size:12.5px;line-height:1.35;display:flex;gap:7px;align-items:baseline}
+.story-title .dot{color:var(--ink-3);font-size:11px;flex:0 0 auto}
+.story.on .story-title .dot{color:var(--accent)}
+.story-pick{font-family:var(--serif);font-size:14px;line-height:1.45;color:var(--ink-2)}
+.story.on .story-pick{color:var(--ink)}
+.story-foot{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.vbar{width:100%;border:0;border-top:1px solid var(--line);background:none;cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.03em;color:var(--ink-3);
+  padding:5px 11px;text-align:left}
+.vbar:hover{color:var(--accent);background:var(--accent-soft)}
+.vlist{display:flex;flex-direction:column;gap:4px;padding:6px 8px 8px;border-top:1px solid var(--line);
+  background:var(--paper)}
+.vgist{padding:0 11px 8px;font-size:11.5px;line-height:1.5;color:var(--ink-3)}
 
 .bullet{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:7px;background:var(--surface);
   padding:9px 11px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border-color .12s,background .12s}
@@ -199,11 +218,12 @@ pre.out{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;line-heigh
     <div class="pane-head">
       <h2>Bullet bank</h2>
       <div class="filters">
-        <input type="search" id="q" placeholder="Search 994 bullets…" aria-label="Search bullets">
+        <input type="search" id="q" placeholder="Search every wording…" aria-label="Search bullets">
         <button class="tog" id="fCur" aria-pressed="false">Current only</button>
         <button class="tog" id="fNum" aria-pressed="false">Has number</button>
         <button class="tog" id="fClean" aria-pressed="false">Slop-free</button>
         <button class="tog" id="fMatch" aria-pressed="false">JD match</button>
+        <button class="tog" id="takeBtn">What's in here</button>
       </div>
     </div>
     <div class="pane-body" id="bank"></div>
@@ -235,12 +255,20 @@ pre.out{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;line-heigh
 const B = window.BANK, $ = s => document.querySelector(s);
 const EXP = Object.fromEntries(B.experiences.map(e => [e.id, e]));
 const byId = Object.fromEntries(B.bullets.map(b => [b.id, b]));
+/* The bank is browsed by STORY, not by wording. 994 strings are ~60 real accomplishments;
+   showing all 994 was the thing that made this unusable. A story is the unit of selection,
+   the wording underneath is the interchangeable part. */
+const STORY = Object.fromEntries((B.stories||[]).map(s => [s.id, s]));
+const VARIANTS = {};
+for(const b of B.bullets){ (VARIANTS[b.storyId] = VARIANTS[b.storyId] || []).push(b); }
+const storiesOf = eid => (B.stories||[]).filter(s => s.experienceId === eid
+  && (VARIANTS[s.id]||[]).some(b => b.section === "bullet"));
 
 const S = {
   profile: B.profiles[0].id, jd: null, reqs: [], picked: {},
   sections: B.sectionOrder.slice(), tagline: B.profiles[0].tagline,
   skills: B.profiles[0].skills, filters:{q:"",cur:false,num:false,clean:false,match:false},
-  open: {walmart:true}, lastBuild: null,
+  open: {walmart:true}, openStory: {}, lastBuild: null,
   // Marketing and Management are two separate BS degrees; Entrepreneurship is the
   // concentration. Resume drops it for space, formal applications keep it.
   formalDegree: false
@@ -277,22 +305,63 @@ async function restore(){
 /* ---------- default selection so the page opens working, not empty ---------- */
 const QUOTA = {walmart:4,uprising:2,siemens:1,accenture:1,muse:1,aiprojects:1,coherent:1,
                edu_berkeley:0,edu_illinois:0,community:0,misc:0};
+/* Score a single wording. Used both to rank stories (via their best wording) and to pick
+   which wording of a chosen story goes on the page. */
+function scoreBullet(b, p){
+  return (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
+    + b.archetypes.filter(a => p.archetypes.includes(a)).length*30
+    + Math.min(b.useCount,12) + matchCount(b)*45
+    // A bullet over 2 lines breaks the format rule, so never let one be the default pick.
+    // She can still choose it deliberately from the wordings list.
+    - (b.estLines > 2 ? 120 : 0);
+}
+const usable = b => b.section==="bullet"
+  && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email");
+/* Best wording of a story for the current profile + JD. This is what "pick the story" means. */
+function bestVariant(sid, p){
+  const pool = (VARIANTS[sid]||[]).filter(usable);
+  if(!pool.length) return null;
+  return pool.reduce((a,b)=> scoreBullet(b,p) > scoreBullet(a,p) ? b : a);
+}
 function autofill(){
   const p = prof(); S.picked = {};
+  // Opening verbs must be unique across the WHOLE page, not just within one job.
+  const verbs = new Set();
+  const pool = {};
   for(const e of B.experiences){
-    const n = QUOTA[e.id] ?? 0; if(!n) continue;
-    const pool = B.bullets.filter(b => b.experienceId===e.id && b.section==="bullet"
-      && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email"));
-    const score = b => (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
-      + b.archetypes.filter(a => p.archetypes.includes(a)).length*30 + Math.min(b.useCount,12)
-      + matchCount(b)*45;
-    const seen = new Set();
-    S.picked[e.id] = pool.slice().sort((a,b)=>score(b)-score(a))
-      .filter(b => { const v=b.verb.toLowerCase(); if(seen.has(v)) return false; seen.add(v); return true; })
-      .slice(0,n).map(b=>b.id);
+    // One wording per story, and never two tellings of the same accomplishment.
+    pool[e.id] = storiesOf(e.id).map(st => bestVariant(st.id, p)).filter(Boolean)
+      .sort((a,b)=> scoreBullet(b,p)-scoreBullet(a,p));
+    S.picked[e.id] = [];
+  }
+  const take = (eid, n) => {
+    for(const b of pool[eid]){
+      if(S.picked[eid].length >= n) break;
+      const v = (b.verb||"").toLowerCase();
+      if(v && verbs.has(v)) continue;
+      if(S.picked[eid].includes(b.id)) continue;
+      verbs.add(v); S.picked[eid].push(b.id);
+    }
+  };
+  for(const e of B.experiences) take(e.id, QUOTA[e.id] ?? 0);
+  // Fill the rest of the page rather than handing her a half-empty one. 52-56 lines is the
+  // documented one-page window; stop the moment another bullet would push past it.
+  for(let guard=0; guard<12 && lineCount() < 52; guard++){
+    const before = JSON.stringify(S.picked);
+    for(const e of B.experiences){
+      if(!(QUOTA[e.id] ?? 0)) continue;
+      if(lineCount() >= 52) break;
+      const n = S.picked[e.id].length + 1;
+      take(e.id, n);
+      if(lineCount() > 56){ S.picked[e.id].pop(); break; }
+    }
+    if(JSON.stringify(S.picked) === before) break;   // nothing left to add
   }
   S.tagline = p.tagline; S.skills = p.skills;
 }
+/* Which story (if any) is currently on the page for this experience. */
+const pickedStory = (eid, sid) => (S.picked[eid]||[]).some(id => byId[id]?.storyId === sid);
+const pickedVariantOf = (eid, sid) => (S.picked[eid]||[]).find(id => byId[id]?.storyId === sid);
 
 /* ---------- JD matching ---------- */
 function matchedReqs(b){
@@ -322,6 +391,12 @@ function lint(){
     }
     for(const s of b.slop) issues.push({lvl:"warn",t:`aislop — ${s.category.replace(/-/g," ")}`,w:`“${s.hits[0]}”`,ref:b.text});
   }
+  const told = {};
+  for(const {b,e} of rows){ (told[b.storyId] = told[b.storyId]||[]).push(e); }
+  for(const [sid,list] of Object.entries(told))
+    if(list.length>1) issues.push({lvl:"bad",t:"Same story told twice",
+      w:`"${STORY[sid]?.title||sid}" is on the page ${list.length}× in different words. `
+        +"Keep the strongest wording and cut the rest."});
   for(const [v,list] of Object.entries(verbs))
     if(list.length>1) issues.push({lvl:"bad",t:`Repeated opening verb “${cap(v)}”`,
       w:`Used ${list.length}× — ${list.map(x=>EXP[x.e].org.split(" ")[0]).join(", ")}. Every bullet must open differently.`});
@@ -374,40 +449,113 @@ function liveScore(){
 /* ---------- render ---------- */
 function renderBank(){
   const f = S.filters, host = $("#bank"); host.innerHTML = "";
-  let shown = 0;
+  const p = prof();
+  let shownStories = 0, shownVariants = 0;
+  const matchesFilters = b => {
+    if(b.section!=="bullet") return false;
+    if(f.q && !b.text.toLowerCase().includes(f.q.toLowerCase())) return false;
+    if(f.cur && !b.current) return false;
+    if(f.num && !b.hasMetric) return false;
+    if(f.clean && b.slop.length) return false;
+    if(f.match && !matchCount(b)) return false;
+    return true;
+  };
+
   for(const e of B.experiences){
-    let list = B.bullets.filter(b=>b.experienceId===e.id && b.section==="bullet");
-    if(f.q){ const q=f.q.toLowerCase(); list = list.filter(b=>b.text.toLowerCase().includes(q)); }
-    if(f.cur) list = list.filter(b=>b.current);
-    if(f.num) list = list.filter(b=>b.hasMetric);
-    if(f.clean) list = list.filter(b=>!b.slop.length);
-    if(f.match) list = list.filter(b=>matchCount(b)>0);
-    if(!list.length) continue;
-    list.sort((a,b)=> matchCount(b)-matchCount(a) || (b.current-a.current) || b.useCount-a.useCount);
-    shown += list.length;
+    // A story survives the filters if any of its wordings does.
+    const sts = storiesOf(e.id)
+      .map(st => ({st, vars:(VARIANTS[st.id]||[]).filter(matchesFilters)}))
+      .filter(x => x.vars.length);
+    if(!sts.length) continue;
+    for(const x of sts){
+      x.vars.sort((a,b)=> matchCount(b)-matchCount(a) || (b.current-a.current)
+        || (a.slop.length-b.slop.length) || b.useCount-a.useCount);
+      x.best = x.vars[0];
+    }
+    sts.sort((a,b)=> (pickedStory(e.id,b.st.id)-pickedStory(e.id,a.st.id))
+      || matchCount(b.best)-matchCount(a.best) || b.st.useCount-a.st.useCount);
+    shownStories += sts.length;
+    shownVariants += sts.reduce((n,x)=>n+x.vars.length,0);
 
     const grp = document.createElement("div"); grp.className="grp";
     const isOpen = S.open[e.id] ?? false;
+    const nPicked = (S.picked[e.id]||[]).length;
     const head = document.createElement("button");
     head.className="grp-head"; head.setAttribute("aria-expanded", String(isOpen));
     head.innerHTML = `<span class="caret">${isOpen?"▾":"▸"}</span>
       <span class="org">${esc(e.org)}</span>
-      <span class="ct">${(S.picked[e.id]||[]).length} of ${list.length}</span>`;
+      <span class="ct">${nPicked} of ${sts.length} stories</span>`;
     head.onclick = ()=>{ S.open[e.id]=!isOpen; renderBank(); };
     grp.appendChild(head);
 
     if(isOpen){
       const wrap = document.createElement("div"); wrap.className="blist";
-      for(const b of list) wrap.appendChild(bulletCard(b,e));
+      for(const x of sts) wrap.appendChild(storyCard(x.st, x.vars, x.best, e, p));
       grp.appendChild(wrap);
     }
     host.appendChild(grp);
   }
-  $("#bankct").textContent = `${shown} of ${B.bullets.filter(b=>b.section==="bullet").length} bullets`;
-  if(!shown) host.innerHTML = `<p class="empty">No bullets match these filters.</p>`;
+  const totalStories = (B.stories||[]).length;
+  $("#bankct").textContent = `${shownStories} of ${totalStories} stories · ${shownVariants} wordings`;
+  if(!shownStories) host.innerHTML = `<p class="empty">Nothing matches these filters.</p>`;
 }
 
-function bulletCard(b,e){
+/* One real accomplishment. Collapsed it shows the wording that fits this JD best; expanded it
+   shows every wording she has ever used for it. Selecting is per STORY -- picking a second
+   wording of the same story swaps it rather than adding a duplicate. */
+function storyCard(st, vars, best, e, p){
+  const on = pickedStory(e.id, st.id);
+  const shownId = pickedVariantOf(e.id, st.id) || best.id;
+  const shown = byId[shownId] || best;
+  const expanded = !!S.openStory[st.id];
+
+  const el = document.createElement("div");
+  el.className = "story" + (on?" on":"");
+
+  const main = document.createElement("button");
+  main.className = "story-main";
+  main.setAttribute("aria-pressed", String(on));
+  const m = matchedReqs(shown);
+  const tags = [];
+  for(const r of m.slice(0,2)) tags.push(`<span class="tag match">covers: ${esc(r.label)}</span>`);
+  if(st.current) tags.push(`<span class="tag cur">${st.current} in rotation</span>`);
+  for(const mt of (st.metrics||[]).slice(0,3)) tags.push(`<span class="tag">${esc(mt)}</span>`);
+  for(const a of (st.archetypes||[]).slice(0,2)) tags.push(`<span class="tag">${esc(a)}</span>`);
+  if(!shown.hasMetric) tags.push(`<span class="tag nonum">no number</span>`);
+  for(const sl of shown.slop.slice(0,1)) tags.push(`<span class="tag slop">${esc(sl.category.replace(/-/g," "))}</span>`);
+  for(const fl of shown.flags) tags.push(`<span class="tag ${fl==="gmv-headline"?"slop":"block"}">${esc(fl.replace(/-/g," "))}</span>`);
+  main.innerHTML = `<div class="story-title"><span class="dot">${on?"●":"○"}</span><span>${esc(st.title)}</span></div>
+    <div class="story-pick">${esc(shown.text)}</div>
+    <div class="story-foot">${tags.join("")}</div>`;
+  const toggle = ()=>{
+    const arr = S.picked[e.id] = S.picked[e.id]||[];
+    const cur = pickedVariantOf(e.id, st.id);
+    if(cur) arr.splice(arr.indexOf(cur),1); else arr.push(shownId);
+    renderAll(); persist();
+  };
+  main.onclick = toggle;
+  el.appendChild(main);
+
+  const bar = document.createElement("button");
+  bar.className = "vbar";
+  bar.setAttribute("aria-expanded", String(expanded));
+  const clean = vars.filter(v=>!v.slop.length).length;
+  bar.textContent = `${expanded?"▾":"▸"} ${vars.length} wording${vars.length===1?"":"s"}`
+    + `  ·  ${clean} slop-free  ·  used ${st.useCount}×`;
+  bar.onclick = ()=>{ S.openStory[st.id]=!expanded; renderBank(); };
+  el.appendChild(bar);
+
+  if(expanded){
+    if(st.gist){ const g=document.createElement("div"); g.className="vgist"; g.textContent=st.gist; el.appendChild(g); }
+    const vl = document.createElement("div"); vl.className="vlist";
+    for(const b of vars) vl.appendChild(bulletCard(b,e,st));
+    el.appendChild(vl);
+  }
+  return el;
+}
+
+/* One wording. Clicking it selects this story WITH this wording -- swapping, never stacking. */
+function bulletCard(b,e,st){
   const on = (S.picked[e.id]||[]).includes(b.id);
   const blocking = b.flags.some(f=>f==="walmart-present"||f==="berkeley-email");
   const el = document.createElement("div");
@@ -415,12 +563,11 @@ function bulletCard(b,e){
   el.tabIndex = 0; el.setAttribute("role","button"); el.setAttribute("aria-pressed",String(on));
   const m = matchedReqs(b);
   const tags = [];
-  if(on) tags.push(`<span class="tag cur">selected</span>`);
+  if(on) tags.push(`<span class="tag cur">on the page</span>`);
   for(const r of m.slice(0,2)) tags.push(`<span class="tag match">covers: ${esc(r.label)}</span>`);
   if(b.current) tags.push(`<span class="tag cur">in rotation</span>`);
-  for(const a of b.archetypes.slice(0,2)) tags.push(`<span class="tag">${esc(a)}</span>`);
   if(!b.hasMetric) tags.push(`<span class="tag nonum">no number</span>`);
-  for(const s of b.slop.slice(0,2)) tags.push(`<span class="tag slop">${esc(s.category.replace(/-/g," "))}</span>`);
+  for(const sl of b.slop.slice(0,2)) tags.push(`<span class="tag slop">${esc(sl.category.replace(/-/g," "))}</span>`);
   for(const fl of b.flags) tags.push(`<span class="tag ${fl==="gmv-headline"?"slop":"block"}">${esc(fl.replace(/-/g," "))}</span>`);
   tags.push(`<span class="tag">${b.estLines} ln</span>`);
   tags.push(`<span class="tag">used ${b.useCount}×</span>`);
@@ -428,8 +575,11 @@ function bulletCard(b,e){
   el.innerHTML = `<div class="btext">${esc(b.text)}</div><div class="bmeta">${tags.join("")}</div>`;
   const toggle = ()=>{
     const arr = S.picked[e.id] = S.picked[e.id]||[];
-    const i = arr.indexOf(b.id);
-    if(i>=0) arr.splice(i,1); else arr.push(b.id);
+    const sid = st ? st.id : b.storyId;
+    const cur = pickedVariantOf(e.id, sid);
+    if(cur === b.id){ arr.splice(arr.indexOf(cur),1); }          // clicking the live one removes it
+    else if(cur){ arr[arr.indexOf(cur)] = b.id; }                 // swap the wording in place
+    else { arr.push(b.id); }
     renderAll(); persist();
   };
   el.onclick = toggle;
@@ -598,6 +748,64 @@ function openDlg(title, bodyHTML, footNodes){
   (footNodes||[]).forEach(n=>f.appendChild(n));
   if(!dlg.open) dlg.showModal();
 }
+/* Hannah, 2026-09-15: these three are settled, so reporting them every run is pure noise.
+   Still live on purpose: security clearance (not the same thing as work authorization),
+   licensure, a comp band below her level, years over the stated band, and req health. */
+function preClearedRule(){
+  const list = B.preCleared || [];
+  if(!list.length) return "";
+  return "Do NOT report these as knockouts — they are already settled, so raising them is noise:\n"
+    + list.map(x=>"  - "+x).join("\n")
+    + "\nStill report: security clearance (different from work authorization), licensure or"
+    + " certification, a compensation band below her level, years of experience over the stated"
+    + " band, and a stale or reposted req.";
+}
+
+/* "What's in here" — she asked what the takeaways were, so the page answers it directly
+   instead of making her count. */
+function takeaways(){
+  // Count the same universe the bank shows: achievement bullets, not coursework lines.
+  const nBul = sid => (VARIANTS[sid]||[]).filter(b=>b.section==="bullet").length;
+  const sts = (B.stories||[]).filter(s=>!s.id.endsWith("-other") && nBul(s.id));
+  const rows = B.experiences.map(e=>{
+    const mine = (B.stories||[]).filter(s=>s.experienceId===e.id && nBul(s.id));
+    const named = mine.filter(s=>!s.id.endsWith("-other"));
+    const v = mine.reduce((n,s)=>n+nBul(s.id),0);
+    return {e, named:named.length, v, other:nBul(e.id+"-other")};
+  }).filter(r=>r.v);
+  const contaminated = sts.filter(s=>s.clean/s.variants < 0.5)
+    .sort((a,b)=>(a.clean/a.variants)-(b.clean/b.variants));
+  const stale = sts.filter(s=>!s.current && s.variants>=5).sort((a,b)=>b.variants-a.variants);
+  const nonum = sts.filter(s=>s.withMetric===0);
+  const totV = rows.reduce((n,r)=>n+r.v,0);
+  const esc2 = x=>esc(String(x));
+  openDlg("What's actually in the bank", `
+    <p class="note"><b>${totV} wordings. ${sts.length} things that actually happened.</b>
+    They are all unique <i>strings</i> — they are not unique <i>stories</i>. Every wording of one
+    accomplishment now sits under that accomplishment, so the choice is which story to tell,
+    not which of 290 sentences to read.</p>
+    <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:12px">
+      <tr style="text-align:left;color:var(--ink-3)">
+        <th style="padding:4px 6px">Experience</th><th style="padding:4px 6px">Stories</th>
+        <th style="padding:4px 6px">Wordings</th><th style="padding:4px 6px">No story yet</th></tr>
+      ${rows.map(r=>`<tr style="border-top:1px solid var(--line)">
+        <td style="padding:4px 6px">${esc2(r.e.org)}</td>
+        <td style="padding:4px 6px;font-family:var(--mono)">${r.named}</td>
+        <td style="padding:4px 6px;font-family:var(--mono);color:var(--ink-3)">${r.v}</td>
+        <td style="padding:4px 6px;font-family:var(--mono);color:var(--ink-3)">${r.other||"—"}</td></tr>`).join("")}
+    </table>
+    ${contaminated.length?`<p class="note"><b>Stories where most wordings carry slop</b> — pick carefully
+      or rewrite:<br>${contaminated.slice(0,5).map(s=>
+      `${esc2(s.title)} <span style="font-family:var(--mono);color:var(--warn)">${s.clean}/${s.variants} clean</span>`).join("<br>")}</p>`:""}
+    ${stale.length?`<p class="note"><b>Real stories you have stopped telling</b> — nothing from these
+      is in current rotation:<br>${stale.slice(0,5).map(s=>esc2(s.title)).join("<br>")}</p>`:""}
+    ${nonum.length?`<p class="note"><b>No number in any wording</b> — these need a metric or a proxy
+      before they go on a page:<br>${nonum.slice(0,5).map(s=>esc2(s.title)).join("<br>")}</p>`:""}
+    <p class="note">The <i>No story yet</i> column is wordings that matched no story. If a number there
+    grows, the story table in <code>scripts/stories.py</code> needs a new entry — ask Claude to add it.</p>`,
+    []);
+}
+
 function mkBtn(label, cls, fn){ const b=document.createElement("button"); b.className="btn"+(cls?" "+cls:""); b.textContent=label; b.onclick=fn; return b; }
 $("#dlgX").onclick = ()=>dlg.close();
 
@@ -631,6 +839,7 @@ async function runJD(){
  "profileWhy":"one sentence","seniority":"...","knockouts":["..."]}
 Rules: 8-14 requirements. keywords must be words that literally appear in the posting, lowercase, 1-3 words each.
 Prefer the posting's own load-bearing nouns over generic PM vocabulary.
+${preClearedRule()}
 
 POSTING (${co} — ${role}):
 ${text.slice(0,14000)}`, {modelTier:"default"});
@@ -670,6 +879,7 @@ Bands: 85-100 top of stack; 70-84 makes the pile; 55-69 buried; under 55 will no
 
 Then, in this order and with these headings:
 KNOCKOUTS — anything that drops this before scoring, or "none found".
+${preClearedRule()}
 WHAT THE AI REVIEW CITES — per must-have, the exact resume line it would cite, or "no evidence found".
 WHAT THE 6-SECOND SKIM RETAINS — read only the tagline and first two bullets; say what a recruiter walks away knowing.
 AISLOP — flag template phrasing, jargon without grounding, a missing "so what", or claims about third parties
@@ -783,6 +993,7 @@ $("#profSel").innerHTML = B.profiles.map(p=>`<option value="${p.id}">${esc(p.nam
 $("#profSel").onchange = e => { S.profile=e.target.value; autofill(); renderAll(); persist(); };
 $("#autoBtn").onclick = ()=>{ autofill(); renderAll(); persist(); };
 $("#q").oninput = e => { S.filters.q=e.target.value; renderBank(); };
+$("#takeBtn").onclick = takeaways;
 for(const [id,key] of [["#fCur","cur"],["#fNum","num"],["#fClean","clean"],["#fMatch","match"]]){
   $(id).onclick = ()=>{ S.filters[key]=!S.filters[key]; $(id).setAttribute("aria-pressed",String(S.filters[key])); renderBank(); };
 }
