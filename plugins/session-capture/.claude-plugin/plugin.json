@@ -1,0 +1,10 @@
+{
+  "name": "session-capture",
+  "displayName": "Session Capture",
+  "version": "0.1.0",
+  "description": "Durable session memory. A UserPromptSubmit hook logs every user message to disk outside the context window (so it survives compaction), and Stop/PreCompact/SessionEnd hooks push that log to the PRIVATE skills repo via git plumbing (so it survives the ephemeral container). A SessionStart hook injects the evidence-ledger pointer so retrieval does not depend on remembering a trigger phrase. Fails closed: never pushes to a public repo, never blocks a prompt.",
+  "author": {
+    "name": "Hannah Schlacter"
+  },
+  "keywords": ["memory", "hooks", "capture", "resume", "learning", "compaction"]
+}
