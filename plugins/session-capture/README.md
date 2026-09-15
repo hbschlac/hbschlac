@@ -1,8 +1,10 @@
 # session-capture
 
-> **STATUS: NOT ENABLED. `flush.py` is UNVERIFIED.** Registered in the marketplace but
-> deliberately absent from `enabledPlugins`. Run the test plan at the bottom before
-> turning it on — these hooks fire on every prompt and every turn.
+> **STATUS: ENABLED 2026-09-15**, after the test plan at the bottom passed end to end.
+> `flush.py` is verified — a real push to `hbschlac/career-skills` left that clone's HEAD,
+> checked-out branch, `status --porcelain` and `.git/index` byte-identical. These hooks fire
+> on every prompt and every turn; to stop them, remove `session-capture@hbschlac` from
+> `enabledPlugins`.
 
 Durable session memory. Solves the two ways a session's knowledge disappears.
 
@@ -70,8 +72,8 @@ flush prints the log path rather than failing silently — data loss is loud, no
 
 ## Test plan — run this before enabling
 
-Bash was unavailable when this was authored, so `capture.py` is tested and `flush.py`
-is not. Run outside auto mode:
+Authored without Bash, so `flush.py` shipped unverified. **Run 2026-09-15 against
+`hbschlac/career-skills`: 1–4 all pass.** Re-run it after any change to these hooks.
 
 ```bash
 # 1. capture: redaction, empty prompt, malformed input — all must exit 0
@@ -97,13 +99,36 @@ git -C /home/user/career-skills ls-tree -r FETCH_HEAD --name-only
 # 4. idempotence: run flush again immediately — expect "no change", no empty commit
 ```
 
-Enable only after 1–4 pass:
+Enable only after 1–4 pass (done 2026-09-15 in `.claude/settings.json`):
 
 ```json
 "enabledPlugins": { "job-fetch@hbschlac": true, "session-capture@hbschlac": true }
 ```
 
 To disable in a hurry, remove that key — the hooks stop firing immediately.
+
+### What the 2026-09-15 run established
+
+Beyond the four steps, three claims made above were exercised rather than assumed:
+
+- **The plumbing really is inert.** Before/after comparison of the receiving clone showed an
+  identical HEAD, checked-out branch, `status --porcelain`, and an unmodified `.git/index` —
+  the temporary `GIT_INDEX_FILE` absorbed every write. `hash-object -w` accepts the log's
+  absolute path from outside the work tree, which is what makes that possible.
+- **Concurrency holds.** A second session's file was committed to the branch, then this
+  session flushed new content of its own: the foreign file survived and the new commit was
+  parented on it. Re-reading `FETCH_HEAD` is what preserves it — a push that skipped the
+  fetch would clobber the other session.
+- **A hostile `session_id` cannot escape the staging directory.** `../../etc/passwd`
+  sanitizes to `etcpasswd`.
+
+Two behaviors worth knowing when reading these logs later: the first push onto a
+non-existent branch is an **orphan commit** (no parent), and `Stop` genuinely throttles —
+one new line inside the 10-minute window pushes nothing, by design.
+
+**One caveat found during cleanup:** this sandbox's git relay refuses ref *deletions*
+(`push --delete` disconnects). The branch can be cleared forward with an empty-tree commit,
+but it cannot be removed from inside a web session.
 
 ## What this does not do yet
 

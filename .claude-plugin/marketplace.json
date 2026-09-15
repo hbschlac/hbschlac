@@ -12,7 +12,7 @@
     {
       "name": "session-capture",
       "source": "./plugins/session-capture",
-      "description": "Durable session memory. Logs every user message to disk outside the context window (survives compaction) and pushes it to the PRIVATE skills repo via git plumbing (survives the ephemeral container), then injects the evidence-ledger pointer at SessionStart so retrieval does not depend on remembering a trigger phrase. Fails closed: never pushes to a public repo, never blocks a prompt. NOT YET ENABLED — see the plugin README test plan."
+      "description": "Durable session memory. Logs every user message to disk outside the context window (survives compaction) and pushes it to the PRIVATE skills repo via git plumbing (survives the ephemeral container), then injects the evidence-ledger pointer at SessionStart so retrieval does not depend on remembering a trigger phrase. Fails closed: never pushes to a public repo, never blocks a prompt. Enabled 2026-09-15 after its README test plan passed end to end."
     },
     {
       "name": "book-clubs",
