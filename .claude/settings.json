@@ -8,7 +8,8 @@
     }
   },
   "enabledPlugins": {
-    "job-fetch@hbschlac": true
+    "job-fetch@hbschlac": true,
+    "session-capture@hbschlac": true
   },
   "permissions": {
     "allow": [
