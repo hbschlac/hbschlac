@@ -45,6 +45,18 @@ Solves selection, not writing: Walmart alone has 290 variants, Uprising 281.
 **Hard dependencies:** `recruiter-filter` (the 100-point scorecard, used verbatim), `aislop`
 (kill lists encoded in `scripts/enrich.py` and mirrored in the page), `job-fetch`, `voice`.
 
+**Read the evidence ledger before writing any bullet — this is blocking.** It lives in
+`hbschlac/career-skills` → `skills/product-networking/references/evidence.md` (**private repo — run `add_repo` first**; if `product-networking-skills` 404s, retry as `career-skills`) — deliberately **not** in this repo, which is public.
+The bank solves *selection*; the ledger solves *evidence*. The 2026-09-15 Anthropic CV took
+3h08m and 127 doc edits for nine bullets because ~14 of Hannah's 46 messages were facts Claude
+did not have, each arriving after a bullet was already written and scored (one bullet hit 15
+versions). Grep the ledger by JD dimension first, batch any remaining gaps into **one** question,
+and append her answers to the ledger in the same turn. Never declare a gap unfixable before
+grepping it — "the IT/Security gap is unfixable without fabricating" was wrong and cost 5 points.
+Verify page fit with `scripts/linefit.py` (measures the exported PDF); **never export a PDF into
+the conversation** — 27 such exports in that session blew the token limit every time and exhausted
+the context window.
+
 **The Composio rule is narrowed, on evidence.** `resume-subskill.md` bans Composio `GOOGLEDOCS_*`
 for CV editing because *whole-doc imports* destroy native formatting. `GOOGLEDOCS_REPLACE_ALL_TEXT`
 is the same `replaceAllText` batchUpdate the sanctioned path uses and never touches structure —

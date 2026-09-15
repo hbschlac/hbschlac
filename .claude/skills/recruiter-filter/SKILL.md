@@ -154,6 +154,29 @@ human, not an edit.
 Show the per-dimension breakdown, not just the total — the total says how she's doing,
 the breakdown says where the work is.
 
+### Score freeze — score twice, not nine times
+
+**Baseline once. Final once. That is the budget.**
+
+On 2026-09-15 this rubric was re-run nine times in one session: 76 → 81 → 84 → 85 → 87 → 89 → 90
+→ 92 → 93. Midway through, the skill itself said *"everything else is a rounding error on a rubric
+that's uncalibrated — re-reading the same bullets moves it several points either way. Chasing
+87 → 92 is chasing noise."* It was right, and then it kept scoring. Hannah lost track of her own
+number and asked about a 90 that was actually an 87.
+
+Rules:
+
+1. **Re-score only when new evidence lands on the page** — a fact she supplied that wasn't there
+   before. A re-score is a response to *content*, never to *wording*.
+2. **Never re-score after a rewrite.** Rewording a bullet that already scored does not change the
+   score; reporting that it does is noise dressed as progress.
+3. **Hard cap: 2 re-scores after the baseline.** At the cap, say so and stop: *"Further scoring is
+   below this rubric's resolution."*
+4. **State the number once per report and never revise it mid-conversation.** If the current score
+   is 87, it is not "about 90."
+5. **When the remaining gaps are structural, say so and stop scoring.** Seniority band and recency
+   cannot be edited. Points that can only be moved by a lie are not a fix list.
+
 ## Step 4 — The two things a screener actually sees
 
 Report these verbatim before the fixes. They are more persuasive than the score.
@@ -295,6 +318,9 @@ do harm.
   the current-role bullets. The rest is stable.
 - **Scoring generously.** An inflated score costs her a week of silence. If it's a 58,
   it's a 58.
+- **Score-chasing.** Re-running the rubric after every rewrite manufactures the feeling of
+  progress while the CV stands still. See Score freeze. If the last three points are seniority
+  band, the answer is outreach, not another pass.
 
 ## Output shape
 
