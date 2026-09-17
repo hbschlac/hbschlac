@@ -2,9 +2,13 @@
 
 > **STATUS: ENABLED 2026-09-15**, after the test plan at the bottom passed end to end.
 > `flush.py` is verified — a real push to `hbschlac/career-skills` left that clone's HEAD,
-> checked-out branch, `status --porcelain` and `.git/index` byte-identical. These hooks fire
-> on every prompt and every turn; to stop them, remove `session-capture@hbschlac` from
-> `enabledPlugins`.
+> checked-out branch, `status --porcelain` and `.git/index` byte-identical.
+>
+> **2026-09-17: fired on the laptop only.** Web sessions never ran a single hook — see
+> *How these hooks are registered* below. Fixed by registering the hooks in
+> `.claude/settings.json` as well. To stop them you must now remove **both**
+> `session-capture@hbschlac` from `enabledPlugins` **and** the `hooks` block from
+> `.claude/settings.json`.
 
 Durable session memory. Solves the two ways a session's knowledge disappears.
 
@@ -35,6 +39,38 @@ not a memory.
 | `Stop` | `flush.py` | Push if ≥5 new lines or ≥10 min since last push. Bounds loss to a few turns without a push per turn. |
 | `PreCompact` | `flush.py` | Forced push. Context is about to be lost. |
 | `SessionEnd` | `flush.py` | Forced push. Last chance before the container goes. |
+
+## How these hooks are registered
+
+Twice, on purpose.
+
+| Path | Declared in | Works where |
+|---|---|---|
+| Plugin | `hooks/hooks.json` + `enabledPlugins` | Laptop, after `claude plugin install` |
+| Settings | `hooks` block in `.claude/settings.json` | Everywhere, no install step |
+
+The plugin path alone was the original design, and it silently did nothing on web for
+two days. A Claude Code web container syncs *account-level* plugins only — it never acts
+on a project's `enabledPlugins`. Measured in a web session on 2026-09-17:
+`claude plugin marketplace list` reported **"No marketplaces configured"** even though
+`.claude/settings.json` declared the marketplace correctly; `installed_plugins.json` was
+`{"plugins": {}}`; `~/.claude/session-capture/` had never been created; and the session
+transcript showed exactly one hook running all session — the user-scope launcher hook.
+Meanwhile the capture branch still held nothing but the 2026-09-15 test artifacts.
+
+Nothing was misconfigured. The config was correct and nothing ever read it.
+
+The settings path needs no install, so it works in a fresh container. Both paths run the
+same scripts; the settings invocations set `SESSION_CAPTURE_VIA_SETTINGS=1`, and
+`_registration.defer_to_plugin()` uses that to stand down when the plugin is also
+installed — so a laptop with both live still captures each message exactly once. That
+guard is deliberately biased to run: an unreadable install state returns `False`, because
+a duplicated line is recoverable and a missed message is the whole failure being fixed.
+
+**This does not fix persistence on its own.** A web session still has to attach the
+private repo (`add_repo`, owner `hbschlac`, repo `career-skills`, access **push** — read
+access clones fine but cannot flush). `remind.py` says so at `SessionStart`; before this
+fix, that reminder never fired either.
 
 ## Design decisions worth knowing
 

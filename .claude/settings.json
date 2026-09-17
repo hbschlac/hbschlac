@@ -1,4 +1,67 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__Composio_Docs_Drive__COMPOSIO_REMOTE_BASH_TOOL",
+      "mcp__Composio_Docs_Drive__COMPOSIO_SEARCH_TOOLS",
+      "mcp__Composio_Docs_Drive__COMPOSIO_MULTI_EXECUTE_TOOL"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/remind.py\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/capture.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "job-fetch@hbschlac": true,
+    "session-capture@hbschlac": true
+  },
   "extraKnownMarketplaces": {
     "hbschlac": {
       "source": {
@@ -6,16 +69,5 @@
         "repo": "hbschlac/hbschlac"
       }
     }
-  },
-  "enabledPlugins": {
-    "job-fetch@hbschlac": true,
-    "session-capture@hbschlac": true
-  },
-  "permissions": {
-    "allow": [
-      "mcp__Composio_Docs_Drive__COMPOSIO_REMOTE_BASH_TOOL",
-      "mcp__Composio_Docs_Drive__COMPOSIO_SEARCH_TOOLS",
-      "mcp__Composio_Docs_Drive__COMPOSIO_MULTI_EXECUTE_TOOL"
-    ]
   }
 }
