@@ -19,6 +19,10 @@ What it refuses (PreToolUse, `permissionDecision: deny`, the reason names the ru
     every occurrence, and a 0-match "fixed" by inserting is how her edits get reverted
   * a Drive download_file_content (a PDF pulled into the chat; 27 of these exhausted
     the 2026-09-15 session) — use resume-builder/scripts/cvcheck.sh instead
+  * Gate 0 before Gate 4: a write to a doc that reads like a CV is refused until
+    skills/resume/scripts/ledger_grep.sh has run this session (it touches
+    ~/.claude/cv-guard/facts-grepped; older than CV_GUARD_FACTS_MAX_H hours does not count).
+    Facts arriving after a bullet was written is how one bullet reached 15 versions.
 
 What it records (PostToolUse):
   * the plaintext of every doc readback, keyed by doc id, so the checks above have
@@ -44,6 +48,7 @@ import time
 GUARD_DIR = pathlib.Path(os.environ.get("CV_GUARD_DIR") or os.path.expanduser("~/.claude/cv-guard"))
 TTL_MIN = int(os.environ.get("CV_GUARD_TTL_MIN", "30"))
 BIG_READ_CHARS = 40_000
+FACTS_MAX_H = float(os.environ.get("CV_GUARD_FACTS_MAX_H", "8"))
 
 BANNED_COMPOSIO = {
     "GOOGLEDOCS_UPDATE_DOCUMENT_MARKDOWN",
@@ -193,6 +198,28 @@ def results_list(resp):
 
 
 # ----------------------------------------------------------------- the checks
+def looks_like_cv(text):
+    """Her CVs carry EXPERIENCE/EDUCATION headers and the BuyBox bullets; a grocery list does not."""
+    t = text or ""
+    return ("EXPERIENCE" in t and "EDUCATION" in t) or "BuyBox" in t or "Buy Box" in t or "CVResume" in t
+
+
+def facts_gate(label):
+    """Gate 0 before Gate 4: a CV write needs a ledger grep recorded this session."""
+    marker = GUARD_DIR / "facts-grepped"
+    try:
+        age_h = (time.time() - marker.stat().st_mtime) / 3600
+    except FileNotFoundError:
+        age_h = None
+    if age_h is None or age_h > FACTS_MAX_H:
+        why = "no ledger grep is recorded for this session" if age_h is None \
+            else f"the last ledger grep was {age_h:.1f} h ago"
+        deny(f"{label}: Gate 0 first — {why}. Parse the JD into its requirements and run "
+             "`bash skills/resume/scripts/ledger_grep.sh <term> ...` (career-skills) for each one; "
+             "batch the real gaps into ONE question for Hannah; then write. Facts that arrive after "
+             "a bullet is written are how one bullet reached 15 versions.")
+
+
 def check_replace(doc, find_text, replace_text, match_case, label):
     if match_case is not True:
         deny(f"{label}: match_case must be true (it defaults to false and would match the wrong "
@@ -210,6 +237,8 @@ def check_replace(doc, find_text, replace_text, match_case, label):
         deny(f"{label}: no plaintext readback of doc {doc} in this session. Read it first "
              "(GOOGLEDOCS_GET_DOCUMENT_PLAINTEXT with sync_response_to_workbench:false, or "
              "get_doc_content), then retry. The doc is the truth; the conversation is not.")
+    if not c.get("parsed") or looks_like_cv(c.get("text", "")):
+        facts_gate(label)
     if not c.get("parsed"):
         return  # a readback happened but could not be indexed — the deterministic rules still held
     age_min = (time.time() - float(c.get("ts", 0))) / 60
