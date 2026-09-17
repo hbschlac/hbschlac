@@ -40,7 +40,16 @@ BRANCH = "session-capture"
 DEST_DIR = "session-capture"
 
 # Clones that may receive the log. Must be private.
+# Where the private clone might be. The remote sandbox checks repos out under
+# /home/user; a laptop puts them under $HOME. Hardcoding only the sandbox paths
+# made find_repo() return None on every laptop session, so capture wrote to disk,
+# never pushed, and printed "NOT persisted" at each session end — the plugin
+# looked enabled and did nothing.
 CANDIDATE_CLONES = [
+    os.path.expanduser("~/career-skills"),
+    os.path.expanduser("~/product-networking-skills"),
+    os.path.expanduser("~/code/career-skills"),
+    os.path.expanduser("~/src/career-skills"),
     "/home/user/career-skills",
     "/home/user/product-networking-skills",
 ]
