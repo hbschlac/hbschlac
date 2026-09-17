@@ -17,7 +17,7 @@ router=$(tok "$R/SKILL.md"); s0=$(tok "$R/references/step0-facts.md"); s1=$(tok 
 s2=$(tok "$R/references/step2-voice.md"); s3=$(tok "$R/references/step3-score.md"); s4=$(tok "$R/references/step4-apply.md")
 s5=$(tok "$R/references/step5-publish.md"); resume=$(tok "$PN/resume.md"); index=$(tok "$PN/resume-subskill.md")
 learn=$(tok "$CS/skills/interview-prep-dust-sierra/references/learnings.md")
-grep_out=$(bash "$R/scripts/ledger_grep.sh" security | wc -c); grep_tok=$(( grep_out / 4 ))
+grep_out=$(CV_GUARD_DIR="$(mktemp -d)" bash "$R/scripts/ledger_grep.sh" security | wc -c); grep_tok=$(( grep_out / 4 ))
 ledger_full=$(( ( $(wc -c < "$PN/evidence.md") + $(wc -c < "$PN/hannah-profile.md") ) / 4 ))
 
 before_list=$(awk -F': ' '/MANDATORY READ-LIST/ {print $2}' "$BEFORE")

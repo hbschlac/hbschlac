@@ -44,7 +44,8 @@ call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is th
 5. Never export a PDF into the conversation: `bash resume-builder/scripts/cvcheck.sh <DOC_ID>`.
 6. Score twice — baseline and final. Never re-score after a rewording.
 7. Gate order: facts → write → voice → score → apply → publish. Facts first, fit last, one
-   batched question, one batched swap list. `skills/resume/SKILL.md` in career-skills.
+   batched question, one batched swap list. `skills/resume/SKILL.md` in career-skills. The hook
+   refuses a session's first CV write until `ledger_grep.sh` has run (`~/.claude/cv-guard/facts-grepped`).
 8. End of a CV session: `python3 scripts/session_meter.py` — edits / read-backs / PDF pulls /
    tokens against the 2026-09-15 baseline (127 / ~15 / 27 / ~4 windows).
 

@@ -37,7 +37,9 @@ here — this repo is public, and the ledger records what she deliberately kept 
 
 > `hbschlac/career-skills` → `skills/product-networking/references/evidence.md` (**private repo — run `add_repo` first**; if `product-networking-skills` 404s, retry as `career-skills`)
 
-**2 — Parse the JD into its requirement list**, then grep the ledger by tag for each one. What you
+**2 — Parse the JD into its requirement list**, then grep the ledger by tag for each one
+(`bash skills/resume/scripts/ledger_grep.sh <terms>` in career-skills — it also records Gate 0; the
+`cv_guard` hook refuses the session's first CV write without it). What you
 find is evidence you already have. **Never ask a question the ledger already answers**, and never
 declare a gap unfixable before grepping it — "the IT/Security gap is unfixable without fabricating"
 was wrong and cost five points.
