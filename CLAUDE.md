@@ -30,6 +30,24 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | recruiter-filter | v1.3 | Screens a CV against a specific job the way the hiring stack actually does: knockout gate, 100-point rubric across 6 dimensions, what the AI review cites + what the 6-second human skim retains, and fixes ranked by points recovered. Grounded in real Ashby/Greenhouse/Workday behavior (refs in `references/`), not the auto-reject myth. Routes to job-fetch for the JD, product-networking to apply edits. Discloses its own blindspots every run (uncalibrated score, no view of the applicant pool or the layout, self-graded projection). Step 7 closes the loop with a read-only Gmail outcome scan (ATS mail patterns verified against the real mailbox) that dates each rejection and says which screening layer failed. Step 0.5 (list the whole board first) and the over-qualification/comp-band gate came from four live runs. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
+## CV editing — the wall (always on; a hook enforces it)
+
+These survive compaction because they live here. `.claude/hooks/cv_guard.py` refuses the doc
+call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is the proof it fired.
+
+1. A CV Hannah has called final is read-only. Edit only a fresh copy made this session.
+2. Never a whole-doc or markdown import, any provider. Copy a base; edit with find→replace only.
+3. `match_case: true` on every replace. `find_text` must match **exactly once** in the *latest*
+   plaintext readback — 0 or 2+ → stop and re-read. Never insert or rewrite a paragraph to
+   compensate; that is how her edits get reverted.
+4. Read the doc before every write round. The doc is the truth; the conversation is not.
+5. Never export a PDF into the conversation: `bash resume-builder/scripts/cvcheck.sh <DOC_ID>`.
+6. Score twice — baseline and final. Never re-score after a rewording.
+7. Gate order: facts → write → voice → score → apply → publish. Facts first, fit last, one
+   batched question, one batched swap list. `skills/resume/SKILL.md` in career-skills.
+8. End of a CV session: `python3 scripts/session_meter.py` — edits / read-backs / PDF pulls /
+   tokens against the 2026-09-15 baseline (127 / ~15 / 27 / ~4 windows).
+
 ## Bullet Bench — the resume builder (`resume-builder/`)
 
 **Dashboard:** https://claude.ai/artifact/RWLv53mteWtb4dmZ1qJSnf (private artifact)
@@ -77,7 +95,7 @@ silently corrupts all 994 bullets (this happened). Use the Drive handoff in RUNB
 Hannah's personal **resume, outreach, and networking** skill is NOT in this repo and NOT in `.claude/skills/` here — don't search for it locally. It lives in **`hbschlac/product-networking-skills`** (old name `career-skills`, which still redirects).
 
 - **Trigger phrase:** "use the product networking skill"
-- **Entry file:** `skills/product-networking/SKILL.md` → routes to `references/resume-subskill.md` (rules/format/publishing) → `references/resume.md` (base content + verb bank) → `references/hannah-profile.md` (story bank).
+- **Entry file for CVs:** `skills/resume/SKILL.md` — five gates, one reference file per gate, loaded one at a time (`references/step0-facts.md` … `step5-publish.md`). `skills/product-networking/SKILL.md` is the entry for outreach and routes CV work there. `resume-subskill.md` is now an index. **Never read the resume references in full up front** — that was ~50k tokens before the JD.
 - **Attach it first:** a remote session does NOT clone it automatically. Run `add_repo` before use. **Redirect gotcha:** the session access grant currently resolves the OLD name — if `add_repo hbschlac/product-networking-skills` returns "not accessible," retry with `hbschlac/career-skills`.
 - **Resume editing needs the Google Docs (Workspace) MCP**, not just Drive — see that skill's Step 2 preflight for the Drive-only fallback.
 

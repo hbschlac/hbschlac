@@ -64,6 +64,36 @@
             "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/session_meter.py\" --append"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__Composio_Docs_Drive__COMPOSIO_MULTI_EXECUTE_TOOL|mcp__Google_Drive__download_file_content|mcp__.*__(find_and_replace_doc|import_to_google_doc)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/cv_guard.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__Composio_Docs_Drive__COMPOSIO_MULTI_EXECUTE_TOOL|mcp__Google_Drive__(read_file_content|download_file_content)|mcp__.*__(get_doc_content|find_and_replace_doc)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/cv_guard.py\""
+          }
+        ]
       }
     ]
   },

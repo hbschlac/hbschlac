@@ -50,7 +50,15 @@ LEDGER = (
     "\n"
     "2. Attaching that repo with push access also lets this session's capture log "
     "persist. Without it, everything she types is lost when the container is "
-    "reclaimed."
+    "reclaimed.\n"
+    "\n"
+    "3. CV EDITING RUNS THROUGH `skills/resume/SKILL.md` — five gates, one reference "
+    "file per gate, loaded one at a time; never the references in full up front. "
+    "The wall: a final CV is read-only; never a whole-doc/markdown import; "
+    "find→replace only with match_case:true and a find_text that matches exactly "
+    "once in the latest plaintext readback; read before every write round; never a "
+    "PDF into the chat (resume-builder/scripts/cvcheck.sh); score twice. A hook "
+    "refuses calls that break these and names the rule."
 )
 
 
