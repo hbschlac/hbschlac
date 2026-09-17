@@ -13,6 +13,12 @@ import json
 import re
 import sys
 
+try:
+    from _registration import defer_to_plugin
+except Exception:  # a missing guard must never break the hook's contract
+    def defer_to_plugin(_plugin):
+        return False
+
 # Known applicant-tracking-system hosts. Tight list to avoid false positives.
 ATS_HOSTS = re.compile(
     r"""https?://[^\s"'>)]*?(
@@ -54,6 +60,9 @@ def find_job_url(text: str):
 
 
 def main():
+    # Registered twice on a laptop (plugin + settings.json). Run once.
+    if defer_to_plugin("job-fetch"):
+        return
     try:
         payload = json.load(sys.stdin)
     except Exception:

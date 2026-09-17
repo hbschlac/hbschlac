@@ -25,7 +25,8 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
 | project-bootstrap | v1.3 | Auto-generate CLAUDE.md + session-start hooks for repos |
 | research-pipeline | v1.3 | Scrape, classify, analyze, present research data + Claude Code session research with WebSearch/WebFetch |
-| job-fetch | v1.1 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Gem (jobs.gem.com) GraphQL mapping added — slug-not-UUID boardId, raw-segment extId, plus board listing. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enable in any repo via `enabledPlugins: {"job-fetch@hbschlac": true}`. |
+| job-fetch | v1.1 | **Packaged as a plugin** (`plugins/job-fetch/`, served from this repo's `.claude-plugin/marketplace.json`). Fetch + ingest a JD past the web sandbox's 403 egress block: ATS public APIs, with a Composio remote-exec MCP fallback when in-sandbox fetch is blocked. Gem (jobs.gem.com) GraphQL mapping added — slug-not-UUID boardId, raw-segment extId, plus board listing. Auto-fires on job URLs (UserPromptSubmit hook). Ingest-and-acknowledge, no JD echo. Enable in any repo via `enabledPlugins: {"job-fetch@hbschlac": true}` **plus** the `hooks` block in `.claude/settings.json` — see "Plugin hooks do not fire on web" below. |
+| session-capture | v1.1 | Durable session memory. Logs every user message to disk outside the context window (survives compaction), pushes it to the private skills repo's `session-capture` branch (survives the ephemeral container), and injects the evidence-ledger pointer at SessionStart. Fails closed: never pushes to a public repo, never blocks a prompt. Persistence requires `add_repo` on `career-skills` with **push** access. |
 | recruiter-filter | v1.3 | Screens a CV against a specific job the way the hiring stack actually does: knockout gate, 100-point rubric across 6 dimensions, what the AI review cites + what the 6-second human skim retains, and fixes ranked by points recovered. Grounded in real Ashby/Greenhouse/Workday behavior (refs in `references/`), not the auto-reject myth. Routes to job-fetch for the JD, product-networking to apply edits. Discloses its own blindspots every run (uncalibrated score, no view of the applicant pool or the layout, self-graded projection). Step 7 closes the loop with a read-only Gmail outcome scan (ATS mail patterns verified against the real mailbox) that dates each rejection and says which screening layer failed. Step 0.5 (list the whole board first) and the over-qualification/comp-band gate came from four live runs. |
 | mcp-contributor | v4.1 | FROZEN -- zero usage, anchor bug unfixed. Do not iterate. |
 
@@ -120,6 +121,30 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 ## Sandbox constraint
 
 Web sessions can only push to `hbschlac/hbschlac`. To change other repos, use GitHub MCP tools to create a PR. If MCP tools can't reach the repo, send a PushNotification with exact commands instead of writing laptop instructions.
+
+## Plugin hooks do not fire on web
+
+**`enabledPlugins` is desktop-only.** A web container syncs *account-level* plugins and never acts on
+a project's `enabledPlugins`, so a project-declared plugin is never installed and none of its hooks
+are ever registered. Measured 2026-09-17: `claude plugin marketplace list` → `No marketplaces
+configured`, `installed_plugins.json` → `{"plugins": {}}`, and the session transcript showed exactly
+one hook running all session — the user-scope launcher hook. `job-fetch` and `session-capture` had
+both been "enabled" since 2026-09-15 and had done nothing on web for two days. Neither failed loudly;
+both were designed to fail closed.
+
+**So any hook that must run on web belongs in the `hooks` block of `.claude/settings.json`**, which
+Claude Code reads natively with no install step, using `$CLAUDE_PROJECT_DIR` paths. Keep
+`enabledPlugins` as well — that is what makes the desktop path work.
+
+When a hook is registered both ways, guard it or it runs twice on the laptop: settings invocations
+set `CLAUDE_HOOKS_VIA_SETTINGS=1`, and each plugin's `hooks/_registration.py` (byte-identical copies)
+exposes `defer_to_plugin("<plugin-name>")` to stand down when the plugin is also installed. The guard
+fails open on purpose.
+
+**If you add a hook, prove it fired.** Registration is read at session start, so a new hook cannot be
+verified in the session that adds it — check `~/.claude/projects/<session>.jsonl` for `hookInfos`
+next session, or a hook's own side effect (a staging dir, a log line). "It looks enabled" is what
+cost two days here.
 
 ## README editing rules
 
