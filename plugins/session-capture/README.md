@@ -61,7 +61,7 @@ Meanwhile the capture branch still held nothing but the 2026-09-15 test artifact
 Nothing was misconfigured. The config was correct and nothing ever read it.
 
 The settings path needs no install, so it works in a fresh container. Both paths run the
-same scripts; the settings invocations set `SESSION_CAPTURE_VIA_SETTINGS=1`, and
+same scripts; the settings invocations set `CLAUDE_HOOKS_VIA_SETTINGS=1`, and
 `_registration.defer_to_plugin()` uses that to stand down when the plugin is also
 installed — so a laptop with both live still captures each message exactly once. That
 guard is deliberately biased to run: an unreadable install state returns `False`, because

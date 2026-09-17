@@ -144,17 +144,45 @@ skill *and* the auto-trigger hook travel together.
   `/plugin marketplace add hbschlac/hbschlac` then `/plugin install job-fetch`. Every desktop session
   on the machine then auto-fires it, regardless of which repo is open.
 - **Web (per repo you use):** web has **no** account-global scope — each session loads config only from
-  the repo it's cloned from, and `~/.claude` is ephemeral. So enable the plugin in the repo's committed
-  `.claude/settings.json`; web re-fetches it from GitHub (allowlisted) at session start. Snippet to add
-  to any repo you job-search from:
+  the repo it's cloned from, and `~/.claude` is ephemeral.
+
+  > **`enabledPlugins` alone does NOT work on web.** This section used to claim web re-fetches the
+  > marketplace from GitHub at session start. It does not. A web container syncs *account-level*
+  > plugins only and never acts on a project's `enabledPlugins`. Measured 2026-09-17 in a web session
+  > of `hbschlac/hbschlac`, which had declared both keys correctly since 2026-09-15:
+  > `claude plugin marketplace list` → `No marketplaces configured`, `installed_plugins.json` → empty,
+  > and this hook had never once auto-fired. Nothing was misconfigured; nothing ever read the config.
+
+  Register the hook directly in the repo's committed `.claude/settings.json`, which Claude Code reads
+  natively with no install step. Keep `enabledPlugins` too — that is what makes the desktop path work.
+  Snippet to add to any repo you job-search from:
 
   ```json
   {
     "extraKnownMarketplaces": {
       "hbschlac": { "source": { "source": "github", "repo": "hbschlac/hbschlac" } }
     },
-    "enabledPlugins": { "job-fetch@hbschlac": true }
+    "enabledPlugins": { "job-fetch@hbschlac": true },
+    "hooks": {
+      "UserPromptSubmit": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/job-fetch/hooks/detect-job-url.py\""
+            }
+          ]
+        }
+      ]
+    }
   }
   ```
 
-  (`hbschlac/hbschlac` itself enables it from its local clone — no fetch needed.)
+  That path only resolves in a repo that *contains* `plugins/job-fetch/` — i.e. `hbschlac/hbschlac`.
+  Elsewhere, point the command at wherever the plugin is checked out.
+
+  Both paths run the same script. The settings invocation sets `CLAUDE_HOOKS_VIA_SETTINGS=1`, and
+  `_registration.defer_to_plugin("job-fetch")` stands down when the plugin is also installed, so a
+  desktop session with both live still fires the hook exactly once. The guard fails open: an
+  unreadable install state runs anyway, since a duplicate trigger is recoverable and a hook that
+  never fires is the failure being fixed.

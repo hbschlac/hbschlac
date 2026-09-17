@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/remind.py\""
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/remind.py\""
           }
         ]
       }
@@ -22,7 +22,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/capture.py\""
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/capture.py\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/job-fetch/hooks/detect-job-url.py\""
           }
         ]
       }
@@ -32,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
           }
         ]
       }
@@ -42,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
           }
         ]
       }
@@ -52,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SESSION_CAPTURE_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/flush.py\""
           }
         ]
       }

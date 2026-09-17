@@ -27,7 +27,7 @@ import sys
 try:
     from _registration import defer_to_plugin
 except Exception:  # a missing guard must never break the hook's contract
-    def defer_to_plugin():
+    def defer_to_plugin(_plugin):
         return False
 
 STAGING = pathlib.Path(os.path.expanduser("~/.claude/session-capture"))
@@ -78,7 +78,7 @@ def unflushed():
 
 def main():
     # Registered twice on a laptop (plugin + settings.json). Run once.
-    if defer_to_plugin():
+    if defer_to_plugin("session-capture"):
         return 0
     try:
         payload = json.load(sys.stdin)
