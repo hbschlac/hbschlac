@@ -1,0 +1,13 @@
+# BEFORE snapshot — 2026-09-17T15:48Z — career-skills @ 04ab6b3
+# tokens ≈ bytes/4
+resume/SKILL.md 4133
+resume-subskill.md 14272
+resume.md 4430
+hannah-profile.md 5816
+job-tracker.md 1004
+voice-profile.md 5451
+evidence.md 7893
+product-networking/SKILL.md 3460
+learnings.md 23683
+recruiter-filter/SKILL.md 5518
+MANDATORY READ-LIST (resume/SKILL.md step 1) total: 35106

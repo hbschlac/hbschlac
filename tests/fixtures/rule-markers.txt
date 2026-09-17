@@ -1,0 +1,63 @@
+CRITICAL - Editing Method
+Connector preflight - Drive alone is NOT enough (READ BEFORE EDITING)
+The Core Premise
+Step 0 - Gather the evidence BEFORE you write (BLOCKING)
+The Ten Rules (non-negotiable on every version)
+1. Everything earns its place against the JD
+2. "Builder" ethos in the verbs and framing
+3. Every bullet = action + measurable outcome + so what
+4. No repeated verbs - scan the full list before finalizing
+5. Skills section leads with AI
+6. The resume must be exactly 1 page
+7. Every bullet must fit within 2 lines in the Google Doc
+8. The italic role/company descriptor must fit on exactly 1 line
+9. The header tagline must fit on exactly 1 line
+10a. Tailor titles to the JD - drop irrelevant suffixes
+10b. Faithfulness when sourcing content from old resumes
+10. No jargon - when in doubt, use plain language
+Use Hannah's Own Voice
+The her-noun rule
+What "No AI Slop" Means
+Quick-reference red flags (top 5 - see /aislop for all 12 categories)
+The correction standard
+Formatting Rules
+Tagline Selection
+Step-by-Step Editing Process
+Publishing a Resume to schlacter.me
+Where the site actually lives
+After publishing (either method)
+Add the link to the application doc
+Update the job tracker
+Known Google Docs API Pitfalls
+Creating bullets resets indentation
+Zero-width borders cause UNIT_UNSPECIFIED error
+Cover Letter Specifics
+`tabStops` is not valid in `updateParagraphStyle`
+`find_and_replace_doc` with empty `replace_text` leaves orphan `●` bullet markers
+STOP. Do NOT proceed with edits, and NEVER substitute a whole-doc / markdown import
+No AI slop
+Re-run verb scan after every batch of swaps
+On already-tailored docs: diff-preview first, API calls second.
+Domain-specific integration claims: cite-or-ask, never infer.
+Placeholder detection is a blocker, not a style note.
+Historical superlatives require WebSearch verification.
+Protect the strongest lines: regression flag rule.
+Tagline = role-shape TLDR, not a single accomplishment stat.
+"Own [system]" bullets read as sub-headers, not bullets - lead with an action verb showing what she DID.
+For senior PM/PgM roles, every bullet must answer "how did this go above and beyond?"
+ADDITIONAL section subheader should be JD-themed, not generic "Projects."
+Portfolio breadth: prefer ONE consolidated breadth bullet over a headline-detail bullet + breadth bullet that re-mentions the headline.
+Gather the evidence BEFORE you write
+match_case
+1J1O1UvDlpiv2HSuvuI0XfnvRKEvNzSAgxFr-vE-9ZBE
+Never export a PDF into the conversation
+leaves orphan
+PAST tense for all Walmart
+Placeholder detection
+Historical superlatives
+diff-preview
+schlacter-resume@schlacter-me.iam.gserviceaccount.com
+[Company]_CVResume-Hannah Schlacter
+occurrence
+GOOGLEDOCS_REPLACE_ALL_TEXT
+A CV Hannah has called final is read-only
