@@ -35,6 +35,7 @@ not a memory.
 | Event | Script | Job |
 |---|---|---|
 | `SessionStart` | `remind.py` | Inject the evidence-ledger pointer + flag unflushed logs. Retrieval stops depending on recall. |
+| `SessionStart` | `freshness.py` | Warn when the ACCOUNT's uploaded skills are behind the repo — the one distribution path nothing else guards. |
 | `UserPromptSubmit` | `capture.py` | Append the message to a local JSONL. No intelligence, ~0 tokens, never in context — so compaction can't touch it. |
 | `Stop` | `flush.py` | Push if ≥5 new lines or ≥10 min since last push. Bounds loss to a few turns without a push per turn. |
 | `PreCompact` | `flush.py` | Forced push. Context is about to be lost. |
@@ -71,6 +72,34 @@ a duplicated line is recoverable and a missed message is the whole failure being
 private repo (`add_repo`, owner `hbschlac`, repo `career-skills`, access **push** — read
 access clones fine but cannot flush). `remind.py` says so at `SessionStart`; before this
 fix, that reminder never fired either.
+
+## The third pipeline, and why `freshness.py` exists
+
+Skills reach a session three ways, and only two were ever guarded:
+
+1. `~/.claude/skills/` — laptop canonical
+2. `hbschlac/career-skills` — repo mirror &nbsp;&nbsp;← `sync.sh` guards 1 ↔ 2, both directions
+3. **account-level uploaded zips** — what web and phone sessions actually load
+
+Nothing watched 3. It refreshes only when someone runs `build-web-zips.py` and then
+manually re-uploads each zip. On 2026-09-17 the uploaded `resume` skill was two weeks
+behind — no ledger, no Step 0 gate, no her-noun rule, and a Composio ban that had been
+narrowed on evidence. The detection mechanism was a session remarking that the skill
+seemed "stale and old". Within two days of re-uploading, it had drifted again.
+
+`freshness.py` compares the loaded account copy against the repo at `SessionStart`. Two
+things make it trustworthy rather than noisy:
+
+- **It applies the build's own `rewrite()` before hashing.** The bundle deliberately
+  rewrites `~/.claude/skills/...` paths so it works on a phone, so a raw byte comparison
+  flags every file containing one. Importing `rewrite` from the repo's `build-web-zips.py`
+  keeps a single source of truth instead of a copy that drifts.
+- **It refuses to judge from a clone that is behind `origin/main`.** While this was being
+  written, an eight-commits-behind clone made it report the account as stale when the
+  account was current and the *clone* was stale. Acting on that would have rebuilt the zips
+  from old content and overwritten newer uploaded skills — the same shape as the sync that
+  deleted the ledger's hard-limits section. A comparison against a behind clone isn't a
+  weak signal, it's an inverted one, so it says so and stops.
 
 ## Design decisions worth knowing
 
