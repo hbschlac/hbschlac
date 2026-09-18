@@ -58,8 +58,9 @@ WALL = (
     "The wall (career-skills skills/resume/SKILL.md): copy a base doc and edit it with "
     "find→replace only; match_case:true on every replace; find_text must match exactly "
     "once in the LATEST plaintext readback; never a whole-doc or markdown import; never "
-    "a PDF into the chat. Escape hatch: `touch ~/.claude/cv-guard/off` and tell Hannah "
-    "the guard misfired."
+    "a PDF into the chat. The scripts live in the private repo: if it is not attached, run "
+    "add_repo (owner hbschlac, repo career-skills, access push) and use the clone. Escape "
+    "hatch: `touch ~/.claude/cv-guard/off` and tell Hannah the guard misfired."
 )
 
 
@@ -186,6 +187,24 @@ def longest_string(obj, min_len):
     return best if len(best) >= min_len else None
 
 
+def docs_json_text(obj):
+    """Concatenate textRun.content values from a Docs API document JSON (GET_DOCUMENT_BY_ID)."""
+    out = []
+
+    def walk(o):
+        if isinstance(o, dict):
+            tr = o.get("textRun")
+            if isinstance(tr, dict) and isinstance(tr.get("content"), str):
+                out.append(tr["content"])
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(obj)
+    return "".join(out)
+
+
 def looks_truncated(text):
     tail = text[-40:].lower()
     return ("truncated" in tail) or tail.endswith("…") or tail.endswith("...") \
@@ -215,7 +234,8 @@ def facts_gate(label):
         why = "no ledger grep is recorded for this session" if age_h is None \
             else f"the last ledger grep was {age_h:.1f} h ago"
         deny(f"{label}: Gate 0 first — {why}. Parse the JD into its requirements and run "
-             "`bash skills/resume/scripts/ledger_grep.sh <term> ...` (career-skills) for each one; "
+             "`bash skills/resume/scripts/ledger_grep.sh <term> ...` from the career-skills clone for "
+             "each one (not attached? add_repo owner hbschlac, repo career-skills, access push); "
              "batch the real gaps into ONE question for Hannah; then write. Facts that arrive after "
              "a bullet is written are how one bullet reached 15 versions.")
 
@@ -235,8 +255,8 @@ def check_replace(doc, find_text, replace_text, match_case, label):
     c = load_cache(doc)
     if c is None:
         deny(f"{label}: no plaintext readback of doc {doc} in this session. Read it first "
-             "(GOOGLEDOCS_GET_DOCUMENT_PLAINTEXT with sync_response_to_workbench:false, or "
-             "get_doc_content), then retry. The doc is the truth; the conversation is not.")
+             "(GOOGLEDOCS_GET_DOCUMENT_PLAINTEXT with sync_response_to_workbench:false, "
+             "GOOGLEDOCS_GET_DOCUMENT_BY_ID, or get_doc_content), then retry. The doc is the truth; the conversation is not.")
     if not c.get("parsed") or looks_like_cv(c.get("text", "")):
         facts_gate(label)
     if not c.get("parsed"):
@@ -320,6 +340,12 @@ def post(name, tool_input, tool_response):
                 parsed = bool(text) and not looks_truncated(text)
                 save_cache(doc, text, parsed)
                 log(f"CACHE {doc} parsed={parsed} chars={len(text or '')}")
+            elif slug == "GOOGLEDOCS_GET_DOCUMENT_BY_ID":
+                doc = doc_id(args.get("id") or args.get("document_id"))
+                text = docs_json_text(payload)
+                parsed = len(text) >= 200
+                save_cache(doc, text, parsed)
+                log(f"CACHE {doc} parsed={parsed} chars={len(text)} (structured readback)")
             elif slug == "GOOGLEDOCS_REPLACE_ALL_TEXT":
                 doc = doc_id(args.get("document_id") or args.get("id"))
                 n = find_key(payload, ("occurrencesChanged", "occurrences_changed"))

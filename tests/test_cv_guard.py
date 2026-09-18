@@ -18,6 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 HOOK = ROOT / ".claude" / "hooks" / "cv_guard.py"
 DOC = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789abcdefg"
 DOC2 = "1GroceryListDocIdZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
+DOC3 = "1StructuredReadbackDocIdYYYYYYYYYYYYYYYYYYYY"
 TEXT = ("Hannah Schlacter\nSenior Product Manager building AI-powered products\n"
         "● Built internal GenAI assistant that reduced diagnostic time by 40%\n"
         "● Led BuyBox ranking launches across 50+ teams\n"
@@ -86,6 +87,15 @@ with tempfile.TemporaryDirectory() as tmp:
             tool_response=[{"type": "text", "text": json.dumps({"results": [{"data": {"text": TEXT}}]})}], env=env)
     check("MCP content-block response is also parsed", json.loads(pathlib.Path(tmp, DOC + "zz.json").read_text()).get("parsed") is True)
 
+    docs_json = {"results": [{"data": {"body": {"content": [
+        {"paragraph": {"elements": [{"textRun": {"content": "Hannah Schlacter\n"}}]}},
+        {"paragraph": {"elements": [{"textRun": {"content": "EXPERIENCE\n"}}]}},
+        {"paragraph": {"elements": [{"textRun": {"content": "Led BuyBox ranking launches across 50+ teams STRUCT\n"}}]}},
+        {"paragraph": {"elements": [{"textRun": {"content": "EDUCATION " + "x" * 200 + "\n"}}]}}]}}}]}
+    run("PostToolUse", EXEC, composio("GOOGLEDOCS_GET_DOCUMENT_BY_ID", id=DOC3), tool_response=docs_json, env=env)
+    c3 = json.loads(pathlib.Path(tmp, DOC3 + ".json").read_text())
+    check("structured GET_DOCUMENT_BY_ID readback is cached as text", c3.get("parsed") is True and "teams STRUCT" in c3["text"])
+
     print("cv_guard — Gate 0 before the first CV write")
     r = run("PreToolUse", EXEC, composio("GOOGLEDOCS_REPLACE_ALL_TEXT", document_id=DOC, find_text="Led BuyBox", replace_text="x", match_case=True), env=env)
     check("CV write with no ledger grep recorded is denied (Gate 0)", decision(r) == "deny" and "Gate 0" in json.dumps(r) and "ledger_grep" in json.dumps(r))
@@ -99,6 +109,8 @@ with tempfile.TemporaryDirectory() as tmp:
     r = run("PreToolUse", EXEC, composio("GOOGLEDOCS_REPLACE_ALL_TEXT", document_id=DOC2, find_text="plumber UNIQUE2", replace_text="electrician", match_case=True), env=env)
     check("a doc that does not read like a CV is not gated", r is None)
     marker.write_text("2026-09-17T16:00:00Z  security compliance\n")
+    r = run("PreToolUse", EXEC, composio("GOOGLEDOCS_REPLACE_ALL_TEXT", document_id=DOC3, find_text="teams STRUCT", replace_text="teams, once", match_case=True), env=env)
+    check("a write after a structured readback is allowed", r is None)
 
     print("cv_guard — uniqueness against the readback")
     r = run("PreToolUse", EXEC, composio("GOOGLEDOCS_REPLACE_ALL_TEXT", document_id=DOC, find_text="Senior Product Manager building AI-powered products", replace_text="X", match_case=True), env=env)
