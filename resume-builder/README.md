@@ -74,7 +74,7 @@ One bullet appears in **101 different CVs**.
 
 Format rules come from `career-skills/skills/product-networking/references/resume-subskill.md`;
 slop rules from `career-skills/skills/aislop/SKILL.md`; the 100-point scorecard from
-`.claude/skills/recruiter-filter/SKILL.md`. The dashboard and `enrich.py` read the same tables so
+`career-skills/skills/recruiter-filter/SKILL.md`. The dashboard and `enrich.py` read the same tables so
 they cannot drift.
 
 Blocking: repeated opening verb · em dash inside a bullet · trailing period · `+`/`/` shorthand ·
