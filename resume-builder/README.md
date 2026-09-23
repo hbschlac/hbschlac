@@ -9,14 +9,14 @@ Every resume bullet Hannah has ever written, in one place, selectable against a 
 Applying to ~30 roles at a time, every bullet has to be measurable *and* aligned to that JD.
 The bottleneck was never writing — it was **selection**. The same Uprising story has a strategy
 framing and a product framing; Walmart has a marketplace framing and an AI/ML-platform framing.
-Those variants existed, but scattered across 256 CV Google Docs, so each application meant
+Those variants existed, but scattered across 300+ CV Google Docs, so each application meant
 re-deriving choices already made.
 
 ## What's here
 
 | Path | What it is |
 |---|---|
-| `data/bullets.tsv` | Raw mined bank — 990 rows, one per unique bullet |
+| `data/bullets.tsv` | Raw mined bank — 1,180 rows, one per unique bullet |
 | `data/bullets.json` | Enriched: verb, metrics, skills, archetypes, slop flags, recency |
 | `scripts/mine_cvs.py` | Drive archive → `bullets.tsv` (runs in the Composio workbench) |
 | `scripts/enrich.py` | `bullets.tsv` → `bullets.json`. **The rules live here**, not in the payload |
@@ -29,7 +29,7 @@ re-deriving choices already made.
 
 ## Selection was only half the problem
 
-The bank solves **selection** — 994 bullets she has already written, browsable and badged.
+The bank solves **selection** — 1,184 bullets she has already written, browsable and badged.
 It does not solve **evidence**: the things she knows that were never on a CV in the first place.
 
 The 2026-09-15 Anthropic build took **3h08m of working time and 127 doc edits** for nine bullets,
@@ -48,22 +48,26 @@ searchable on her GitHub profile.
 ## The bank
 
 Mined 2026-09-14 from **346 CV docs found, 331 fetched (2021+), 256 actual resumes** →
-**994 unique bullets** after dedupe and splitting merged lines.
+**994 unique bullets** after dedupe and splitting merged lines. Refreshed 2026-09-23 from the
+**50 CV docs created since** (Sept 15–23: Gap, Sela, DoorDash, Abridge, Reddit, Visa, Bain and
+the rest) → **+190 new bullets, 17 existing ones re-dated**, **1,184 total**. `scripts/mine_cvs.py`
+holds the incremental run; move its `SINCE` forward each time.
 
 | Experience | Variants |
 |---|---|
-| Walmart | 290 |
-| Uprising | 281 |
-| Siemens | 132 |
-| Accenture | 81 |
+| Walmart | 397 |
+| Uprising | 311 |
+| Siemens | 146 |
+| Accenture | 94 |
 | Berkeley | 66 |
-| Community | 43 |
-| Muse | 34 |
-| AI projects | 28 |
+| Community | 45 |
+| Muse | 51 |
+| AI projects | 34 |
 | Illinois | 16 |
-| Coherent Finance | 3 |
+| Coherent Finance | 4 |
+| Misc | 20 |
 
-152 are in current rotation (used Aug 2026+). 839 carry a number. 858 are slop-free.
+343 are in current rotation (used Aug 2026+). 1,000 carry a number. 1,041 are slop-free.
 One bullet appears in **101 different CVs**.
 
 ## Rules it enforces
