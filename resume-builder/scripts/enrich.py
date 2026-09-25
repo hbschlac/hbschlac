@@ -178,6 +178,10 @@ def main() -> int:
                 flags.append("walmart-present")          # blocking: role ended 2026
             if BERKELEY_EMAIL.search(piece):
                 flags.append("berkeley-email")           # blocking: always hbschlac@gmail.com
+            if "buybox engineer" in piece.lower():
+                # blocking: Hannah 2026-09-25 -- "saying 'buybox' doesnt mean anything to the reader".
+                # On a page it is the "team agent" / "dedicated prod team agent".
+                flags.append("internal-name")
             low = piece.lower()
             if "gmv" in low and "$400m" not in low and \
                piece.split()[0].lower() in ("owned", "shipped", "drove", "delivered"):
