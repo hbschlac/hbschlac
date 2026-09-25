@@ -18,7 +18,7 @@ What it refuses (PreToolUse, `permissionDecision: deny`, the reason names the ru
     whose find_text matches 0 or 2+ times in that readback — REPLACE_ALL replaces
     every occurrence, and a 0-match "fixed" by inserting is how her edits get reverted
   * a Drive download_file_content (a PDF pulled into the chat; 27 of these exhausted
-    the 2026-09-15 session) — use resume-builder/scripts/cvcheck.sh instead
+    the 2026-09-15 session) — use skills/resume/scripts/cvcheck.sh (career-skills) instead
   * Gate 0 before Gate 4: a write to a doc that reads like a CV is refused until
     skills/resume/scripts/ledger_grep.sh has run this session (it touches
     ~/.claude/cv-guard/facts-grepped; older than CV_GUARD_FACTS_MAX_H hours does not count).
@@ -287,8 +287,8 @@ def pre(name, tool_input):
         if (GUARD_DIR / "allow-download").exists():
             allow("download permitted by marker")
         deny("Drive download_file_content pulls the whole file (a PDF is 10–25k tokens) into the "
-             "conversation. For a CV, run `bash resume-builder/scripts/cvcheck.sh <DOC_ID>` in "
-             "hbschlac/hbschlac — it exports the PDF to a file and prints only the line-fit "
+             "conversation. For a CV, run `bash skills/resume/scripts/cvcheck.sh <DOC_ID>` from "
+             "hbschlac/career-skills (attach it with add_repo) — it exports the PDF to a file and prints only the line-fit "
              "summary. If you genuinely need the file in the chat: `touch "
              "~/.claude/cv-guard/allow-download` and retry.")
     if name.endswith("COMPOSIO_MULTI_EXECUTE_TOOL"):
@@ -379,7 +379,7 @@ def post(name, tool_input, tool_response):
         if size > BIG_READ_CHARS:
             post_context(f"That Drive read put ~{size // 1000}k characters (~{size // 4000}k tokens) into "
                          "the conversation. If it was a PDF or an exported CV, do not repeat it: "
-                         "`bash resume-builder/scripts/cvcheck.sh <DOC_ID>` writes the PDF to a file "
+                         "`bash skills/resume/scripts/cvcheck.sh <DOC_ID>` (career-skills) writes the PDF to a file "
                          "and returns only the line-fit summary.")
         allow()
     allow()

@@ -34,6 +34,11 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 
 These survive compaction because they live here. `.claude/hooks/cv_guard.py` refuses the doc
 call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is the proof it fired.
+**Canonical hooks moved to `career-skills` (2026-09-25).** This repo's copy runs only when
+`hbschlac` is the session's sole repo; resume sessions attach `career-skills`, so the canonical
+`cv_guard.py` (now also guarding the Pipeline sheet), `session_meter.py` and a SessionStart
+reminder live there. A session with BOTH repos attached starts in `/home/user` and loads
+neither repo's hooks — start CV sessions with `career-skills` alone.
 
 1. A CV Hannah has called final is read-only. Edit only a fresh copy made this session.
 2. Never a whole-doc or markdown import, any provider. Copy a base; edit with find→replace only.
@@ -41,7 +46,8 @@ call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is th
    plaintext readback — 0 or 2+ → stop and re-read. Never insert or rewrite a paragraph to
    compensate; that is how her edits get reverted.
 4. Read the doc before every write round. The doc is the truth; the conversation is not.
-5. Never export a PDF into the conversation: `bash resume-builder/scripts/cvcheck.sh <DOC_ID>`.
+5. Never export a PDF into the conversation: `bash skills/resume/scripts/cvcheck.sh <DOC_ID>` in
+   career-skills (moved there 2026-09-25 so it loads with the resume skill; runs on web).
 6. Score twice — baseline and final. Never re-score after a rewording.
 7. Gate order: facts → write → voice → score → apply → publish. Facts first, fit last, one
    batched question, one batched swap list. `skills/resume/SKILL.md` in career-skills. The hook

@@ -57,7 +57,7 @@ LEDGER = (
     "The wall: a final CV is read-only; never a whole-doc/markdown import; "
     "find→replace only with match_case:true and a find_text that matches exactly "
     "once in the latest plaintext readback; read before every write round; never a "
-    "PDF into the chat (resume-builder/scripts/cvcheck.sh); score twice. A hook "
+    "PDF into the chat (career-skills skills/resume/scripts/cvcheck.sh); score twice. A hook "
     "refuses calls that break these and names the rule."
 )
 

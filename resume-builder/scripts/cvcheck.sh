@@ -7,6 +7,8 @@
 #
 # Exit codes: 0 fits · 1 over one page or a bullet too long · 3 export failed (doc not
 # link-readable) · 2 usage.
+# Canonical copy: hbschlac/career-skills skills/resume/scripts/cvcheck.sh (loads with the resume
+# skill). This copy stays for the Bullet Bench; change career-skills first.
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [[ $# -ge 1 ]] || { echo "usage: cvcheck.sh DOC_ID_OR_URL [--over N]" >&2; exit 2; }
