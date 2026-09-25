@@ -34,6 +34,11 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 
 These survive compaction because they live here. `.claude/hooks/cv_guard.py` refuses the doc
 call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is the proof it fired.
+**Canonical hooks moved to `career-skills` (2026-09-25).** This repo's copy runs only when
+`hbschlac` is the session's sole repo; resume sessions attach `career-skills`, so the canonical
+`cv_guard.py` (now also guarding the Pipeline sheet), `session_meter.py` and a SessionStart
+reminder live there. A session with BOTH repos attached starts in `/home/user` and loads
+neither repo's hooks — start CV sessions with `career-skills` alone.
 
 1. A CV Hannah has called final is read-only. Edit only a fresh copy made this session.
 2. Never a whole-doc or markdown import, any provider. Copy a base; edit with find→replace only.
