@@ -23761,34 +23761,6 @@
    "slop": []
   },
   {
-   "id": "walmart-0b675025",
-   "experienceId": "walmart",
-   "section": "bullet",
-   "text": "Designed guardrails across 30+ initiatives a quarter so bad actors, buyer or seller, could not game the ranking algorithm; caught daily-changing prices and false delivery SLAs, and built the gates that ruled them out",
-   "verb": "Designed",
-   "metrics": [
-    "30"
-   ],
-   "hasMetric": true,
-   "chars": 216,
-   "estLines": 3,
-   "skills": [
-    "experimentation",
-    "marketplace",
-    "ml-ranking"
-   ],
-   "archetypes": [
-    "ecomm-marketplace",
-    "platform-ml"
-   ],
-   "useCount": 2,
-   "lastUsed": "2026-09-25",
-   "current": true,
-   "source": "Ramp PM IntlTax",
-   "flags": [],
-   "slop": []
-  },
-  {
    "id": "walmart-efa94084",
    "experienceId": "walmart",
    "section": "bullet",
@@ -26406,6 +26378,34 @@
    "lastUsed": "2026-09-23",
    "current": true,
    "source": "GapInc AIStrategy R218349",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-ade484ef",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Designed guardrails across 30+ initiatives a quarter to prevent marketplace bad actors, buyer or seller, from gaming the ranking algorithm; caught daily-changing prices and false delivery SLAs, and built the gates that ruled them out",
+   "verb": "Designed",
+   "metrics": [
+    "30"
+   ],
+   "hasMetric": true,
+   "chars": 233,
+   "estLines": 3,
+   "skills": [
+    "experimentation",
+    "marketplace",
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "ecomm-marketplace",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
    "flags": [],
    "slop": []
   },
@@ -29126,6 +29126,34 @@
    "lastUsed": "2026-09-17",
    "current": true,
    "source": "CapitalOne SrMgrPM DevEx R246485",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-0b675025",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Designed guardrails across 30+ initiatives a quarter so bad actors, buyer or seller, could not game the ranking algorithm; caught daily-changing prices and false delivery SLAs, and built the gates that ruled them out",
+   "verb": "Designed",
+   "metrics": [
+    "30"
+   ],
+   "hasMetric": true,
+   "chars": 216,
+   "estLines": 3,
+   "skills": [
+    "experimentation",
+    "marketplace",
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "ecomm-marketplace",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-18",
+   "current": true,
+   "source": "Visa RAS AgenticCommerce",
    "flags": [],
    "slop": []
   },
