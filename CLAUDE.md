@@ -41,7 +41,8 @@ call when one is broken and names the rule; `~/.claude/cv-guard/guard.log` is th
    plaintext readback — 0 or 2+ → stop and re-read. Never insert or rewrite a paragraph to
    compensate; that is how her edits get reverted.
 4. Read the doc before every write round. The doc is the truth; the conversation is not.
-5. Never export a PDF into the conversation: `bash resume-builder/scripts/cvcheck.sh <DOC_ID>`.
+5. Never export a PDF into the conversation: `bash skills/resume/scripts/cvcheck.sh <DOC_ID>` in
+   career-skills (moved there 2026-09-25 so it loads with the resume skill; runs on web).
 6. Score twice — baseline and final. Never re-score after a rewording.
 7. Gate order: facts → write → voice → score → apply → publish. Facts first, fit last, one
    batched question, one batched swap list. `skills/resume/SKILL.md` in career-skills. The hook
