@@ -547,10 +547,10 @@
     "enterprise-b2b",
     "ops-generalist"
    ],
-   "useCount": 4,
-   "lastUsed": "2026-09-23",
+   "useCount": 6,
+   "lastUsed": "2026-09-25",
    "current": true,
-   "source": "Adobe SrPM CreativeAgents",
+   "source": "Ramp ProductOps CustomerSetup",
    "flags": [],
    "slop": []
   },
@@ -3068,6 +3068,33 @@
    "slop": []
   },
   {
+   "id": "aiprojects-45f64cb9",
+   "experienceId": "aiprojects",
+   "section": "bullet",
+   "text": "Authored and debugged agent skills for real workflows, from detecting Git divergence and unsafe merges to repairing stale data pipelines; fixed flaky triggers and ran prompt experiments to improve when agents act, recover, and abstain",
+   "verb": "Authored",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 234,
+   "estLines": 3,
+   "skills": [
+    "agents-llm",
+    "experimentation",
+    "ops-process"
+   ],
+   "archetypes": [
+    "ai-native",
+    "ops-generalist",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "aiprojects-18df3a72",
    "experienceId": "aiprojects",
    "section": "bullet",
@@ -3478,6 +3505,29 @@
    "lastUsed": "2026-09-14",
    "current": true,
    "source": "Google ConsumerShopping",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "coherent-f3b45d9c",
+   "experienceId": "coherent",
+   "section": "bullet",
+   "text": "Took the concept to MVP; ran diligence on 10 financial data vendors and selected the partner supplying impact data on underlying companies, tied to ETFs; integrated Plaid to aggregate holdings across institutions",
+   "verb": "Took",
+   "metrics": [
+    "10"
+   ],
+   "hasMetric": true,
+   "chars": 212,
+   "estLines": 2,
+   "skills": [
+    "stakeholder"
+   ],
+   "archetypes": [],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
    "flags": [],
    "slop": []
   },
@@ -7800,6 +7850,55 @@
    "slop": []
   },
   {
+   "id": "muse-62c4c95a",
+   "experienceId": "muse",
+   "section": "bullet",
+   "text": "Grounded the shopping assistant with RAG over the product catalog; designed API and MCP tool calls and evals for live inventory accuracy, then built self-healing agents to detect and recover from broken user experiences",
+   "verb": "Grounded",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 219,
+   "estLines": 3,
+   "skills": [
+    "agents-llm"
+   ],
+   "archetypes": [
+    "ai-native",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "muse-07a1a7d9",
+   "experienceId": "muse",
+   "section": "bullet",
+   "text": "Shipped an MCP that scans retailers so brands and retailers can put their own products on the platform without a hand-built integration; grounded the shopping assistant with RAG and evals for live inventory accuracy",
+   "verb": "Shipped",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 215,
+   "estLines": 2,
+   "skills": [
+    "agents-llm"
+   ],
+   "archetypes": [
+    "ai-native",
+    "ecomm-marketplace",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "muse-4fe26bbe",
    "experienceId": "muse",
    "section": "bullet",
@@ -10914,6 +11013,38 @@
      ]
     }
    ]
+  },
+  {
+   "id": "siemens-05841eb7",
+   "experienceId": "siemens",
+   "section": "bullet",
+   "text": "Shaped the market-entry and subscription growth strategy for a 0→1 consumer SaaS product; modeled subscription economics, ran 15+ customer interviews; presented execs a roadmap projected to grow LTV 6x and customers 5x",
+   "verb": "Shaped",
+   "metrics": [
+    "15",
+    "6x",
+    "5x"
+   ],
+   "hasMetric": true,
+   "chars": 218,
+   "estLines": 3,
+   "skills": [
+    "0-to-1",
+    "customer-research",
+    "growth",
+    "ml-ranking",
+    "revenue",
+    "strategy"
+   ],
+   "archetypes": [
+    "consumer-growth"
+   ],
+   "useCount": 2,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
   },
   {
    "id": "siemens-25c26fce",
@@ -14938,6 +15069,37 @@
    "slop": []
   },
   {
+   "id": "uprising-ac6a0077",
+   "experienceId": "uprising",
+   "section": "bullet",
+   "text": "Created a KPI reporting product that reached 90% adoption across 30 companies and cut reporting time 50%; A/B tested read-rate on the 50-page quarterly report and doubled NPS in six months by shipping what the data pointed to",
+   "verb": "Created",
+   "metrics": [
+    "90%",
+    "30",
+    "50%",
+    "50"
+   ],
+   "hasMetric": true,
+   "chars": 225,
+   "estLines": 3,
+   "skills": [
+    "adoption",
+    "analytics",
+    "experimentation"
+   ],
+   "archetypes": [
+    "enterprise-b2b",
+    "ops-generalist"
+   ],
+   "useCount": 4,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "uprising-6e2538c9",
    "experienceId": "uprising",
    "section": "bullet",
@@ -15069,37 +15231,6 @@
    "lastUsed": "2025-01-10",
    "current": false,
    "source": "Chime PM",
-   "flags": [],
-   "slop": []
-  },
-  {
-   "id": "uprising-ac6a0077",
-   "experienceId": "uprising",
-   "section": "bullet",
-   "text": "Created a KPI reporting product that reached 90% adoption across 30 companies and cut reporting time 50%; A/B tested read-rate on the 50-page quarterly report and doubled NPS in six months by shipping what the data pointed to",
-   "verb": "Created",
-   "metrics": [
-    "90%",
-    "30",
-    "50%",
-    "50"
-   ],
-   "hasMetric": true,
-   "chars": 225,
-   "estLines": 3,
-   "skills": [
-    "adoption",
-    "analytics",
-    "experimentation"
-   ],
-   "archetypes": [
-    "enterprise-b2b",
-    "ops-generalist"
-   ],
-   "useCount": 3,
-   "lastUsed": "2026-09-23",
-   "current": true,
-   "source": "Adobe SrPM CreativeAgents",
    "flags": [],
    "slop": []
   },
@@ -20111,6 +20242,29 @@
    "slop": []
   },
   {
+   "id": "uprising-8140e359",
+   "experienceId": "uprising",
+   "section": "bullet",
+   "text": "Reworked the investor journey country by country for multi-million-dollar LP transfers from Australia and the UK, matching each country’s legal process; chose and managed the bank that moved hundreds of millions",
+   "verb": "Reworked",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 211,
+   "estLines": 2,
+   "skills": [
+    "ops-process"
+   ],
+   "archetypes": [
+    "ops-generalist"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "uprising-73dd7230",
    "experienceId": "uprising",
    "section": "bullet",
@@ -20191,6 +20345,33 @@
    "lastUsed": "2026-09-18",
    "current": true,
    "source": "Sela ForwardDeployedPM",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "uprising-046ac91d",
+   "experienceId": "uprising",
+   "section": "bullet",
+   "text": "Launched a self-serve investment tool that calculated investor participation in upcoming rounds; ran know-your-investor with legal and set sensitive-data handling, driving ~95% adoption and $100M+ in two months",
+   "verb": "Launched",
+   "metrics": [
+    "~95%",
+    "$100M+"
+   ],
+   "hasMetric": true,
+   "chars": 210,
+   "estLines": 2,
+   "skills": [
+    "0-to-1",
+    "adoption"
+   ],
+   "archetypes": [
+    "enterprise-b2b"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
    "flags": [],
    "slop": []
   },
@@ -20396,6 +20577,30 @@
    "lastUsed": "2026-09-16",
    "current": true,
    "source": "GrowTherapy StaffPM Growth",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "uprising-7b9468b5",
+   "experienceId": "uprising",
+   "section": "bullet",
+   "text": "Owned onboarding for new investors and portfolio companies; sent investors accurate, relevant docs for the main fund and each investment, and set up startups’ systems for updates and financial reporting",
+   "verb": "Owned",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 202,
+   "estLines": 2,
+   "skills": [
+    "adoption",
+    "analytics"
+   ],
+   "archetypes": [
+    "ops-generalist"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
    "flags": [],
    "slop": []
   },
@@ -22642,6 +22847,29 @@
    "slop": []
   },
   {
+   "id": "walmart-fd21eaf8",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Translated a new tax law and Legal's risk assessment into product and engineering requirements and shipped compliance over peak holiday; adapted offer selection for Mexico and Canada with international and legal teams",
+   "verb": "Translated",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 217,
+   "estLines": 3,
+   "skills": [
+    "marketplace"
+   ],
+   "archetypes": [
+    "ecomm-marketplace"
+   ],
+   "useCount": 3,
+   "lastUsed": "2026-09-18",
+   "current": true,
+   "source": "Sela ForwardDeployedPM",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "walmart-ce4ad62e",
    "experienceId": "walmart",
    "section": "bullet",
@@ -22763,6 +22991,39 @@
    "lastUsed": "2026-04-13",
    "current": false,
    "source": "old Twitch",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-b1115c81",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Shipped two flagship signal-based offer ranking and prioritization experiments banking ~$137M GMV and lifting third-party conversion +1.51% against the platform’s $400M+ revenue charter",
+   "verb": "Shipped",
+   "metrics": [
+    "~$137M",
+    "+1.51%",
+    "$400M+"
+   ],
+   "hasMetric": true,
+   "chars": 185,
+   "estLines": 2,
+   "skills": [
+    "experimentation",
+    "growth",
+    "marketplace",
+    "ml-ranking",
+    "revenue"
+   ],
+   "archetypes": [
+    "consumer-growth",
+    "ecomm-marketplace",
+    "platform-ml"
+   ],
+   "useCount": 3,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
    "flags": [],
    "slop": []
   },
@@ -23486,25 +23747,30 @@
    "slop": []
   },
   {
-   "id": "walmart-fd21eaf8",
+   "id": "walmart-0b675025",
    "experienceId": "walmart",
    "section": "bullet",
-   "text": "Translated a new tax law and Legal's risk assessment into product and engineering requirements and shipped compliance over peak holiday; adapted offer selection for Mexico and Canada with international and legal teams",
-   "verb": "Translated",
-   "metrics": [],
-   "hasMetric": false,
-   "chars": 217,
+   "text": "Designed guardrails across 30+ initiatives a quarter so bad actors, buyer or seller, could not game the ranking algorithm; caught daily-changing prices and false delivery SLAs, and built the gates that ruled them out",
+   "verb": "Designed",
+   "metrics": [
+    "30"
+   ],
+   "hasMetric": true,
+   "chars": 216,
    "estLines": 3,
    "skills": [
-    "marketplace"
+    "experimentation",
+    "marketplace",
+    "ml-ranking"
    ],
    "archetypes": [
-    "ecomm-marketplace"
+    "ecomm-marketplace",
+    "platform-ml"
    ],
    "useCount": 2,
-   "lastUsed": "2026-09-18",
+   "lastUsed": "2026-09-25",
    "current": true,
-   "source": "Sela ForwardDeployedPM",
+   "source": "Ramp PM IntlTax",
    "flags": [],
    "slop": []
   },
@@ -24071,39 +24337,6 @@
    "lastUsed": "2026-05-27",
    "current": false,
    "source": "UberGenAI",
-   "flags": [],
-   "slop": []
-  },
-  {
-   "id": "walmart-b1115c81",
-   "experienceId": "walmart",
-   "section": "bullet",
-   "text": "Shipped two flagship signal-based offer ranking and prioritization experiments banking ~$137M GMV and lifting third-party conversion +1.51% against the platform’s $400M+ revenue charter",
-   "verb": "Shipped",
-   "metrics": [
-    "~$137M",
-    "+1.51%",
-    "$400M+"
-   ],
-   "hasMetric": true,
-   "chars": 185,
-   "estLines": 2,
-   "skills": [
-    "experimentation",
-    "growth",
-    "marketplace",
-    "ml-ranking",
-    "revenue"
-   ],
-   "archetypes": [
-    "consumer-growth",
-    "ecomm-marketplace",
-    "platform-ml"
-   ],
-   "useCount": 2,
-   "lastUsed": "2026-09-23",
-   "current": true,
-   "source": "Adobe SrPM CreativeAgents",
    "flags": [],
    "slop": []
   },
@@ -26910,6 +27143,31 @@
    "slop": []
   },
   {
+   "id": "walmart-44e8a512",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Guided the international team's Mexico and Canada launch as US BuyBox point of contact; set launch readiness criteria, found where the US experience broke for Mexico, and defined how Canada's tax and payment rules shape ranking",
+   "verb": "Guided",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 227,
+   "estLines": 3,
+   "skills": [
+    "0-to-1",
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "ecomm-marketplace",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "walmart-8450320f",
    "experienceId": "walmart",
    "section": "bullet",
@@ -27428,6 +27686,35 @@
    "slop": []
   },
   {
+   "id": "walmart-7a615075",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Stood up the dashboard engineering leadership used to plan quarterly intake across 50+ engineering teams and ~100 initiatives; automated its updates into Slack and Teams, cutting allocation churn 80% with no formal authority",
+   "verb": "Stood",
+   "metrics": [
+    "50",
+    "100",
+    "80%"
+   ],
+   "hasMetric": true,
+   "chars": 224,
+   "estLines": 3,
+   "skills": [
+    "analytics",
+    "ops-process",
+    "stakeholder"
+   ],
+   "archetypes": [
+    "ops-generalist"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "walmart-00a60989",
    "experienceId": "walmart",
    "section": "bullet",
@@ -27674,6 +27961,61 @@
    "lastUsed": "2026-09-23",
    "current": true,
    "source": "Abridge FDPM",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-73379fe5",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Built ‘BuyBox Engineer,’ an LLM agent reasoning across 10+ upstream systems to root-cause ranking issues; defined evals, iterated with early-access teams, and scaled across a 200+ person org, cutting investigation time ~80%",
+   "verb": "Built",
+   "metrics": [
+    "10",
+    "200",
+    "~80%"
+   ],
+   "hasMetric": true,
+   "chars": 223,
+   "estLines": 3,
+   "skills": [
+    "agents-llm",
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "ai-native",
+    "ecomm-marketplace",
+    "enterprise-b2b",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-f12d0e06",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Ran on-call for customer escalations when shoppers saw the wrong offer or an outdated price or speed; first to troubleshoot, diagnosed the underlying cause, fixed it with engineering, and confirmed it was correct in product",
+   "verb": "Ran",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 223,
+   "estLines": 3,
+   "skills": [
+    "marketplace"
+   ],
+   "archetypes": [
+    "consumer-growth",
+    "ecomm-marketplace"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
    "flags": [],
    "slop": []
   },
@@ -28728,34 +29070,6 @@
    "lastUsed": "2026-09-17",
    "current": true,
    "source": "CapitalOne SrMgrPM DevEx R246485",
-   "flags": [],
-   "slop": []
-  },
-  {
-   "id": "walmart-0b675025",
-   "experienceId": "walmart",
-   "section": "bullet",
-   "text": "Designed guardrails across 30+ initiatives a quarter so bad actors, buyer or seller, could not game the ranking algorithm; caught daily-changing prices and false delivery SLAs, and built the gates that ruled them out",
-   "verb": "Designed",
-   "metrics": [
-    "30"
-   ],
-   "hasMetric": true,
-   "chars": 216,
-   "estLines": 3,
-   "skills": [
-    "experimentation",
-    "marketplace",
-    "ml-ranking"
-   ],
-   "archetypes": [
-    "ecomm-marketplace",
-    "platform-ml"
-   ],
-   "useCount": 1,
-   "lastUsed": "2026-09-18",
-   "current": true,
-   "source": "Visa RAS AgenticCommerce",
    "flags": [],
    "slop": []
   },
@@ -29983,6 +30297,60 @@
    "slop": []
   },
   {
+   "id": "walmart-f6322a9e",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Translated a new tax law and Legal’s risk assessment into product, business, and engineering requirements; shipped compliance changes before peak holiday so shoppers never saw a price Walmart couldn’t honor",
+   "verb": "Translated",
+   "metrics": [],
+   "hasMetric": false,
+   "chars": 206,
+   "estLines": 2,
+   "skills": [
+    "marketplace"
+   ],
+   "archetypes": [
+    "consumer-growth",
+    "ecomm-marketplace"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp PM IntlTax",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-e3bf3083",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Launched a new item-page module across ~45M daily impressions, lifting multi-offer conversion +0.46%; ran launch readiness and held the launch to fix broken image renderings before they broke customer trust",
+   "verb": "Launched",
+   "metrics": [
+    "~45M",
+    "+0.46%"
+   ],
+   "hasMetric": true,
+   "chars": 206,
+   "estLines": 2,
+   "skills": [
+    "0-to-1",
+    "experimentation",
+    "growth",
+    "marketplace"
+   ],
+   "archetypes": [
+    "consumer-growth",
+    "ecomm-marketplace"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "walmart-e23c98b7",
    "experienceId": "walmart",
    "section": "bullet",
@@ -30634,6 +31002,38 @@
    "lastUsed": "2026-09-02",
    "current": true,
    "source": "Constellation OpsGeneralist",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-b9253c73",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Built ‘BuyBox Engineer,’ an LLM agent that took over production triage across 10+ upstream systems; almost the whole team adopted it, it spread to a 200+ person org, and cut investigation time ~80%",
+   "verb": "Built",
+   "metrics": [
+    "10",
+    "200",
+    "~80%"
+   ],
+   "hasMetric": true,
+   "chars": 197,
+   "estLines": 2,
+   "skills": [
+    "adoption",
+    "agents-llm",
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "ai-native",
+    "ecomm-marketplace",
+    "enterprise-b2b",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-25",
+   "current": true,
+   "source": "Ramp ProductOps CustomerSetup",
    "flags": [],
    "slop": []
   },

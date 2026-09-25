@@ -52,6 +52,10 @@ Mined 2026-09-14 from **346 CV docs found, 331 fetched (2021+), 256 actual resum
 **50 CV docs created since** (Sept 15–23: Gap, Sela, DoorDash, Abridge, Reddit, Visa, Bain and
 the rest) → **+190 new bullets, 17 existing ones re-dated**, **1,184 total**. `scripts/mine_cvs.py`
 holds the incremental run; move its `SINCE` forward each time.
+2026-09-25: the two Ramp CVs (PM International + Tax, Product Ops Customer Setup) merged in with
+`mine_cvs.merge()` and a hash-verified transfer → **+15 new bullets, 5 re-dated, 1,199 total**. That
+was a targeted merge, not a full incremental run, so `SINCE` did not move — CVs created 09-23→09-25
+other than Ramp (e.g. Adobe Intl Strategy, OpenTable) are still unmined.
 
 | Experience | Variants |
 |---|---|
