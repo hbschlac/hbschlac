@@ -282,7 +282,7 @@ function autofill(){
   for(const e of B.experiences){
     const n = QUOTA[e.id] ?? 0; if(!n) continue;
     const pool = B.bullets.filter(b => b.experienceId===e.id && b.section==="bullet"
-      && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email"));
+      && !b.flags.includes("walmart-present") && !b.flags.includes("berkeley-email") && !b.flags.includes("internal-name"));
     const score = b => (b.current?100:0) + (b.hasMetric?40:0) - b.slop.length*25
       + b.archetypes.filter(a => p.archetypes.includes(a)).length*30 + Math.min(b.useCount,12)
       + matchCount(b)*45;
@@ -318,6 +318,7 @@ function lint(){
     for(const f of b.flags){
       if(f==="walmart-present") issues.push({lvl:"bad",t:"Present tense on Walmart",w:"The role ended in 2026 — use past tense.",ref:b.text});
       if(f==="berkeley-email") issues.push({lvl:"bad",t:"Berkeley email present",w:"Always hbschlac@gmail.com.",ref:b.text});
+      if(f==="internal-name") issues.push({lvl:"bad",t:"\"BuyBox Engineer\" on the page",w:"Call it the team agent or dedicated prod team agent; the reader can't decode BuyBox.",ref:b.text});
       if(f==="gmv-headline") issues.push({lvl:"warn",t:"GMV is leading the bullet",w:"The $400M+ charter is the stronger claim; GMV is supporting evidence.",ref:b.text});
     }
     for(const s of b.slop) issues.push({lvl:"warn",t:`aislop — ${s.category.replace(/-/g," ")}`,w:`“${s.hits[0]}”`,ref:b.text});
@@ -409,7 +410,7 @@ function renderBank(){
 
 function bulletCard(b,e){
   const on = (S.picked[e.id]||[]).includes(b.id);
-  const blocking = b.flags.some(f=>f==="walmart-present"||f==="berkeley-email");
+  const blocking = b.flags.some(f=>f==="walmart-present"||f==="berkeley-email"||f==="internal-name");
   const el = document.createElement("div");
   el.className = "bullet" + (on?" on":"") + (blocking?" hasblock":(b.slop.length?" hasslop":""));
   el.tabIndex = 0; el.setAttribute("role","button"); el.setAttribute("aria-pressed",String(on));
