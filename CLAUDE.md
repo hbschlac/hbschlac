@@ -19,7 +19,7 @@ Between April 14 and June 23, 2026, **45+ Claude Code web sessions** audited and
 | code-builder | v8.9 | Execution engine: single-pass, debug loop, visual mode, rapid shipping. MCP integration patterns. Parallel mode collapsed to stub. Learnings in LEARNINGS.md |
 | vercel-ship | v1.8 | Pre-deploy validation for Next.js + Vercel + Docker/k8s + concrete MCP deployment workflows |
 | content-quality | v11 | Anti-AI-slop, voice matching, hallucination prevention, UX copy, wizard flow copy |
-| session-safety | v20 | Groundhog Day prevention, BLOCKING review circuit breaker, Step 0 productive work routing, branch cleanup, scheduled routine templates, concurrent-merge discipline (rebase-before-merge + SHA-pinned force-with-lease + reconcile-not-duplicate) |
+| session-safety | v21 | Groundhog Day prevention, BLOCKING review circuit breaker, Step 0 productive work routing, branch cleanup, scheduled routine templates, concurrent-merge discipline (rebase-before-merge + SHA-pinned force-with-lease + reconcile-not-duplicate), notify via GitHub issue (push is off) |
 | debug-escalation | v12.1 | Fix-churn breaker, cross-skill routing, pipeline hardening, scheduled routine failure handling |
 | portfolio-dev | v3.2 | schlacter.me / Next.js portfolio patterns + end-to-end new project workflow |
 | session-start-hook | v6 | SessionStart hook creation + hook debugging |
@@ -128,7 +128,7 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 3. **code-builder parallel mode collapsed.** Stub-only in SKILL.md (full spec in git history). Laptop-only, never tested.
 4. **No project has monitoring configured.** Incidents are discovered reactively. Use Vercel MCP tools + WebFetch in scheduled routines for health checks.
 5. **muse-shopping #1 draft PR.** Created by vibe-improver, 50+ days in draft limbo. Close or merge.
-6. **100% of sessions since Jun 4 did skill reviews, 0% did feature work.** Productive Work Accelerator moved to Step 0 (first thing sessions see). Circuit breaker now sends PushNotification when routines are misconfigured.
+6. **100% of sessions since Jun 4 did skill reviews, 0% did feature work.** Productive Work Accelerator moved to Step 0 (first thing sessions see). Circuit breaker now opens a GitHub issue when routines are misconfigured.
 7. **Scheduled routines misconfigured.** Routines configured to "review skills" hit the circuit breaker every time. Reconfigure to: health check, PR hygiene, or dependency freshness.
 8. **54 orphaned branches.** Branch cleanup commands now in session-safety. Run them.
 9. **recs.community 4 stacked PRs open 30+ days.** PRs #4-7 in dependency chain, none merged. Merge #4 first.
@@ -145,7 +145,11 @@ Hannah's personal **resume, outreach, and networking** skill is NOT in this repo
 
 ## Sandbox constraint
 
-Web sessions can only push to `hbschlac/hbschlac`. To change other repos, use GitHub MCP tools to create a PR. If MCP tools can't reach the repo, send a PushNotification with exact commands instead of writing laptop instructions.
+Web sessions can only push to `hbschlac/hbschlac`. To change other repos, use GitHub MCP tools to create a PR. If MCP tools can't reach the repo, open a GitHub issue on `hbschlac/hbschlac` with the exact commands instead of writing laptop instructions.
+
+## Notifications go to GitHub issues, not push
+
+Hannah turned off "Push when Claude decides" on 2026-09-29, so don't call PushNotification. Anything a session would have pushed (a blocker, laptop-only commands, a scheduled-routine finding) goes in an issue on this repo, `hbschlac/hbschlac`. This repo is public: no career, personal or credential details in an issue. Search open issues first; if one already covers it, don't open another. Format and rules: session-safety → "Notify via GitHub issue".
 
 ## Plugin hooks do not fire on web
 

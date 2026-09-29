@@ -268,7 +268,7 @@ Step 3: Use Agent tool (subagent_type: "Explore") for parallel fetches across mu
 | Read key sources | `WebFetch` on top 5-10 | Extracted facts, quotes, data points |
 | Cross-reference | `WebSearch` for verification | Confirm claims from multiple sources |
 | Synthesize | (manual analysis) | Findings with citations |
-| Present | Write to file or PushNotification | Report or notification to user |
+| Present | Write to file; open a GitHub issue only if the user must act (session-safety → "Notify via GitHub issue") | Report or notification to user |
 
 ### When to use Python vs. session tools
 
