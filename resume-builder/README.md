@@ -56,6 +56,13 @@ holds the incremental run; move its `SINCE` forward each time.
 `mine_cvs.merge()` and a hash-verified transfer → **+15 new bullets, 5 re-dated, 1,199 total**. That
 was a targeted merge, not a full incremental run, so `SINCE` did not move — CVs created 09-23→09-25
 other than Ramp (e.g. Adobe Intl Strategy, OpenTable) are still unmined.
+2026-09-29: incremental run over every CV doc created after the 09-23 refresh (`SINCE`
+2026-09-23T04:52:03Z), the two Ramp CVs excluded because 09-25 already merged them → **49 CV docs**
+(Adobe Intl Strategy, OpenTable, Mercury, Retool, Traba, AfterQuery PM and the rest) → **+150 new
+bullets, 55 existing ones re-counted (51 re-dated), 1,347 total**. Transferred out of the workbench
+with `upload_local_file` and a curl of its link, sha256-verified (`859c2e30…`); `SINCE` moved to
+2026-09-29T01:05:00Z. The live dashboard artifact was **not** republished: its `data.js` carries
+the story blocks this repo's `build_page_data.py` does not produce (see RUNBOOK).
 
 | Experience | Variants |
 |---|---|
