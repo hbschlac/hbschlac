@@ -124,15 +124,15 @@ This session WILL NOT do a full skill review. Options:
 
 **This is BLOCKING like Groundhog Day.** Do not proceed with a full review unless the user explicitly overrides.
 
-**Scheduled routines:** If a scheduled routine's task says "review skills" or similar, the circuit breaker fires AND you must send a PushNotification telling the user to reconfigure:
+**Scheduled routines:** If a scheduled routine's task says "review skills" or similar, the circuit breaker fires AND you must open a GitHub issue telling the user to reconfigure (see "Notify via GitHub issue" below; if this issue is already open, leave it):
 
 ```
-<routine_summary>
+Title: [claude] A scheduled routine is set to review skills: reconfigure it
+Body:
 Your scheduled routine is configured to review skills — this is blocked by the circuit breaker
 (15 skill-review PRs merged since Jun 4, 0 feature work PRs). Reconfigure this routine to do
 one of: health check monitoring, PR hygiene sweep, or dependency freshness audit. See
 session-safety's "Scheduled Routine Templates" section for ready-to-use templates.
-</routine_summary>
 ```
 
 ---
@@ -309,14 +309,14 @@ Web sessions are scope-locked to one repo. Before assuming you can't reach anoth
 
 When you detect stuck PRs, try to merge NOW:
 1. Use `mcp__github__search_pull_requests` (works across repos) to find and merge them.
-2. If MCP tools can't reach the repo, send a PushNotification with exact commands.
-3. Don't write laptop instructions that will sit unread. Notifications reach the user; CLAUDE.md doesn't.
+2. If MCP tools can't reach the repo, open a GitHub issue with exact commands (see "Notify via GitHub issue").
+3. Don't write laptop instructions that will sit unread. An open issue is a to-do the user can see and close; a line in CLAUDE.md isn't.
 
 ## Scheduled / Autonomous Sessions
 
-When running as a scheduled routine (no user watching), the session has different constraints than interactive sessions. The user set this up to run while they're away — the push notification is the deliverable, not the transcript.
+When running as a scheduled routine (no user watching), the session has different constraints than interactive sessions. The user set this up to run while they're away — the GitHub issue is the deliverable, not the transcript.
 
-### When to notify (PushNotification)
+### When to notify
 
 | Situation | Action |
 |---|---|
@@ -326,17 +326,15 @@ When running as a scheduled routine (no user watching), the session has differen
 | Found something interesting but not actionable | **Stay silent.** Only notify if they should do something in response. |
 | Made changes and pushed (code fixes, PR comments) | **Notify** with what you changed and why. They need to know the repo state changed. |
 
-### Notification format
+### Notify via GitHub issue
 
-Lead with the one sentence they'd read on a phone lock screen. Then include enough detail for them to act without opening the session:
+Hannah turned off "Push when Claude decides" on 2026-09-29, so don't call PushNotification. Notify by opening an issue on `hbschlac/hbschlac` (`add_repo` it first if the session doesn't have it). This applies to interactive sessions too.
 
-```
-<routine_summary>
-{One sentence: what happened and what to do about it.}
-{2-3 sentences: supporting detail — numbers, PR links, specific files.}
-{If action needed: what specifically to do next.}
-</routine_summary>
-```
+1. **Search first.** List open issues on `hbschlac/hbschlac`. If one already covers this, comment only if something changed; otherwise leave it. The mcp-contributor cron filed 8+ identical issues that nobody actioned. Don't repeat that.
+2. **Title:** the one sentence the user needs, starting with `[claude]`. Example: `[claude] recs.community PR #4 needs a merge from your laptop`.
+3. **Body:** 2-3 sentences of detail (numbers, PR links, specific files), then what to do next, with exact commands in a code block.
+4. **The repo is public.** Operational notes only: no career or job-search details, personal info, credentials or pasted logs. If the detail is private, say what needs attention and where to look, nothing more.
+5. **It won't ping them.** The GitHub MCP tools act as `hbschlac`, and GitHub doesn't notify you about issues you open yourself. The issue waits in the Issues tab until the user checks.
 
 ### Scheduled Routine Templates
 
@@ -468,6 +466,6 @@ When a scheduled workflow creates the same issue/alert repeatedly:
 
 If `list_repos`/`add_repo` tools don't exist in the current session:
 1. Open a web session directly in the target repo and merge from there.
-2. Send a PushNotification with exact merge commands (don't write them in CLAUDE.md where they'll sit for weeks).
+2. Open a GitHub issue with exact merge commands (see "Notify via GitHub issue"; don't write them in CLAUDE.md where they'll sit for weeks).
 
 ---
