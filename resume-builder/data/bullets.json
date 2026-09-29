@@ -8575,14 +8575,14 @@
    "slop": []
   },
   {
-   "id": "muse-b84c3461",
+   "id": "muse-b9764093",
    "experienceId": "muse",
    "section": "bullet",
-   "text": "Shipped agentic Stripe checkout for a multi-retailer cart, so shoppers never re-enter shipping info; kept inventory live via API and built an MCP that scans retailers to put brands' products on the platform",
+   "text": "Shipped agentic Stripe checkout for a multi-retailer cart so that shoppers never re-enter shipping info; kept inventory live via API and built an MCP that scans retailers to put brands' products on the platform",
    "verb": "Shipped",
    "metrics": [],
    "hasMetric": false,
-   "chars": 206,
+   "chars": 210,
    "estLines": 2,
    "skills": [
     "agents-llm",
@@ -24223,31 +24223,6 @@
    "slop": []
   },
   {
-   "id": "walmart-e2227f17",
-   "experienceId": "walmart",
-   "section": "bullet",
-   "text": "Quantified why ranking and the item page disagreed on delivery speed: inputs differed ~7% of the time and the issue surfaced ~5 times a week; won product and engineering buy-in and designed one unified speed system",
-   "verb": "Quantified",
-   "metrics": [
-    "~7%"
-   ],
-   "hasMetric": true,
-   "chars": 214,
-   "estLines": 2,
-   "skills": [
-    "ml-ranking"
-   ],
-   "archetypes": [
-    "platform-ml"
-   ],
-   "useCount": 7,
-   "lastUsed": "2026-09-29",
-   "current": true,
-   "source": "Stord PM V2",
-   "flags": [],
-   "slop": []
-  },
-  {
    "id": "walmart-aacfe5a1",
    "experienceId": "walmart",
    "section": "bullet",
@@ -24424,6 +24399,31 @@
    "lastUsed": "2026-09-29",
    "current": true,
    "source": "EvenUp SrPM AIOrchestration",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-e2227f17",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Quantified why ranking and the item page disagreed on delivery speed: inputs differed ~7% of the time and the issue surfaced ~5 times a week; won product and engineering buy-in and designed one unified speed system",
+   "verb": "Quantified",
+   "metrics": [
+    "~7%"
+   ],
+   "hasMetric": true,
+   "chars": 214,
+   "estLines": 2,
+   "skills": [
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "platform-ml"
+   ],
+   "useCount": 6,
+   "lastUsed": "2026-09-29",
+   "current": true,
+   "source": "elf AIPO AgenticCommerce",
    "flags": [],
    "slop": []
   },
@@ -30471,6 +30471,36 @@
    "slop": []
   },
   {
+   "id": "walmart-35819e9b",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Built 0→1 dedicated prod team agent into daily product and engineering work, triaging issues across 10+ upstream systems; cut troubleshooting and bug investigation time ~80%; inspired teams across 200+ person org to build own",
+   "verb": "Built",
+   "metrics": [
+    "10",
+    "~80%",
+    "200"
+   ],
+   "hasMetric": true,
+   "chars": 225,
+   "estLines": 3,
+   "skills": [
+    "0-to-1",
+    "agents-llm"
+   ],
+   "archetypes": [
+    "ai-native",
+    "enterprise-b2b",
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-29",
+   "current": true,
+   "source": "Stord PM V2",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "walmart-9cd5a43f",
    "experienceId": "walmart",
    "section": "bullet",
@@ -31043,6 +31073,32 @@
    "lastUsed": "2026-09-02",
    "current": true,
    "source": "Scale SPL GenAI",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "walmart-94773b38",
+   "experienceId": "walmart",
+   "section": "bullet",
+   "text": "Diagnosed system fragmentation causing incongruency between ranking and item page for speed metric; won prod and engg buy-in and designed unified speed system; reduced system differences from ~7% to ~2% for all impressions",
+   "verb": "Diagnosed",
+   "metrics": [
+    "~7%",
+    "~2%"
+   ],
+   "hasMetric": true,
+   "chars": 222,
+   "estLines": 3,
+   "skills": [
+    "ml-ranking"
+   ],
+   "archetypes": [
+    "platform-ml"
+   ],
+   "useCount": 1,
+   "lastUsed": "2026-09-29",
+   "current": true,
+   "source": "Stord PM V2",
    "flags": [],
    "slop": []
   },
@@ -34262,35 +34318,6 @@
    "lastUsed": "2026-04-07",
    "current": false,
    "source": "ChatGPT Business Growth OpenAI",
-   "flags": [],
-   "slop": []
-  },
-  {
-   "id": "walmart-6eae6311",
-   "experienceId": "walmart",
-   "section": "bullet",
-   "text": "Built a dedicated prod team agent into daily product and engineering work, triaging issues across 10+ upstream systems; cut investigation time ~80%, and teams across the 200+ person org built their own",
-   "verb": "Built",
-   "metrics": [
-    "10",
-    "~80%",
-    "200"
-   ],
-   "hasMetric": true,
-   "chars": 201,
-   "estLines": 2,
-   "skills": [
-    "agents-llm"
-   ],
-   "archetypes": [
-    "ai-native",
-    "enterprise-b2b",
-    "platform-ml"
-   ],
-   "useCount": 1,
-   "lastUsed": "2026-09-29",
-   "current": true,
-   "source": "Stord PM V2",
    "flags": [],
    "slop": []
   },
