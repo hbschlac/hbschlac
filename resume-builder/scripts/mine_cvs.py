@@ -29,7 +29,7 @@ Getting the result out of the workbench
 import hashlib, re, subprocess
 from concurrent.futures import ThreadPoolExecutor
 
-SINCE = "2026-09-14T22:55:00Z"   # the last full mine; move this forward after each run
+SINCE = "2026-09-29T01:05:00Z"   # the last incremental run (2026-09-29); move this forward after each run
 RAW = "https://raw.githubusercontent.com/hbschlac/hbschlac/main/resume-builder/data/bullets.tsv"
 
 # Header text -> experienceId. First match wins; anything unmatched is "misc"
