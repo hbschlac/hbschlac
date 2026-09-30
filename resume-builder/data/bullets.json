@@ -3816,6 +3816,32 @@
    "slop": []
   },
   {
+   "id": "aiprojects-f4369ea2",
+   "experienceId": "aiprojects",
+   "section": "bullet",
+   "text": "Built Career Kit, a Claude Code agent that turns a job posting into a tailored, fact-checked resume and learns from each correction; cut my inputs per resume from 46 to a median of 3 and time to under 45 min",
+   "verb": "Built",
+   "metrics": [
+    "46",
+    "45"
+   ],
+   "hasMetric": true,
+   "chars": 207,
+   "estLines": 2,
+   "skills": [
+    "agents-llm"
+   ],
+   "archetypes": [
+    "ai-native"
+   ],
+   "useCount": 0,
+   "lastUsed": "2026-09-30",
+   "current": true,
+   "source": "Career Kit metrics (2026-09-30), one-line CV version",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "aiprojects-24ceecce",
    "experienceId": "aiprojects",
    "section": "bullet",
