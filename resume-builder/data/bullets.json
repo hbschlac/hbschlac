@@ -3816,6 +3816,79 @@
    "slop": []
   },
   {
+   "id": "aiprojects-24ceecce",
+   "experienceId": "aiprojects",
+   "section": "bullet",
+   "text": "Built Career Kit, a Claude Code agent for job search that turns my repeated corrections into tested rules (220+ tests); cut human inputs per tailored resume from 46 messages to a median of 3",
+   "verb": "Built",
+   "metrics": [
+    "220",
+    "46"
+   ],
+   "hasMetric": true,
+   "chars": 190,
+   "estLines": 2,
+   "skills": [
+    "agents-llm"
+   ],
+   "archetypes": [
+    "ai-native"
+   ],
+   "useCount": 0,
+   "lastUsed": "2026-09-30",
+   "current": true,
+   "source": "Career Kit metrics (2026-09-30)",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "aiprojects-3cb14bb6",
+   "experienceId": "aiprojects",
+   "section": "bullet",
+   "text": "Eliminated context-window overruns (0 in 21 sessions); cut doc edits per resume 87% (127 to a median of 16) by batching edits and loading instructions one step at a time",
+   "verb": "Eliminated",
+   "metrics": [
+    "21",
+    "87%",
+    "127",
+    "16"
+   ],
+   "hasMetric": true,
+   "chars": 169,
+   "estLines": 2,
+   "skills": [],
+   "archetypes": [],
+   "useCount": 0,
+   "lastUsed": "2026-09-30",
+   "current": true,
+   "source": "Career Kit metrics (2026-09-30)",
+   "flags": [],
+   "slop": []
+  },
+  {
+   "id": "aiprojects-f35a2042",
+   "experienceId": "aiprojects",
+   "section": "bullet",
+   "text": "Cut time per tailored resume from 3 hours to under 45 minutes by moving page-fit checks, fact lookups and tracker updates out of the model's context and into scripts",
+   "verb": "Cut",
+   "metrics": [
+    "45"
+   ],
+   "hasMetric": true,
+   "chars": 165,
+   "estLines": 2,
+   "skills": [
+    "ml-ranking"
+   ],
+   "archetypes": [],
+   "useCount": 0,
+   "lastUsed": "2026-09-30",
+   "current": true,
+   "source": "Career Kit metrics (2026-09-30)",
+   "flags": [],
+   "slop": []
+  },
+  {
    "id": "coherent-f3b45d9c",
    "experienceId": "coherent",
    "section": "bullet",
