@@ -13,6 +13,14 @@
             "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/remind.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CLAUDE_HOOKS_VIA_SETTINGS=1 python3 \"$CLAUDE_PROJECT_DIR/plugins/session-capture/hooks/freshness.py\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
