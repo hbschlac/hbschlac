@@ -1,0 +1,271 @@
+<title>Rx Cash Price Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+/* Layout: one reading column; summary figures, then filters, then the price table, then the gaps. Pharmacy-label palette: white label stock, ink, prescription-vial amber. */
+:root {
+  --paper: #f6f7f5;
+  --card: #ffffff;
+  --ink: #17201e;
+  --muted: #5b6662;
+  --rule: #d8ddda;
+  --amber: #9c5408;
+  --amber-soft: #f4e5d2;
+  --good: #1d7350;
+  --good-soft: #dcefe4;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111614; --card: #171e1b; --ink: #e5eae7; --muted: #9aa5a1; --rule: #2b3431;
+    --amber: #e39a48; --amber-soft: #3a2914; --good: #5fc596; --good-soft: #15302a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111614; --card: #171e1b; --ink: #e5eae7; --muted: #9aa5a1; --rule: #2b3431;
+  --amber: #e39a48; --amber-soft: #3a2914; --good: #5fc596; --good-soft: #15302a; color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 32px 18px 64px; display: grid; gap: 28px; }
+.wrap > * { min-width: 0; }
+.eyebrow { font: 500 12px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--amber); }
+h1 { font: 600 clamp(28px, 4.4vw, 44px)/1.12 var(--display); margin: 8px 0 12px; text-wrap: balance; max-width: 22ch; }
+h2 { font: 600 22px/1.25 var(--display); margin: 0 0 8px; text-wrap: balance; }
+.lede { max-width: 66ch; color: var(--muted); margin: 0; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.fig { background: var(--card); padding: 14px 16px; display: grid; gap: 2px; min-width: 0; }
+.fig b { font: 500 26px/1.15 var(--mono); font-variant-numeric: tabular-nums; }
+.fig span { color: var(--muted); font-size: 13px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--card); }
+.seg button { font: 500 13px/1 var(--body); color: var(--muted); background: none; border: 0; padding: 10px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.seg button:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.label { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 8px; }
+.tablebox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 11px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--paper); position: sticky; top: 0; }
+td.num, th.num { text-align: right; }
+.price { font: 500 15px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.sub { display: block; font-size: 12px; line-height: 1.35; color: var(--muted); margin-top: 3px; }
+.best { background: var(--good-soft); }
+.best .price { color: var(--good); }
+.best .price::after { content: " cheapest"; font: 500 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.none { color: var(--muted); font-family: var(--mono); }
+.rank { font: 500 13px/1.2 var(--mono); color: var(--amber); width: 2.5em; }
+.drug { font-weight: 600; }
+.ratio { display: grid; grid-template-columns: 1fr 3.6em; gap: 8px; align-items: center; min-width: 120px; }
+.bar { height: 8px; background: var(--amber-soft); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--amber); }
+.ratio .price { text-align: right; }
+.where { font-size: 13px; margin: 0 0 10px; max-width: 80ch; }
+.where strong { color: var(--ink); font-weight: 600; }
+.gaps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.gap { border: 1px solid var(--rule); border-radius: 6px; padding: 16px; background: var(--card); min-width: 0; }
+.gap ul { margin: 8px 0 0; padding-left: 18px; }
+.gap li { margin: 3px 0; }
+.chip { display: inline-block; font: 500 12px/1 var(--mono); padding: 5px 7px; border-radius: 4px; background: var(--amber-soft); color: var(--ink); margin: 4px 4px 0 0; }
+.foot { font-size: 13px; color: var(--muted); max-width: 72ch; display: grid; gap: 8px; }
+.foot p { margin: 0; }
+code { font: 13px var(--mono); }
+@media (prefers-reduced-motion: no-preference) { .bar i { transition: width .25s ease; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">Cash prescription prices</div>
+    <h1 id="headline">What a fill costs when you price it yourself</h1>
+    <p class="lede">The most-filled drugs on GoodRx and SingleCare, priced from every source whose
+      terms let a tool read it. Ranked only by what you pay. Next to each price: what the pharmacy
+      itself paid for the drug, from <strong>NADAC</strong>, the federal government's weekly survey.</p>
+  </header>
+
+  <section class="figures" id="figures" aria-label="Summary"></section>
+
+  <section class="controls" aria-label="Filters">
+    <div><span class="label">List</span>
+      <span class="seg" id="list-seg">
+        <button type="button" data-list="goodrx" aria-pressed="true">GoodRx top 20</button>
+        <button type="button" data-list="singlecare" aria-pressed="false">SingleCare top 20</button>
+        <button type="button" data-list="all" aria-pressed="false">All 27</button>
+      </span>
+    </div>
+    <div><span class="label">ZIP</span><span class="seg" id="zip-seg"></span></div>
+  </section>
+
+  <section class="tablewrap">
+    <p class="sub where" id="where"></p>
+    <div class="tablebox">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Drug</th>
+          <th class="num">Cost Plus · mail</th>
+          <th class="num">Team Cuban Card · pickup</th>
+          <th class="num">Pharmacy paid</th>
+          <th>Cheapest ÷ pharmacy cost</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What this grid can't see yet</h2>
+    <div class="gaps">
+      <div class="gap">
+        <strong>Programs we couldn't check</strong>
+        <p class="sub">Their sites block automated reads or their terms forbid it. A cheaper price may
+          exist on any of them. Each has been asked for written permission.</p>
+        <ul id="waiting"></ul>
+      </div>
+      <div class="gap">
+        <strong id="chains-title">Pharmacies in this ZIP</strong>
+        <p class="sub">Pharmacy locations registered in this ZIP (CMS NPI Registry). Chains marked
+          with no readable price have no source we can read.</p>
+        <div id="chains"></div>
+      </div>
+      <div class="gap">
+        <strong>GoodRx</strong>
+        <p class="sub">GoodRx blocks automated reads, and its partner API's terms forbid showing its
+          prices next to any other source. So it isn't a column here. The MCP server's
+          <code>check_quote</code> tool compares it instead: you bring the price GoodRx showed you,
+          and it tells you whether anything here beats it.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p id="built"></p>
+    <p>Strengths and quantities are our choice of a common fill; neither published list gives one.
+      Cost Plus prices come from its public pricing API, with fees and standard shipping included.
+      Team Cuban Card is Cost Plus's discount card. It shows only when a participating pharmacy is
+      within 30 miles. "Pharmacy paid" is the median NADAC across generic manufacturers. It's a
+      yardstick, not a price you can buy at.</p>
+    <p>Source code, method and the terms behind every source: <code>rx-compare/</code> in the
+      hbschlac/hbschlac GitHub repo.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const G = window.GRID;
+  const state = { list: "goodrx", zip: G.zips[0].zip };
+  try { const s = JSON.parse(localStorage.getItem("rxgrid") || "{}"); Object.assign(state, s); } catch (e) {}
+  if (!G.zips.some(z => z.zip === state.zip)) state.zip = G.zips[0].zip;
+
+  const $ = id => document.getElementById(id);
+  const money = v => v == null ? null : "$" + v.toFixed(2);
+  const median = a => { const s = a.filter(x => x != null).sort((x, y) => x - y); if (!s.length) return null;
+    const m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // Ratio bar on a log scale, 1× to the largest ratio in the data, so 2× and 30× are both legible.
+  const ratios = [];
+  G.rows.forEach(r => G.zips.forEach(z => { const c = r.zips[z.zip]; if (c.best_price && r.nadac) ratios.push(c.best_price / r.nadac); }));
+  const maxRatio = Math.max(2, ...ratios);
+  const barPct = x => Math.max(2, Math.min(100, Math.log(Math.max(1, x)) / Math.log(maxRatio) * 100));
+
+  function rowsFor(list) {
+    let rows = G.rows.slice();
+    if (list === "goodrx") rows = rows.filter(r => r.goodrx).sort((a, b) => a.goodrx - b.goodrx);
+    else if (list === "singlecare") rows = rows.filter(r => r.singlecare).sort((a, b) => a.singlecare - b.singlecare);
+    return rows;
+  }
+
+  function renderFigures() {
+    const rows = rowsFor(state.list);
+    const cells = rows.map(r => r.zips[state.zip]);
+    const best = median(cells.map(c => c.best_price));
+    const paid = median(rows.map(r => r.nadac));
+    const priced = rows.filter(r => r.zips[state.zip].best_price != null);
+    const mx = median(priced.filter(r => r.nadac).map(r => r.zips[state.zip].best_price / r.nadac));
+    const mailWins = priced.filter(r => r.zips[state.zip].best === "Cost Plus Drugs (mail order)").length;
+    const unpriced = rows.length - priced.length;
+    $("figures").innerHTML = [
+      [money(best), "median cheapest price we can read"],
+      [money(paid), "median the pharmacy paid (NADAC)"],
+      [mx ? mx.toFixed(1) + "×" : "—", "median markup, cheapest ÷ pharmacy cost"],
+      [`${mailWins} of ${priced.length}`, "drugs where mail order beats the card"],
+      [String(unpriced), unpriced === 1 ? "drug no readable source sells" : "drugs no readable source sells"],
+    ].map(([b, s]) => `<div class="fig"><b>${b}</b><span>${s}</span></div>`).join("");
+    const z = G.zips.find(z => z.zip === state.zip);
+    $("headline").textContent = paid != null && best != null
+      ? `Pharmacies pay about ${money(paid)} for a typical fill. The cheapest price we can read is ${money(best)}.`
+      : "What a fill costs when you price it yourself";
+    $("eyebrow").textContent = `Cash prescription prices · ${z.label}`;
+  }
+
+  function renderRows() {
+    const rows = rowsFor(state.list);
+    $("rows").innerHTML = rows.map(r => {
+      const c = r.zips[state.zip];
+      const rank = state.list === "goodrx" ? r.goodrx : state.list === "singlecare" ? r.singlecare : "";
+      const bestIsMail = c.best === "Cost Plus Drugs (mail order)";
+      const mailCell = r.mail != null
+        ? `<td class="num${bestIsMail ? " best" : ""}"><span class="price">${money(r.mail)}</span><span class="sub">${esc(r.mail_note)}</span></td>`
+        : `<td class="num"><span class="none">—</span><span class="sub">not sold</span></td>`;
+      const cardCell = c.card != null
+        ? `<td class="num${!bestIsMail && c.best ? " best" : ""}"><span class="price">${money(c.card)}</span><span class="sub">at ${c.n} ${c.n === 1 ? "pharmacy" : "pharmacies"} nearby</span></td>`
+        : `<td class="num"><span class="none">—</span><span class="sub">${r.mail == null ? "not sold" : "no participating pharmacy within 30 mi"}</span></td>`;
+      const ratio = c.best_price && r.nadac ? c.best_price / r.nadac : null;
+      const ratioCell = ratio
+        ? `<td><div class="ratio"><div class="bar" role="img" aria-label="${ratio.toFixed(1)} times"><i style="width:${barPct(ratio)}%"></i></div><span class="price">${ratio.toFixed(1)}×</span></div></td>`
+        : `<td><span class="none">—</span></td>`;
+      const label = `${r.strength} ${r.form || ""} ×${r.qty}`;
+      const note = r.note ? `<span class="sub">${esc(r.note)}</span>` : "";
+      return `<tr>
+        <td class="rank">${rank}</td>
+        <td><span class="drug">${esc(r.drug)}</span><span class="sub">${esc(label)}</span>${note}</td>
+        ${mailCell}${cardCell}
+        <td class="num"><span class="price">${r.nadac != null ? money(r.nadac) : "—"}</span><span class="sub">${r.nadac_date ? "NADAC " + r.nadac_date : "not in NADAC"}</span></td>
+        ${ratioCell}
+      </tr>`;
+    }).join("");
+  }
+
+  function renderWhere() {
+    // The card network near a ZIP is the same for nearly every drug: say it once, not per row.
+    const sample = G.rows.map(r => r.zips[state.zip]).filter(c => c.n).sort((a, b) => b.n - a.n)[0];
+    if (!sample) { $("where").textContent = "No Team Cuban Card pharmacy within 30 miles of this ZIP."; return; }
+    const near = sample.nearest.map(p => `${esc(p.name)} (${p.mi.toFixed(1)} mi)`).join(", ");
+    $("where").innerHTML = `<strong>Team Cuban Card near ${state.zip}:</strong> ${sample.n} participating ` +
+      `${sample.n === 1 ? "pharmacy" : "pharmacies"} within 30 miles (${esc(sample.chains.join(", "))}). Nearest: ${near}. ` +
+      `Cost Plus mail order ships anywhere; prices include standard shipping.`;
+  }
+
+  function renderGaps() {
+    $("waiting").innerHTML = G.waiting.map(w => `<li>${esc(w)}</li>`).join("");
+    const counts = G.chains_in_zip[state.zip] || {};
+    const covered = new Set();
+    G.rows.forEach(r => (r.zips[state.zip].chains || []).forEach(c => covered.add(c)));
+    const isCovered = name => [...covered].some(c => c && (name.includes(c) || c.includes(name)));
+    const z = G.zips.find(z => z.zip === state.zip);
+    $("chains-title").textContent = `Pharmacies in ${z.zip}`;
+    const entries = Object.entries(counts);
+    $("chains").innerHTML = entries.length
+      ? entries.map(([name, n]) => `<span class="chip">${esc(name)} · ${n}${isCovered(name) ? "" : " · no readable price"}</span>`).join("")
+      : `<p class="sub">No pharmacy locations found in the registry for this ZIP.</p>`;
+  }
+
+  function render() {
+    document.querySelectorAll("#list-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.list === state.list)));
+    document.querySelectorAll("#zip-seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.zip === state.zip)));
+    renderFigures(); renderWhere(); renderRows(); renderGaps();
+    try { localStorage.setItem("rxgrid", JSON.stringify(state)); } catch (e) {}
+  }
+
+  $("zip-seg").innerHTML = G.zips.map(z => `<button type="button" data-zip="${z.zip}" aria-pressed="false">${esc(z.label.split("—")[1].trim())} ${z.zip}</button>`).join("");
+  document.querySelectorAll("#list-seg button").forEach(b => b.addEventListener("click", () => { state.list = b.dataset.list; render(); }));
+  document.querySelectorAll("#zip-seg button").forEach(b => b.addEventListener("click", () => { state.zip = b.dataset.zip; render(); }));
+  $("built").textContent = `Prices read ${G.built}. Cost Plus prices are live API quotes on that date; NADAC is the latest weekly survey.`;
+  render();
+})();
+</script>
