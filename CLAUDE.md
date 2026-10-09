@@ -97,6 +97,22 @@ provider. This is what makes Docs editing work from her **phone** — it does no
 **Never transfer the bank by gzip+base64 through the conversation** — one mistyped character
 silently corrupts all 994 bullets (this happened). Use the Drive handoff in RUNBOOK.md.
 
+## rx-compare — customer-first prescription prices (`rx-compare/`)
+
+**Grid:** https://claude.ai/artifact/52W5sBzsyG4xWZoUMgNTnd (private). An MCP server that shows every cash
+price a patient can use for a drug near a ZIP, ranked only by what they pay, plus NADAC (what the
+pharmacy paid). Registered in repo-root `.mcp.json`. Read `rx-compare/README.md` first.
+
+- **`rx-compare/SOURCES.md` decides what may be read.** Only Cost Plus (public API, incl. its ZIP-aware
+  Team Cuban Card network) and NADAC are cleared. Every other card blocks bots or forbids automated
+  access. Never scrape GoodRx, RxSaver (GoodRx-owned) or any "Ask" row. Permission requests went out as
+  Gmail drafts on 2026-10-09; a yes = new `sources/<key>.py` + flip the row.
+- GoodRx is compared via `check_quote` (the patient brings the GoodRx number), never via its API — its
+  terms bar showing its prices next to other sources.
+- Tests: `cd rx-compare && python3 -m unittest discover tests` (offline). End-to-end:
+  `uv run python scripts/mcp_smoke.py`. Rebuild: `scripts/build_grid.py` then `scripts/build_page_data.py`,
+  then republish `app/index.html` (+ `data.js`) to the same artifact URL.
+
 ## Personal skills live in a SEPARATE repo (add_repo first)
 
 Hannah's personal **resume, outreach, and networking** skill is NOT in this repo and NOT in `.claude/skills/` here — don't search for it locally. It lives in **`hbschlac/product-networking-skills`** (old name `career-skills`, which still redirects).

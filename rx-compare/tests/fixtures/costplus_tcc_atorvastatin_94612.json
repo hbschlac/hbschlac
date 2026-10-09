@@ -1,0 +1,97 @@
+[
+ {
+  "external_sku": "4f2d770c71280f83e60898aa7c08f083",
+  "medication_name": "Atorvastatin",
+  "brand_generic": "Generic",
+  "form": "Tablet",
+  "strength": "40mg",
+  "treatment_categories": [
+   "Heart Health",
+   "High Cholesterol"
+  ],
+  "brand_name": "Lipitor",
+  "pack_size": 1000,
+  "quantity": 1,
+  "splittable": true,
+  "unit": "ea",
+  "rxnorm_id": "617311",
+  "special_handling": null,
+  "sample_pack_size": 30,
+  "sample_volume": "30 count",
+  "tcc_channel": {
+   "price_per_unit": "0.02416",
+   "pharmacy_dispensing_fee": 12,
+   "currency": "USD",
+   "admin_fee": 1,
+   "sample_pack_price": 0.72,
+   "sample_pack_price_w_dispensing": 13.72,
+   "pharmacies": [
+    {
+     "name": "Selam Pharmacy",
+     "address": "2447 Telegraph Avenue, Oakland, California, 94612",
+     "address_obj": {
+      "line": "2447 Telegraph Avenue",
+      "line2": "",
+      "city": "Oakland",
+      "state": "California",
+      "postal_code": "94612"
+     },
+     "distance": "0.55",
+     "pharmacy_dispensing_fee": 12,
+     "chain": "Independent",
+     "chain_code": null,
+     "phone_number": "213-840-2931",
+     "npi": "1144964784",
+     "effective_date": "2023-12-28 00:00:00",
+     "sample_pack_price_w_dispensing": 13.72
+    },
+    {
+     "name": "Safeway Pharmacy",
+     "address": "2600 5TH ST., Alameda, CA, 94501",
+     "address_obj": {
+      "line": "2600 5TH ST.",
+      "line2": "",
+      "city": "Alameda",
+      "state": "CA",
+      "postal_code": "94501"
+     },
+     "distance": "1.56",
+     "pharmacy_dispensing_fee": 12,
+     "chain": "Albertsons",
+     "chain_code": "400",
+     "phone_number": "(510) 523-1827",
+     "npi": "1508261520",
+     "effective_date": "2024-03-04 00:00:00",
+     "sample_pack_price_w_dispensing": 13.72
+    },
+    {
+     "name": "Safeway Pharmacy",
+     "address": "3889 SAN PABLO AVE, Emeryville, CA, 94608",
+     "address_obj": {
+      "line": "3889 SAN PABLO AVE",
+      "line2": "",
+      "city": "Emeryville",
+      "state": "CA",
+      "postal_code": "94608"
+     },
+     "distance": "1.70",
+     "pharmacy_dispensing_fee": 12,
+     "chain": "Albertsons",
+     "chain_code": "400",
+     "phone_number": "(510) 768-1034",
+     "npi": "1184050924",
+     "effective_date": "2024-03-04 00:00:00",
+     "sample_pack_price_w_dispensing": 13.72
+    }
+   ]
+  },
+  "equivalent_ndcs": [
+   "63304-0829-05",
+   "55111-0123-05",
+   "43063-0453-30",
+   "68084-0099-01",
+   "00378-3952-05",
+   "68071-0916-30"
+  ]
+ }
+]
