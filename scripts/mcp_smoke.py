@@ -1,6 +1,6 @@
 """End-to-end check: spawn the MCP server over stdio, list its tools, call two of them.
 
-    uv run --directory rx-compare python scripts/mcp_smoke.py
+    uv run python scripts/mcp_smoke.py
 """
 from __future__ import annotations
 

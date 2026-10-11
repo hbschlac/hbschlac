@@ -1,6 +1,6 @@
 """27 drugs × 3 ZIPs → data/grid.json + data/grid.csv, using only cleared sources.
 
-    uv run --directory rx-compare python scripts/build_grid.py
+    uv run python scripts/build_grid.py
 
 Polite by construction: sequential requests, 0.5 s apart, every response cached for the run.
 """

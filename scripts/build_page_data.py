@@ -1,6 +1,6 @@
 """data/grid.json → app/data.js (window.GRID), trimmed to what the page shows.
 
-    python3 rx-compare/scripts/build_page_data.py
+    python3 scripts/build_page_data.py
 """
 from __future__ import annotations
 

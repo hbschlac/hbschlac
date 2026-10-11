@@ -38,7 +38,7 @@ check_quote($30, "GoodRx") →   "Cheaper option found … saves $19.08 … the 
 Only three sources are both automated and clearly allowed today: the Cost Plus Drugs public API
 (mail order, plus its Team Cuban Card retail network by ZIP), and CMS's NADAC data. Every other
 discount card blocks automated reads or forbids them in its terms. That includes Optum Perks,
-Inside Rx, SingleCare, Hippo, Costco, BuzzRx and GoodRx. Requests for written permission are out.
+Inside Rx, SingleCare, Hippo, Costco, BuzzRx and GoodRx. Requests for written permission are drafted.
 Each one granted adds a source. [`SOURCES.md`](SOURCES.md) has the clause and date for every
 program.
 
@@ -56,7 +56,6 @@ Every answer lists the programs it couldn't check, so a patient knows a cheaper 
 ## Run it
 
 ```bash
-cd rx-compare
 uv sync                                   # installs the MCP SDK (mcp 2.x)
 uv run python -m rxcompare.server         # stdio MCP server
 uv run python scripts/mcp_smoke.py        # spawns the server, lists tools, calls two
@@ -65,7 +64,7 @@ uv run python scripts/build_grid.py       # 27 drugs × 3 ZIPs → data/grid.jso
 python3 scripts/build_page_data.py        # grid.json → app/data.js
 ```
 
-The repo-root `.mcp.json` registers the server for Claude Code sessions in this repo.
+`.mcp.json` registers the server for Claude Code sessions in this repo.
 
 ## What's here
 

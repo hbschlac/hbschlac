@@ -1,6 +1,6 @@
 """MCP server: every cash price a patient can use for a prescription, cheapest first.
 
-Run:  uv run --directory rx-compare python -m rxcompare.server     (stdio)
+Run:  uv run python -m rxcompare.server     (stdio)
 """
 from __future__ import annotations
 

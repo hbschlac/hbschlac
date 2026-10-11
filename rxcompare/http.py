@@ -10,7 +10,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-USER_AGENT = "rx-compare/0.1 (+https://github.com/hbschlac/hbschlac/tree/main/rx-compare)"
+USER_AGENT = "rx-compare/0.1 (+https://github.com/hbschlac)"
 TIMEOUT = 60
 TTL_SECONDS = 6 * 3600  # prices move weekly at most; NLM asks RxNav callers to cache 12-24h
 

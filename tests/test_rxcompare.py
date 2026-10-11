@@ -1,6 +1,6 @@
 """Offline tests: recorded Cost Plus responses (2026-10-09), synthetic NADAC rows, no network.
 
-    cd rx-compare && python3 -m unittest discover tests      (stdlib only)
+    python3 -m unittest discover tests      (stdlib only)
 """
 from __future__ import annotations
 
