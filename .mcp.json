@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "rx-compare": {
-      "command": "uv",
-      "args": ["run", "--directory", "rx-compare", "python", "-m", "rxcompare.server"]
-    }
-  }
-}

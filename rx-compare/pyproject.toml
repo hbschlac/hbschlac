@@ -1,9 +1,0 @@
-[project]
-name = "rxcompare"
-version = "0.1.0"
-description = "Every cash price a patient can use for a prescription, cheapest first."
-requires-python = ">=3.11"
-dependencies = ["mcp>=1.2"]
-
-[tool.uv]
-package = false
