@@ -1,0 +1,8 @@
+{
+  "_about": "One urban, one suburban, one rural ZIP. Chosen for chain mix: Oakland (Safeway/Albertsons, Walgreens), Westerville OH (Kroger, Meijer, Giant Eagle, CVS, Walmart), Kosciusko MS (Walmart, CVS, independents; Mississippi is where a court blocked forced discount-card acceptance in 2025).",
+  "zips": [
+    {"zip": "94612", "label": "Urban — Oakland, CA"},
+    {"zip": "43081", "label": "Suburban — Westerville, OH"},
+    {"zip": "39090", "label": "Rural — Kosciusko, MS"}
+  ]
+}

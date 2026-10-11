@@ -1,0 +1,121 @@
+[
+ {
+  "external_sku": "4f2d770c71280f83e60898aa7c08f083",
+  "medication_name": "Atorvastatin",
+  "brand_generic": "Generic",
+  "form": "Tablet",
+  "strength": "40mg",
+  "treatment_categories": [
+   "Heart Health",
+   "High Cholesterol"
+  ],
+  "brand_name": "Lipitor",
+  "pack_size": 1000,
+  "quantity": 1,
+  "splittable": true,
+  "unit": "ea",
+  "equivalent_ndcs": [
+   "63304-0829-05",
+   "55111-0123-05",
+   "43063-0453-30",
+   "68084-0099-01",
+   "00378-3952-05",
+   "68071-0916-30"
+  ],
+  "rxnorm_id": "617311",
+  "special_handling": null,
+  "sample_pack_size": 30,
+  "sample_volume": "30 count",
+  "url": "https://www.costplusdrugs.com/medications/atorvastatin-40mg-tablet/?utm_source=api&utm_content=pricing-api",
+  "cpd_channel": {
+   "cash_dispensing_fee": 5,
+   "cash_shipping_cost": 5.25,
+   "cash_expedited_shipping_cost": 15,
+   "insurance_dispensing_fee": 5,
+   "insurance_shipping_cost": 4,
+   "insurance_expedited_shipping_cost": 15,
+   "insurance_eligible": true,
+   "currency": "USD",
+   "in_stock": true,
+   "price_per_unit": 0.02242,
+   "sample_pricing": [
+    {
+     "sample_pack_size": "30 count",
+     "sample_pack_price": "0.67",
+     "sample_pack_price_total_to_patient_without_shipping": "5.67"
+    },
+    {
+     "sample_pack_size": "60 count",
+     "sample_pack_price": "1.35",
+     "sample_pack_price_total_to_patient_without_shipping": "6.35"
+    },
+    {
+     "sample_pack_size": "90 count",
+     "sample_pack_price": "2.02",
+     "sample_pack_price_total_to_patient_without_shipping": "7.02"
+    }
+   ],
+   "sample_pack_price": "0.67",
+   "sample_pack_price_total_to_patient_without_shipping": "5.67",
+   "sample_pack_price_w_shipping_dispensing": "10.92"
+  }
+ },
+ {
+  "external_sku": "8adc231e774e000291610598af8f6eb2",
+  "medication_name": "Amlodipine-Atorvastatin",
+  "brand_generic": "Generic",
+  "form": "Tablet",
+  "strength": "10-40mg",
+  "treatment_categories": [
+   "Angina",
+   "High Blood Pressure",
+   "High Cholesterol"
+  ],
+  "brand_name": "Caduet",
+  "pack_size": 30,
+  "quantity": 1,
+  "splittable": true,
+  "unit": "ea",
+  "equivalent_ndcs": [
+   "00378-4519-93",
+   "43598-0315-30"
+  ],
+  "rxnorm_id": "597990",
+  "special_handling": null,
+  "sample_pack_size": 30,
+  "sample_volume": "30 count",
+  "url": "https://www.costplusdrugs.com/medications/amlodipine-atorvastatin-10-40mg-tablet-caduet/?utm_source=api&utm_content=pricing-api",
+  "cpd_channel": {
+   "cash_dispensing_fee": 5,
+   "cash_shipping_cost": 5.25,
+   "cash_expedited_shipping_cost": 15,
+   "insurance_dispensing_fee": 5,
+   "insurance_shipping_cost": 4,
+   "insurance_expedited_shipping_cost": 15,
+   "insurance_eligible": true,
+   "currency": "USD",
+   "in_stock": true,
+   "price_per_unit": 0.02242,
+   "sample_pricing": [
+    {
+     "sample_pack_size": "30 count",
+     "sample_pack_price": "0.67",
+     "sample_pack_price_total_to_patient_without_shipping": "5.67"
+    },
+    {
+     "sample_pack_size": "60 count",
+     "sample_pack_price": "1.35",
+     "sample_pack_price_total_to_patient_without_shipping": "6.35"
+    },
+    {
+     "sample_pack_size": "90 count",
+     "sample_pack_price": "2.02",
+     "sample_pack_price_total_to_patient_without_shipping": "7.02"
+    }
+   ],
+   "sample_pack_price": "0.67",
+   "sample_pack_price_total_to_patient_without_shipping": "5.67",
+   "sample_pack_price_w_shipping_dispensing": "10.92"
+  }
+ }
+]

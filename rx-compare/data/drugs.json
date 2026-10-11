@@ -1,0 +1,229 @@
+{
+  "_about": "The union of GoodRx's top 20 and SingleCare's 2025 top 20 (27 drugs). Ranks are as each source published them. Strength, form and quantity are OUR default for a common fill; neither list states one. GoodRx list: goodrx.com/hcp/drug-info (undated; Becker's reprint 2025-10-09; GoodRx doesn't say whether it counts fills, searches or national prescriptions). SingleCare list: singlecare.com/blog/most-prescribed-drugs (2025 fills on SingleCare cards, opioids excluded by SingleCare; updated 2026-01-13).",
+  "drugs": [
+    {
+      "name": "atorvastatin",
+      "strength": "40mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 1,
+      "singlecare_rank": 5
+    },
+    {
+      "name": "amlodipine",
+      "strength": "5mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 2,
+      "singlecare_rank": 4
+    },
+    {
+      "name": "levothyroxine",
+      "strength": "50mcg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 3,
+      "singlecare_rank": 8
+    },
+    {
+      "name": "lisinopril",
+      "strength": "10mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 4,
+      "singlecare_rank": 6
+    },
+    {
+      "name": "losartan",
+      "strength": "50mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 5,
+      "singlecare_rank": 11
+    },
+    {
+      "name": "rosuvastatin",
+      "strength": "10mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 6,
+      "singlecare_rank": 18
+    },
+    {
+      "name": "metoprolol",
+      "strength": "25mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 7,
+      "singlecare_rank": 20,
+      "match": "Extended Release",
+      "display": "metoprolol succinate ER",
+      "note": "Cost Plus lists it as 'Metoprolol Extended Release (ER)'"
+    },
+    {
+      "name": "metformin",
+      "strength": "500mg",
+      "form": "tablet",
+      "qty": 60,
+      "goodrx_rank": 8,
+      "singlecare_rank": null
+    },
+    {
+      "name": "gabapentin",
+      "strength": "300mg",
+      "form": "capsule",
+      "qty": 90,
+      "goodrx_rank": 9,
+      "singlecare_rank": 13
+    },
+    {
+      "name": "pantoprazole",
+      "strength": "40mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 10,
+      "singlecare_rank": 16
+    },
+    {
+      "name": "escitalopram",
+      "strength": "10mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 11,
+      "singlecare_rank": 9
+    },
+    {
+      "name": "omeprazole",
+      "strength": "20mg",
+      "form": "capsule",
+      "qty": 30,
+      "goodrx_rank": 12,
+      "singlecare_rank": 17
+    },
+    {
+      "name": "hydrochlorothiazide",
+      "strength": "25mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 13,
+      "singlecare_rank": null
+    },
+    {
+      "name": "albuterol",
+      "strength": "90mcg",
+      "form": "inhaler",
+      "qty": 1,
+      "goodrx_rank": 14,
+      "singlecare_rank": null,
+      "note": "qty 1 = one inhaler"
+    },
+    {
+      "name": "bupropion",
+      "strength": "150mg",
+      "form": "tablet",
+      "match": "XL",
+      "qty": 30,
+      "goodrx_rank": 15,
+      "singlecare_rank": null,
+      "note": "GoodRx's page says SR, the Becker's reprint says ER; we price XL (once daily), the most common ER form"
+    },
+    {
+      "name": "trazodone",
+      "strength": "50mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 16,
+      "singlecare_rank": null
+    },
+    {
+      "name": "sertraline",
+      "strength": "50mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 17,
+      "singlecare_rank": 12
+    },
+    {
+      "name": "tamsulosin",
+      "strength": "0.4mg",
+      "form": "capsule",
+      "qty": 30,
+      "goodrx_rank": 18,
+      "singlecare_rank": null
+    },
+    {
+      "name": "montelukast",
+      "strength": "10mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": 19,
+      "singlecare_rank": null
+    },
+    {
+      "name": "fluoxetine",
+      "strength": "20mg",
+      "form": "capsule",
+      "qty": 30,
+      "goodrx_rank": 20,
+      "singlecare_rank": 10
+    },
+    {
+      "name": "tadalafil",
+      "strength": "5mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": null,
+      "singlecare_rank": 1
+    },
+    {
+      "name": "phentermine",
+      "strength": "37.5mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": null,
+      "singlecare_rank": 2,
+      "note": "Schedule IV controlled substance"
+    },
+    {
+      "name": "sildenafil",
+      "strength": "20mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": null,
+      "singlecare_rank": 3
+    },
+    {
+      "name": "amphetamine-dextroamphetamine",
+      "strength": "20mg",
+      "form": "tablet",
+      "qty": 30,
+      "goodrx_rank": null,
+      "singlecare_rank": 7,
+      "note": "Schedule II controlled substance"
+    },
+    {
+      "name": "amoxicillin",
+      "strength": "500mg",
+      "form": "capsule",
+      "qty": 21,
+      "goodrx_rank": null,
+      "singlecare_rank": 14
+    },
+    {
+      "name": "benzonatate",
+      "strength": "100mg",
+      "form": "capsule",
+      "qty": 30,
+      "goodrx_rank": null,
+      "singlecare_rank": 15
+    },
+    {
+      "name": "amoxicillin-clavulanate",
+      "strength": "875-125mg",
+      "form": "tablet",
+      "qty": 20,
+      "goodrx_rank": null,
+      "singlecare_rank": 19
+    }
+  ]
+}
