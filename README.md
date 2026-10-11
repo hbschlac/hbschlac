@@ -2,7 +2,7 @@
 
 I spec it, design it, and ship it. No CS degree.
 
-Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M daily product page views. I run experiments, ship features, and build internal AI tools outside my formal scope.
+Most recently Senior PM at Walmart, where I owned the BuyBox — the ML system behind ~400M daily product page views. I ran experiments, shipped features, and built internal AI tools outside my formal scope.
 
 ---
 
@@ -19,7 +19,7 @@ Senior PM at Walmart, where I own the BuyBox — the ML system behind ~400M dail
 
 ### Work
 
-🏪 &nbsp;**Walmart BuyBox** (2024–present) · Senior PM · ML system across ~30% of marketplace volume · 7% CVR improvement YoY · Secondary BuyBox launch (~45M daily impressions) · built internal GenAI assistant scaling knowledge across 200+ person org
+🏪 &nbsp;**Walmart BuyBox** (2024–2026) · Senior PM · ML system across ~30% of marketplace volume · 7% CVR improvement YoY · Secondary BuyBox launch (~45M daily impressions) · built internal GenAI assistant scaling knowledge across 200+ person org
 
 💼 &nbsp;**Uprising VC** (2019–2022) · Chief of Staff → Director of Platform · $400M+ raised · KPI platform with 90% adoption across 30 portfolio startups
 
